@@ -1,0 +1,16 @@
+.DS_Store
+/temp
+.claude  
+.backup
+push-to-github.sh
+/resource
+docs/.obsidian/
+# Loop runtime files (old path)
+skills/pensieve/loop/.active
+skills/pensieve/loop/current
+skills/pensieve/loop/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*/
+
+# Loop runtime files (new path)
+skill/loop/.active
+skill/loop/current
+skill/loop/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*/

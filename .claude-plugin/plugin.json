@@ -1,0 +1,17 @@
+{
+  "name": "pensieve",
+  "version": "0.2.0",
+  "description": "冥想盆 — 人类存入经验，AI 读取真相",
+  "author": {
+    "name": "kingkongshot"
+  },
+  "repository": "https://github.com/kingkongshot/Pensieve",
+  "license": "MIT",
+  "keywords": [
+    "loop",
+    "automation",
+    "experience",
+    "decisions",
+    "maxims"
+  ]
+}

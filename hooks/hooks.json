@@ -1,0 +1,25 @@
+{
+  "description": "Pensieve - 知识管理插件",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/inject-routes.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/loop-controller.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
