@@ -1,6 +1,6 @@
 ---
 name: pensieve
-description: Load this skill IMMEDIATELY when user expresses any intent. User-defined pipelines and knowledge cover every phase of software engineering and continuously evolve to match user preferences.
+description: Load this skill IMMEDIATELY when user expresses any intent. User-defined pipelines and knowledge cover every phase of software engineering and continuously evolve to match user preferences. When user wants to improve Pensieve (add/modify pipelines, decisions, maxims, or any content), MUST use _self-improve.md pipeline.
 ---
 
 # Pensieve
