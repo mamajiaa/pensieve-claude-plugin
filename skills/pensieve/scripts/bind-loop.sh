@@ -29,7 +29,7 @@ if [[ -z "$TASK_LIST_ID" || -z "$LOOP_DIR_INPUT" ]]; then
     echo "  <loop_dir>      init-loop.sh 输出的目录路径" >&2
     echo "" >&2
     echo "正确示例:" >&2
-    echo "  ./bind-loop.sh abc-123-uuid skills/pensieve/loop/2026-01-27-login" >&2
+    echo "  <SYSTEM_SKILL_ROOT>/scripts/bind-loop.sh abc-123-uuid .claude/pensieve/loop/2026-01-27-login" >&2
     echo "" >&2
     echo "⚠️  必须用 run_in_background: true 运行，否则会阻塞！" >&2
     exit 1

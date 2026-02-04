@@ -1,27 +1,32 @@
 #!/bin/bash
-# Pensieve Loop 共享函数库
+# Pensieve 共享函数库
+#
+# 约定：
+# - 系统能力位于插件内部：<plugin>/skills/pensieve
+# - 用户数据位于项目级：<project>/.claude/pensieve
 
-# ============================================
-# Skill 目录查找
-# ============================================
+plugin_root_from_script() {
+    local script_dir="$1"
+    local skill_root
+    skill_root="$(cd "$script_dir/.." && pwd)"           # .../skills/pensieve
+    cd "$skill_root/../.." && pwd                        # ... (plugin root)
+}
 
-# 查找 pensieve skill 目录
-# 按优先级检查: 项目级 > 用户级
-# 返回: skill 目录路径（stdout），或返回非零退出码
-find_skill_root() {
-    # 项目级
-    if [[ -d "$PWD/.claude/skills/pensieve" ]]; then
-        echo "$PWD/.claude/skills/pensieve"
-        return 0
-    fi
+project_root() {
+    git rev-parse --show-toplevel 2>/dev/null || pwd
+}
 
-    # 用户级
-    if [[ -d "$HOME/.claude/skills/pensieve" ]]; then
-        echo "$HOME/.claude/skills/pensieve"
-        return 0
-    fi
+user_data_root() {
+    local pr
+    pr="$(project_root)"
+    echo "$pr/.claude/pensieve"
+}
 
-    return 1
+ensure_user_data_root() {
+    local dr
+    dr="$(user_data_root)"
+    mkdir -p "$dr"/{maxims,decisions,knowledge,loop}
+    echo "$dr"
 }
 
 # ============================================

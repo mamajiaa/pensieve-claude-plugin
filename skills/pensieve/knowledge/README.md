@@ -59,7 +59,7 @@ Knowledge 存在的理由是**减少执行摩擦**。
 ### 目录结构
 
 ```
-knowledge/{name}/
+.claude/pensieve/knowledge/{name}/
 ├── content.md      # 知识内容
 └── source/         # 附属源码（可选）
 ```
@@ -108,3 +108,8 @@ Anthropic 官方的 Agent 工具设计指南。
 - 优先链接原文，避免复制 — content 建立与 source 的联系
 - 如果需要本地保存，使用命令复制移动，而不是重新输出
 - 定期清理过时知识
+
+## 系统 Knowledge vs 项目 Knowledge
+
+- 插件内系统 knowledge 位于：`skills/pensieve/knowledge/`（随插件更新）
+- 项目级自定义 knowledge 位于：`.claude/pensieve/knowledge/`（插件不覆盖）

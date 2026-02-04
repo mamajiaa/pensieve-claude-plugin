@@ -48,8 +48,8 @@ Decision 存在的理由是**避免重复踩坑**。
 
 | 阶段 | 位置 | 说明 |
 |------|------|------|
-| Loop 执行中 | `loop/{name}/_decisions/` | 临时记录，随 loop 生命周期 |
-| Loop 结束后 | `decisions/` | 经三个黄金问题筛选后移入 |
+| Loop 执行中 | `.claude/pensieve/loop/{name}/_decisions/` | 临时记录，随 loop 生命周期 |
+| Loop 结束后 | `.claude/pensieve/decisions/` | 项目级用户数据（不会被插件更新覆盖） |
 
 ### Decision 层次
 
@@ -64,7 +64,7 @@ Decision 存在的理由是**避免重复踩坑**。
 ### 目录结构
 
 ```
-decisions/{date}-{陈述句结论}.md
+.claude/pensieve/decisions/{date}-{陈述句结论}.md
 ```
 
 命名原则：

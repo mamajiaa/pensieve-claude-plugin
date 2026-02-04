@@ -12,8 +12,17 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SKILL_ROOT="$(dirname "$SCRIPT_DIR")"
-LOOP_BASE_DIR="$SKILL_ROOT/loop"
+SKILL_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+source "$SCRIPT_DIR/_lib.sh"
+
+# 插件根目录（系统能力）
+PLUGIN_ROOT="$(plugin_root_from_script "$SCRIPT_DIR")"
+SYSTEM_SKILL_ROOT="$PLUGIN_ROOT/skills/pensieve"
+
+# 用户数据（loop 产物）在项目级，不随插件更新覆盖
+DATA_ROOT="$(ensure_user_data_root)"
+LOOP_BASE_DIR="$DATA_ROOT/loop"
 CLAUDE_TASKS_BASE="$HOME/.claude/tasks"
 
 # ============================================
@@ -118,7 +127,7 @@ echo "已创建: $LOOP_DIR/_context.md"
 # 生成 _agent-prompt.md
 # ============================================
 
-cat > "$LOOP_DIR/_agent-prompt.md" << 'EOF'
+cat > "$LOOP_DIR/_agent-prompt.md" << EOF
 ---
 name: expert-developer
 description: 执行单个开发任务，完成后返回
@@ -132,7 +141,13 @@ description: 执行单个开发任务，完成后返回
 
 ## 准则
 
-读取 `skills/pensieve/maxims/` 目录下的准则文件（`_linus.md` 和 `custom.md`），核心信条：
+系统准则（随插件更新）：
+- \`$SYSTEM_SKILL_ROOT/maxims/_linus.md\`
+
+项目级自定义准则（永不被插件覆盖）：
+- \`$DATA_ROOT/maxims/custom.md\`（若不存在可忽略）
+
+核心信条：
 
 - 如果需要超过 3 层缩进，你就已经完蛋了
 - 重写问题让特殊情况消失，不要加 if 打补丁
@@ -178,5 +193,8 @@ echo ""
 echo "Loop 初始化完成"
 echo "目录: $LOOP_DIR"
 echo "Task: $TASKS_DIR"
+echo ""
+echo "TASK_LIST_ID=$TASK_LIST_ID"
+echo "LOOP_DIR=$LOOP_DIR"
 echo ""
 echo "下一步: 填充 _context.md，然后启动 bind-loop.sh"

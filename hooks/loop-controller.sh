@@ -9,7 +9,8 @@ command -v jq >/dev/null 2>&1 || exit 0
 
 # 获取插件根目录
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# 注意: loop_dir 从 marker 文件读取，不需要预先知道 skill 目录位置
+PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$SCRIPT_DIR/.." && pwd)}"
+SYSTEM_SKILL_ROOT="$PLUGIN_ROOT/skills/pensieve"
 
 # 读取 Hook 输入
 HOOK_INPUT=$(cat)
@@ -226,12 +227,22 @@ generate_reinforcement() {
 
     local context_file="$LOOP_DIR/_context.md"
 
+    local project_root user_data_root
+    project_root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+    user_data_root="$project_root/.claude/pensieve"
+
     cat << EOF
 只调用 Task，不要自己执行：
 
 Task(subagent_type: "general-purpose", prompt: "Read $agent_prompt and execute task_id=$task_id")
 
-遇到方向性偏差时：1. 阅读 skills/pensieve/ 下的 pipelines/decisions/maxims/knowledge 寻找答案 2. 将问题和答案记录到 $context_file 的"事后 Context"部分 3. 继续推进
+系统能力（随插件更新）：$SYSTEM_SKILL_ROOT
+项目级用户数据（永不覆盖）：$user_data_root
+
+遇到方向性偏差时：
+1. 优先阅读系统能力目录下的 pipelines/maxims/knowledge 寻找答案
+2. 将问题和答案记录到 $context_file 的"事后 Context"部分
+3. 继续推进
 EOF
 }
 

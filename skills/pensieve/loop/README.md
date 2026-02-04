@@ -22,14 +22,14 @@ TaskCreate subject="初始化 loop" description="1. 初始化 loop 目录 2. 为
 ### Step 2: 初始化 loop 目录
 
 ```bash
-./skills/pensieve/scripts/init-loop.sh <taskListId> <slug>
+<SYSTEM_SKILL_ROOT>/scripts/init-loop.sh <taskListId> <slug>
 # 例如：
-./skills/pensieve/scripts/init-loop.sh abc-123-uuid login-feature
+<SYSTEM_SKILL_ROOT>/scripts/init-loop.sh abc-123-uuid login-feature
 ```
 
 ### Step 3: 填充 context（主窗口负责）
 
-在 loop 目录（`loop/{date}-{slug}/`）下：
+在 loop 目录（`.claude/pensieve/loop/{date}-{slug}/`）下：
 
 1. **填充 `_context.md`**（见下方格式）
 2. **按需创建文档**
@@ -109,8 +109,9 @@ TaskCreate subject="初始化 loop" description="1. 初始化 loop 目录 2. 为
 ```
 Task agent=task-executor prompt="
 task_id: 1
-context: skills/pensieve/loop/{date}-{slug}/_context.md
-skill_root: skills/pensieve
+context: .claude/pensieve/loop/{date}-{slug}/_context.md
+system_skill_root: <SYSTEM_SKILL_ROOT>
+user_data_root: .claude/pensieve
 "
 ```
 
@@ -121,7 +122,7 @@ Agent 执行完一个 task 返回。Stop Hook 检测到 pending task 会强化�
 | 存储 | 内容 | 用途 |
 |------|------|------|
 | `~/.claude/tasks/<uuid>/` | 任务状态（JSON） | Claude Code 原生 |
-| `loop/{date}-{slug}/` | 元数据 + 文档 | 追踪执行，沉淀改进 |
+| `.claude/pensieve/loop/{date}-{slug}/` | 元数据 + 文档 | 项目级追踪执行，沉淀改进（不被插件覆盖） |
 
 ## 目录结构
 
@@ -131,7 +132,7 @@ Agent 执行完一个 task 返回。Stop Hook 检测到 pending task 会强化�
     ├── 2.json
     └── ...
 
-skills/pensieve/loop/            # 本地追踪（元数据 + 沉淀）
+.claude/pensieve/loop/           # 项目级追踪（元数据 + 沉淀）
     └── 2026-01-23-login/        # 每个 loop 独立目录
         ├── _meta.md             # 元数据（目标、pipeline）
         ├── _context.md          # 对话上下文、干预记录

@@ -4,7 +4,13 @@
 description: 知识沉淀流程。当 loop 完成、用户说"沉淀"、"记录下来"、"保存经验"时触发。
 ---
 
-You are helping capture learnings and patterns into Pensieve's knowledge system. Determine what's worth preserving, categorize it correctly, and write it in the proper format.
+You are helping capture learnings and patterns into Pensieve's knowledge system.
+
+**System prompts** (pipelines/scripts/system knowledge) live in the plugin and are updated only via plugin updates.
+
+**User data** lives in project-level `.claude/pensieve/` and is never overwritten by the plugin.
+
+Determine what's worth preserving, categorize it correctly, and write it in the proper format.
 
 ## Core Principles
 
@@ -75,7 +81,7 @@ You are helping capture learnings and patterns into Pensieve's knowledge system.
 **Actions**:
 1. Read the corresponding README:
    ```
-   Read skills/pensieve/{type}/README.md
+   Read <SYSTEM_SKILL_ROOT>/{type}/README.md
    ```
 
 2. Verify the content meets the capture criteria defined in README
@@ -91,11 +97,17 @@ You are helping capture learnings and patterns into Pensieve's knowledge system.
 **Actions**:
 1. Draft the file content following README specifications
 
-2. **Present draft to user for review**:
+2. Choose the target location:
+   - **pipeline** → `<SYSTEM_SKILL_ROOT>/pipelines/{name}.md` (system prompt, plugin-managed)
+   - **maxim** → `.claude/pensieve/maxims/{name}.md` (project user data)
+   - **decision** → `.claude/pensieve/decisions/{date}-{conclusion}.md` (project user data)
+   - **knowledge** → `.claude/pensieve/knowledge/{name}/content.md` (project user data)
+
+3. **Present draft to user for review**:
    ```markdown
    ## 草稿预览
 
-   文件：`{type}/{filename}.md`
+   文件：`{target_path}`
 
    ---
    [draft content]
@@ -115,7 +127,7 @@ You are helping capture learnings and patterns into Pensieve's knowledge system.
 **DO NOT START WITHOUT USER APPROVAL** from Phase 4.
 
 **Actions**:
-1. Write the file to the correct location
+1. Write the file to `{target_path}`
 2. Confirm successful write to user
 3. Suggest any related follow-up actions (e.g., update other files that reference this)
 

@@ -97,9 +97,10 @@ If you're an LLM agent, explain to the user what this project can do now.
 
 ## Installation
 
-Pensieve has two parts: **Plugin** (provides hooks) and **Skill** (provides content).
+Pensieve follows the **official Claude Code plugin structure**:
 
-> **Why split?** So you can call `/pensieve` directly instead of `/pensieve-plugin:pensieve`.
+- **Plugin (system capability)**: hooks + skills, updated only via plugin updates
+- **Project user data**: `.claude/pensieve/`, never overwritten by the plugin
 
 ### Quick Install
 
@@ -115,20 +116,24 @@ Add to `.claude/settings.json`:
 }
 ```
 
-#### 2. Install Skill
-
-```bash
-git clone https://github.com/kingkongshot/Pensieve.git /tmp/pensieve
-mkdir -p .claude/skills && cp -r /tmp/pensieve/skill .claude/skills/pensieve
-rm -rf /tmp/pensieve
-```
-
-#### 3. Add to CLAUDE.md
+#### 2. Add to CLAUDE.md
 
 ```markdown
 ## Pensieve
 Load pensieve skill IMMEDIATELY when user expresses any intent.
 When user wants to improve Pensieve, MUST use _self-improve.md pipeline.
+```
+
+#### 3. Initialize project user data (recommended)
+
+```bash
+mkdir -p .claude/pensieve/{maxims,decisions,knowledge,loop}
+```
+
+Or run the plugin initializer (does not overwrite existing files). The absolute path is injected at SessionStart:
+
+```bash
+<SYSTEM_SKILL_ROOT>/scripts/init-project-data.sh
 ```
 
 #### 4. Restart Claude Code
@@ -141,17 +146,12 @@ See **[Installation Guide](docs/installation.md)** for details. For updates, see
 
 If you're an LLM agent, help the user:
 
-1. Clone and copy skill:
-   ```bash
-   git clone https://github.com/kingkongshot/Pensieve.git /tmp/pensieve
-   mkdir -p .claude/skills && cp -r /tmp/pensieve/skill .claude/skills/pensieve
-   rm -rf /tmp/pensieve
-   ```
-2. Add plugin to `.claude/settings.json`:
+1. Add plugin to `.claude/settings.json`:
    ```json
    {"plugins": [{"source": {"type": "url", "url": "https://github.com/kingkongshot/Pensieve"}}]}
    ```
-3. Add to `CLAUDE.md`: `## Pensieve\nLoad pensieve skill IMMEDIATELY. To improve Pensieve, use _self-improve.md.`
+2. Add to `CLAUDE.md`: `## Pensieve\nLoad pensieve skill IMMEDIATELY. To improve Pensieve, use _self-improve.md.`
+3. Initialize `.claude/pensieve/` (project user data)
 4. Remind user to restart Claude Code
 
 ---
@@ -191,7 +191,7 @@ Phase 6: end-loop.sh ends + self-improve captures learnings
 | Storage | Content | Why |
 |---------|---------|-----|
 | `~/.claude/tasks/<uuid>/` | Task state (JSON) | Claude Code native, for Stop Hook detection |
-| `loop/{date}-{slug}/` | Metadata + docs | Track execution, capture improvements |
+| `.claude/pensieve/loop/{date}-{slug}/` | Metadata + docs | Project-level tracking, capture improvements |
 
 ### Automation Level
 
@@ -293,24 +293,26 @@ Decision guides → Pipeline improvement
 
 ## Customization
 
-Say `capture` or `record this` to trigger the self-improve pipeline, which will guide you through adding Pipelines, Decisions, or Maxims.
+Say `capture` or `record this` to trigger the self-improve pipeline, which will guide you through capturing project learnings into **project-level user data**.
 
 | Type | Location | Naming |
 |------|----------|--------|
-| Pipeline | `pipelines/` | `my-pipeline.md` |
-| Decision | `decisions/` | `{date}-{conclusion}.md` |
-| Maxim | `maxims/custom.md` | Edit this file |
+| Decision | `.claude/pensieve/decisions/` | `{date}-{conclusion}.md` |
+| Maxim | `.claude/pensieve/maxims/custom.md` | Edit this file |
+| Knowledge | `.claude/pensieve/knowledge/{name}/` | `content.md` |
 
-**Note**: Files starting with `_` are built-in and will be overwritten during updates.
+**Note**: System prompts (pipelines/scripts/system knowledge) are shipped inside the plugin and updated only via plugin updates.
 
 ---
 
 ## Architecture
 
-Pensieve is split into **Plugin** (hooks) and **Skill** (content), installed separately.
+Pensieve is an official Claude Code plugin:
+
+- **Plugin (system capability)**: hooks + skills inside the plugin directory
+- **Project user data**: `.claude/pensieve/` (never overwritten)
 
 ```
-# Plugin (in .claude/plugins/pensieve/)
 pensieve/
 ├── .claude-plugin/
 │   └── plugin.json          # Plugin manifest
@@ -318,38 +320,30 @@ pensieve/
 │   ├── hooks.json           # Hook config
 │   ├── inject-routes.sh     # SessionStart: scan resources, inject into context
 │   └── loop-controller.sh   # Stop: detect pending task, auto-continue
-└── skill/                    # Skill source (copy to .claude/skills/)
+└── skills/
+    └── pensieve/             # System skill (shipped in plugin)
+        ├── SKILL.md
+        ├── pipelines/
+        ├── maxims/
+        ├── decisions/
+        ├── knowledge/
+        ├── loop/             # Docs + templates (run outputs go to user data)
+        └── scripts/
 
-# Skill (in .claude/skills/pensieve/)
-pensieve/
-├── SKILL.md                 # Entry (dynamically generated resource list)
-├── maxims/                  # Maxims
-│   ├── README.md           # Writing guide (single source of truth)
-│   ├── _linus.md           # Built-in maxims (Linus's 4)
-│   └── custom.md           # User-defined maxims
-├── decisions/               # Decisions
-│   └── README.md           # Writing guide
-├── pipelines/               # Pipelines
-│   ├── README.md           # Writing guide
-│   ├── _loop.md            # Built-in: auto loop
-│   ├── _self-improve.md    # Built-in: knowledge capture
-│   └── review.md           # Example: code review
-├── knowledge/               # Knowledge
-│   └── taste-review/       # Example: code review standards
-├── loop/                    # Execution layer
-│   ├── README.md           # Loop mechanism details
-│   └── {date}-{slug}/      # Historical Loop directories
-└── scripts/                 # Script tools
-    ├── init-loop.sh        # Initialize Loop directory
-    ├── bind-loop.sh        # Background bind (activate Stop Hook)
-    └── end-loop.sh         # End Loop
+<project>/
+└── .claude/
+    └── pensieve/            # Project user data (never overwritten)
+        ├── maxims/
+        ├── decisions/
+        ├── knowledge/
+        └── loop/
 ```
 
 ### Hook System
 
 | Hook | Trigger Time | Function |
 |------|--------------|----------|
-| `inject-routes.sh` | SessionStart | Scan pipelines/ and knowledge/, inject into SKILL.md |
+| `inject-routes.sh` | SessionStart | Inject system paths + user data overview into context |
 | `loop-controller.sh` | Stop | Check for pending tasks, inject reinforcement and continue if found |
 
 **Stop Hook is the heart of Loop mode — it makes auto-looping possible.**

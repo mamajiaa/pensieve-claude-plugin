@@ -97,9 +97,10 @@ Pensieve 的 Loop 模式让你可以：
 
 ## 安装
 
-Pensieve 分为两部分：**插件**（提供 hooks）和 **Skill**（提供内容）。
+Pensieve 现在采用**官方插件结构**：
 
-> **为什么分开？** 这样可以直接调用 `/pensieve`，而不是 `/pensieve-plugin:pensieve`。
+- **插件（系统能力）**：hooks + skills，完全由插件更新维护
+- **项目级用户数据**：`.claude/pensieve/`，永不被插件更新覆盖
 
 ### 快速安装
 
@@ -115,20 +116,24 @@ Pensieve 分为两部分：**插件**（提供 hooks）和 **Skill**（提供内
 }
 ```
 
-#### 2. 安装 Skill
-
-```bash
-git clone https://github.com/kingkongshot/Pensieve.git /tmp/pensieve
-mkdir -p .claude/skills && cp -r /tmp/pensieve/skill .claude/skills/pensieve
-rm -rf /tmp/pensieve
-```
-
-#### 3. 配置 CLAUDE.md
+#### 2. 配置 CLAUDE.md
 
 ```markdown
 ## Pensieve
 Load pensieve skill IMMEDIATELY when user expresses any intent.
 When user wants to improve Pensieve, MUST use _self-improve.md pipeline.
+```
+
+#### 3. 初始化项目级用户数据（推荐）
+
+```bash
+mkdir -p .claude/pensieve/{maxims,decisions,knowledge,loop}
+```
+
+或运行插件内置初始化脚本（不会覆盖已有文件；绝对路径会在 SessionStart 注入）：
+
+```bash
+<SYSTEM_SKILL_ROOT>/scripts/init-project-data.sh
 ```
 
 #### 4. 重启 Claude Code
@@ -141,17 +146,12 @@ When user wants to improve Pensieve, MUST use _self-improve.md pipeline.
 
 如果你是 LLM 智能体，帮用户：
 
-1. 克隆并复制 skill：
-   ```bash
-   git clone https://github.com/kingkongshot/Pensieve.git /tmp/pensieve
-   mkdir -p .claude/skills && cp -r /tmp/pensieve/skill .claude/skills/pensieve
-   rm -rf /tmp/pensieve
-   ```
-2. 添加插件到 `.claude/settings.json`：
+1. 添加插件到 `.claude/settings.json`：
    ```json
    {"plugins": [{"source": {"type": "url", "url": "https://github.com/kingkongshot/Pensieve"}}]}
    ```
-3. 在 `CLAUDE.md` 中添加：`## Pensieve\nLoad pensieve skill IMMEDIATELY. To improve Pensieve, use _self-improve.md.`
+2. 在 `CLAUDE.md` 中添加：`## Pensieve\nLoad pensieve skill IMMEDIATELY. To improve Pensieve, use _self-improve.md.`
+3. 初始化项目级用户数据：`.claude/pensieve/`
 4. 提醒用户重启 Claude Code
 
 ---
@@ -191,7 +191,7 @@ Phase 6: end-loop.sh 结束 + self-improve 沉淀经验
 | 存储 | 内容 | 为什么 |
 |------|------|--------|
 | `~/.claude/tasks/<uuid>/` | 任务状态（JSON） | Claude Code 原生，用于 Stop Hook 检测 |
-| `loop/{date}-{slug}/` | 元数据 + 文档 | 追踪执行过程，沉淀改进 |
+| `.claude/pensieve/loop/{date}-{slug}/` | 元数据 + 文档 | 项目级追踪执行过程，沉淀改进 |
 
 ### 自动化程度
 
@@ -293,24 +293,26 @@ Decision 指导 → Pipeline 改进
 
 ## 自定义
 
-说 `沉淀` 或 `记录下来` 触发自改进流程，它会引导你添加 Pipeline、Decision 或 Maxim。
+说 `沉淀` 或 `记录下来` 触发自改进流程，它会引导你把经验沉淀到**项目级用户数据**中（插件更新不会覆盖）。
 
 | 类型 | 位置 | 命名 |
 |------|------|------|
-| Pipeline | `pipelines/` | `my-pipeline.md` |
-| Decision | `decisions/` | `{date}-{结论}.md` |
-| Maxim | `maxims/custom.md` | 编辑此文件 |
+| Decision | `.claude/pensieve/decisions/` | `{date}-{结论}.md` |
+| Maxim | `.claude/pensieve/maxims/custom.md` | 编辑此文件 |
+| Knowledge | `.claude/pensieve/knowledge/{name}/` | `content.md` |
 
-**注意**：`_` 开头的文件是内置文件，更新时会被覆盖。
+**注意**：系统提示词（pipelines/scripts/系统 knowledge）都在插件内，完全随插件更新维护。
 
 ---
 
 ## 架构
 
-Pensieve 分为**插件**（hooks）和 **Skill**（内容），分开安装。
+Pensieve 采用官方插件结构：
+
+- **插件（系统能力）**：hooks + skills（随插件更新）
+- **项目级用户数据**：`.claude/pensieve/`（永不覆盖）
 
 ```
-# 插件（在 .claude/plugins/pensieve/）
 pensieve/
 ├── .claude-plugin/
 │   └── plugin.json          # 插件清单
@@ -318,38 +320,30 @@ pensieve/
 │   ├── hooks.json           # Hook 配置
 │   ├── inject-routes.sh     # SessionStart: 扫描可用资源，注入到上下文
 │   └── loop-controller.sh   # Stop: 检测 pending task，自动继续
-└── skill/                    # Skill 源文件（复制到 .claude/skills/）
+└── skills/
+    └── pensieve/             # 系统 Skill（随插件更新）
+        ├── SKILL.md
+        ├── maxims/
+        ├── decisions/
+        ├── pipelines/
+        ├── knowledge/
+        ├── loop/             # 文档与模板（运行产物在用户数据目录）
+        └── scripts/
 
-# Skill（在 .claude/skills/pensieve/）
-pensieve/
-├── SKILL.md                 # 入口（动态生成的资源列表）
-├── maxims/                  # 准则
-│   ├── README.md           # 编写指南（唯一真相源）
-│   ├── _linus.md           # 内置准则（Linus 的 4 条）
-│   └── custom.md           # 用户自定义准则
-├── decisions/               # 决策
-│   └── README.md           # 编写指南
-├── pipelines/               # 流程
-│   ├── README.md           # 编写指南
-│   ├── _loop.md            # 内置：自动循环
-│   ├── _self-improve.md    # 内置：知识沉淀
-│   └── review.md           # 示例：代码审查
-├── knowledge/               # 知识
-│   └── taste-review/       # 示例：代码审查标准
-├── loop/                    # 执行层
-│   ├── README.md           # Loop 机制详解
-│   └── {date}-{slug}/      # 历史 Loop 目录
-└── scripts/                 # 脚本工具
-    ├── init-loop.sh        # 初始化 Loop 目录
-    ├── bind-loop.sh        # 后台绑定（激活 Stop Hook）
-    └── end-loop.sh         # 结束 Loop
+<project>/
+└── .claude/
+    └── pensieve/             # 项目级用户数据（永不覆盖）
+        ├── maxims/
+        ├── decisions/
+        ├── knowledge/
+        └── loop/
 ```
 
 ### Hook 系统
 
 | Hook | 触发时机 | 作用 |
 |------|----------|------|
-| `inject-routes.sh` | SessionStart | 扫描 pipelines/ 和 knowledge/，注入到 SKILL.md |
+| `inject-routes.sh` | SessionStart | 注入系统路径 + 项目级用户数据概览到上下文 |
 | `loop-controller.sh` | Stop | 检查是否有 pending task，有则注入强化信息继续执行 |
 
 **Stop Hook 是 Loop 模式的心脏——它让自动循环成为可能。**

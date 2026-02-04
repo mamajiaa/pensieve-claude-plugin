@@ -14,6 +14,13 @@ You are orchestrating an automated task execution loop. Break down complex work 
 - **Clean handoff**: Subagents execute one task and return; Stop Hook triggers next
 
 > **路径说明**：以下脚本路径相对于插件根目录（`skills/pensieve/` 的上级）。脚本内部已自定位，支持从任意工作目录调用。
+>
+> **重要**：在已安装插件的真实项目中，插件位于 Claude Code 的插件缓存目录里，不在你的项目仓库内。
+> SessionStart hook 会把“系统 Skill 的绝对路径”注入到上下文中。
+>
+> 下文中出现的：
+> - `<SYSTEM_SKILL_ROOT>`：指注入的系统 Skill 绝对路径（形如 `/.../plugins/.../skills/pensieve`）
+> - `<USER_DATA_ROOT>`：指项目级用户数据目录（形如 `<project>/.claude/pensieve`）
 
 ---
 
@@ -48,12 +55,12 @@ You are orchestrating an automated task execution loop. Break down complex work 
 
 2. Run init script to create loop directory:
    ```bash
-   ./skills/pensieve/scripts/init-loop.sh <taskListId> <slug>
+   <SYSTEM_SKILL_ROOT>/scripts/init-loop.sh <taskListId> <slug>
    ```
    脚本输出（记住这两个值）：
    ```
    TASK_LIST_ID=abc-123-uuid
-   LOOP_DIR=skills/pensieve/loop/2026-01-27-login
+   LOOP_DIR=.claude/pensieve/loop/2026-01-27-login
    ```
 
 ---
@@ -68,19 +75,19 @@ You are orchestrating an automated task execution loop. Break down complex work 
    ✅ **正确**（两个参数 + 后台运行）：
    ```
    Bash(
-     command: "./skills/pensieve/scripts/bind-loop.sh ${TASK_LIST_ID} ${LOOP_DIR}",
+     command: "<SYSTEM_SKILL_ROOT>/scripts/bind-loop.sh ${TASK_LIST_ID} ${LOOP_DIR}",
      run_in_background: true
    )
    ```
 
    ❌ **错误 1**（缺少 LOOP_DIR）：
    ```
-   Bash(command: "./skills/pensieve/scripts/bind-loop.sh ${TASK_LIST_ID}")
+   Bash(command: "<SYSTEM_SKILL_ROOT>/scripts/bind-loop.sh ${TASK_LIST_ID}")
    ```
 
    ❌ **错误 2**（没有 run_in_background，会阻塞 30+ 秒）：
    ```
-   Bash(command: "./skills/pensieve/scripts/bind-loop.sh ${TASK_LIST_ID} ${LOOP_DIR}")
+   Bash(command: "<SYSTEM_SKILL_ROOT>/scripts/bind-loop.sh ${TASK_LIST_ID} ${LOOP_DIR}")
    ```
 
 ---
@@ -172,7 +179,7 @@ You are orchestrating an automated task execution loop. Break down complex work 
 ```
 Task(
   subagent_type: "general-purpose",
-  prompt: "Read skills/pensieve/loop/{date}-{slug}/_agent-prompt.md and execute task_id={id}"
+  prompt: "Read .claude/pensieve/loop/{date}-{slug}/_agent-prompt.md and execute task_id={id}"
 )
 ```
 
@@ -195,7 +202,7 @@ Agent prompt 模板（`_agent-prompt.md`）由 init-loop.sh 生成，包含：
 
    ✅ **正确**：
    ```bash
-   ./skills/pensieve/scripts/end-loop.sh <taskListId>
+   <SYSTEM_SKILL_ROOT>/scripts/end-loop.sh <taskListId>
    ```
 
    ❌ **错误**（缺少 task_list_id 参数）：

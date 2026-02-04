@@ -33,7 +33,7 @@ gate: auto
 3. 快速暴露问题，不要用 fallback 掩盖上游 bug
 4. 复杂性是万恶之源
 
-**知识参考**：`knowledge/taste-review/content.md`
+**知识参考**：`<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md`
 
 ---
 

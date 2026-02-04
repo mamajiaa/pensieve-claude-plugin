@@ -13,7 +13,7 @@
 
 ## 写作要求
 
-- 在 `loop/{date}-{slug}/design.md` 创建
+- 在 `.claude/pensieve/loop/{date}-{slug}/design.md` 创建
 - 设计过程中进行必要的代码探索
 - 用户确认后，将路径记录到 `_context.md`
 
@@ -36,7 +36,7 @@
 
 | 类型 | 路径 | 关键内容 |
 |------|------|----------|
-| requirement | `loop/{date}-{slug}/requirements.md` | 核心问题：... |
+| requirement | `.claude/pensieve/loop/{date}-{slug}/requirements.md` | 核心问题：... |
 | decision | `decisions/2026-01-20-xxx.md` | "引用原文" |
 | maxim | `maxims/linus.md` | "好的品味" |
 | 对话 | _context.md#需求澄清 | 用户说："..." |

@@ -13,7 +13,7 @@
 
 ## 写作要求
 
-- 在 `loop/{date}-{slug}/requirements.md` 创建
+- 在 `.claude/pensieve/loop/{date}-{slug}/requirements.md` 创建
 - 先写初版，不要一开始就问问题
 - 用户确认后，将路径记录到 `_context.md`
 

@@ -1,5 +1,5 @@
 {
-  "description": "Pensieve - 知识管理插件",
+  "description": "Pensieve hooks: SessionStart injects system/user context; Stop enforces Loop continuation via task state",
   "hooks": {
     "SessionStart": [
       {

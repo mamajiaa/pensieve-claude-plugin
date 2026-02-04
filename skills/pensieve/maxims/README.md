@@ -49,7 +49,12 @@
 maxims/
 ├── README.md       # 本文件
 ├── _linus.md       # 内置准则（Linus Torvalds 的 4 条）
-└── custom.md       # 用户自定义准则
+```
+
+项目级用户自定义准则（不会被插件更新覆盖）建议放在：
+
+```
+.claude/pensieve/maxims/custom.md
 ```
 
 ### 文件格式
@@ -93,4 +98,4 @@ maxims/
 ## 准则文件
 
 - [_linus.md](./_linus.md) — 内置准则（更新时会被覆盖）
-- [custom.md](./custom.md) — 用户自定义（更新时保留）
+- 项目级自定义：`.claude/pensieve/maxims/custom.md`（插件不覆盖）
