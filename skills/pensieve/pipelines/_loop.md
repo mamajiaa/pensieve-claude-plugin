@@ -57,6 +57,8 @@ You are orchestrating an automated task execution loop. Break down complex work 
    ```bash
    <SYSTEM_SKILL_ROOT>/scripts/init-loop.sh <taskListId> <slug>
    ```
+   **IMPORTANT**: 这一步不要用 `run_in_background: true`。你需要立刻看到脚本输出的 `LOOP_DIR` 才能进入 Phase 2。
+
    脚本输出（记住这两个值）：
    ```
    TASK_LIST_ID=abc-123-uuid
