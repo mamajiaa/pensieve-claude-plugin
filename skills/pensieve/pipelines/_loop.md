@@ -53,7 +53,7 @@ You are orchestrating an automated task execution loop. Break down complex work 
    ```
    ⚠️ **必须使用返回的真实 taskListId**（如 `5e600100-9157-4888-...`），不是 "default"。
 
-2. Run init script to create loop directory:
+2. Run init script to create loop directory and the agent prompt:
    ```bash
    <SYSTEM_SKILL_ROOT>/scripts/init-loop.sh <taskListId> <slug>
    ```
@@ -97,7 +97,7 @@ You are orchestrating an automated task execution loop. Break down complex work 
 **Goal**: Document the conversation context before task generation
 
 **Actions**:
-1. Write to loop 目录下的 `_context.md`（模板由 Phase 1 生成）:
+1. Create and write `LOOP_DIR/_context.md`（Phase 1 不再生成模板文件，避免“已存在文件需先 Read 才能 Write”的摩擦）:
 
 ```markdown
 # 对话上下文

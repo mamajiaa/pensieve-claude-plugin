@@ -70,60 +70,6 @@ fi
 mkdir -p "$LOOP_DIR"
 
 # ============================================
-# 生成 _meta.md
-# ============================================
-
-cat > "$LOOP_DIR/_meta.md" << EOF
----
-created: $TIMESTAMP
-task_list_id: $TASK_LIST_ID
-pipeline:
----
-
-# Loop: $SLUG
-
-## 概述
-
-[主窗口填写：一句话描述目标]
-EOF
-
-echo "已创建: $LOOP_DIR/_meta.md"
-
-# ============================================
-# 生成 _context.md
-# ============================================
-
-cat > "$LOOP_DIR/_context.md" << EOF
-# 对话上下文
-
-## 用户对话原文
-
-[主窗口填写]
-
-## 用户干预节选
-
-[主窗口填写]
-
-## 文档引用
-
-| 类型 | 路径 |
-|------|------|
-| requirements | |
-| design | |
-| plan | |
-
-## 关键对话
-
-[执行过程中补充]
-
-## 直接干预记录
-
-[执行过程中补充]
-EOF
-
-echo "已创建: $LOOP_DIR/_context.md"
-
-# ============================================
 # 生成 _agent-prompt.md
 # ============================================
 
@@ -197,4 +143,6 @@ echo ""
 echo "TASK_LIST_ID=$TASK_LIST_ID"
 echo "LOOP_DIR=$LOOP_DIR"
 echo ""
-echo "下一步: 填充 _context.md，然后启动 bind-loop.sh"
+echo "下一步:"
+echo "1) 创建并填充 $LOOP_DIR/_context.md（建议先 Read 再 Edit/Write，或直接 Write 创建新文件）"
+echo "2) 启动 bind-loop.sh"

@@ -31,7 +31,7 @@ TaskCreate subject="初始化 loop" description="1. 初始化 loop 目录 2. 为
 
 在 loop 目录（`.claude/pensieve/loop/{date}-{slug}/`）下：
 
-1. **填充 `_context.md`**（见下方格式）
+1. **创建并填充 `_context.md`**（见下方格式；为避免“已存在文件需先 Read 才能 Write”的限制，init-loop.sh 不再生成模板文件）
 2. **按需创建文档**
    - `requirements.md` — 需求定义（预估 6+ tasks 时）
    - `design.md` — 方案设计（有多个方案需权衡时）

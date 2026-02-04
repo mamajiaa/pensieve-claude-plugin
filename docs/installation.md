@@ -98,6 +98,8 @@ claude plugin install pensieve@pensieve-claude-plugin --scope user
 2. 说 `loop`，应该触发 Loop Pipeline
 3. 检查 `/help` 中是否有 `pensieve` skill
 
+> 提示：进入 loop 后，`init-loop.sh` 只会创建 loop 目录与 `_agent-prompt.md`，`_context.md` 需要在 Phase 3 由主窗口创建并填充。
+
 ---
 
 ## 常见问题
