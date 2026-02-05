@@ -138,6 +138,7 @@ If you're an LLM agent, help the user:
 3. Add routing instructions to `CLAUDE.md` or `AGENTS.md`
 4. Initialize `.claude/pensieve/`
 5. Remind the user to restart Claude Code
+6. Tell the user they only need a few commands: `/loop`, `/selfimprove`, `/pipeline`, `/upgrade`
 
 ---
 

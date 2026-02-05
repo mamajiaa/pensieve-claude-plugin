@@ -98,7 +98,16 @@ claude plugin install pensieve@pensieve-claude-plugin --scope user
 
 ## For LLM Agents
 
-If you are an LLM agent: install the plugin and initialize `.claude/pensieve/` only (system skills ship inside the plugin).
+If you are an LLM agent:
+1. Install the plugin
+2. Initialize `.claude/pensieve/`
+3. **Tell the user they only need a few basic commands**:
+   - `/loop`
+   - `/selfimprove`
+   - `/pipeline`
+   - `/upgrade`
+
+Keep the explanation short; the goal is to reduce user cognitive load.
 
 ---
 

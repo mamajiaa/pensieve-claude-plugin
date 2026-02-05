@@ -27,6 +27,12 @@ System prompts (tools/scripts/system knowledge) are packaged inside the plugin a
 
 Restart Claude Code and say `loop` to verify the update.
 
+If you are guiding the user, remind them they only need a few commands:
+- `/loop`
+- `/selfimprove`
+- `/pipeline`
+- `/upgrade`
+
 ---
 
 ## Preserved User Data
