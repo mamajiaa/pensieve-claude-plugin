@@ -1,11 +1,11 @@
 {
   "name": "pensieve",
-  "version": "0.4.25",
+  "version": "0.4.26",
   "description": "冥想盆 — 人类存入经验，AI 读取真相",
   "author": {
-    "name": "mamajiaa"
+    "name": "kingkongshot"
   },
-  "repository": "https://github.com/mamajiaa/pensieve-claude-plugin",
+  "repository": "https://github.com/kingkongshot/Pensieve",
   "license": "MIT",
   "keywords": [
     "loop",

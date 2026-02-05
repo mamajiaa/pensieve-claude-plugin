@@ -14,21 +14,21 @@ Pensieve 现在采用**官方插件结构**：
 添加 marketplace（固定到 `zh` 分支）：
 
 ```bash
-claude plugin marketplace add mamajiaa/pensieve-claude-plugin#zh
+claude plugin marketplace add kingkongshot/Pensieve#zh
 ```
 
 安装插件（建议 project 级共享给团队）：
 
 ```bash
-claude plugin install pensieve@pensieve-claude-plugin --scope user
+claude plugin install pensieve@Pensieve --scope user
 ```
 
-> 说明：`pensieve-claude-plugin` 来自本仓库 `.claude-plugin/marketplace.json` 的 `name` 字段。
+> 说明：`Pensieve` 来自本仓库 `.claude-plugin/marketplace.json` 的 `name` 字段。
 
 如果你希望 project 级共享给团队，把 scope 改为 `project`：
 
 ```bash
-claude plugin install pensieve@pensieve-claude-plugin --scope project
+claude plugin install pensieve@Pensieve --scope project
 ```
 
 ### 2. 配置 `CLAUDE.md`（推荐）
@@ -88,7 +88,7 @@ mkdir -p .claude/pensieve/{maxims,decisions,knowledge,pipelines,loop}
 如果你想在所有项目中使用，把安装 scope 改为 `user`：
 
 ```bash
-claude plugin install pensieve@pensieve-claude-plugin --scope user
+claude plugin install pensieve@Pensieve --scope user
 ```
 
 ---
@@ -117,7 +117,7 @@ claude plugin install pensieve@pensieve-claude-plugin --scope user
 
 ## 卸载
 
-1. 卸载插件：`claude plugin uninstall pensieve@pensieve-claude-plugin --scope user`（或用 `/plugin` UI）
+1. 卸载插件：`claude plugin uninstall pensieve@Pensieve --scope user`（或用 `/plugin` UI）
 2. （可选）删除项目级用户数据前请先询问是否需要备份：`rm -rf .claude/pensieve`
 
 ---

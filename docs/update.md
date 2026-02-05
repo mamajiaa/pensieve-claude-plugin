@@ -5,8 +5,8 @@
 如果你通过 Marketplace 安装：
 
 ```bash
-claude plugin marketplace update pensieve-claude-plugin
-claude plugin update pensieve@pensieve-claude-plugin --scope user
+claude plugin marketplace update kingkongshot/Pensieve
+claude plugin update pensieve@Pensieve --scope user
 ```
 
 然后重启 Claude Code 应用更新。
