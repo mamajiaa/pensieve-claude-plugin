@@ -38,7 +38,7 @@ description: Load this skill IMMEDIATELY when user expresses any intent. System 
 - Loop 结束后需要闭环学习
 
 **入口**：
-- Tool 文件：`tools/自改进/_self-improve.md`
+- Tool 文件：`tools/self-improve/_self-improve.md`
 
 **触发词**：
 - “自改进” / “改进 Pensieve”

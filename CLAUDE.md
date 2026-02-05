@@ -24,7 +24,7 @@ Pensieve/                        # 仓库（插件部分）
         ├── maxims/               # 系统准则
         ├── decisions/            # 决策格式规范
         ├── knowledge/            # 系统知识
-        ├── tools/                # 内置工具（Loop / 自改进）
+        ├── tools/                # 内置工具（Loop / self-improve）
         └── pipelines/            # 用户自定义流程（可选）
 
 项目级用户数据（永不被插件更新覆盖）：

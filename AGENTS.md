@@ -12,9 +12,9 @@ This repo is **Pensieve**, a Claude Code knowledge/automation system with two pa
   - `inject-routes.sh` (SessionStart) — scans installed skill content and injects a “available resources” summary
   - `loop-controller.sh` (Stop) — auto-continues pending tasks in Loop mode via marker + task status
 - `skills/pensieve/` — system skill shipped in the plugin (updated via plugin updates)
-  - `tools/` — built-in tools (`loop/`, `自改进/`)
+  - `tools/` — built-in tools (`loop/`, `self-improve/`)
     - `loop/` — loop tool markdown + scripts
-    - `自改进/` — self-improve tool markdown
+    - `self-improve/` — self-improve tool markdown
   - `pipelines/` — optional user-defined workflows (e.g. `review.md`)
   - `maxims/` — system principles (`_linus.md` built-in)
   - `decisions/` — decision format docs
@@ -34,7 +34,7 @@ Project-level user data lives in `.claude/pensieve/` and is never overwritten by
 - Shell scripts are **bash** and should be non-interactive.
 - Prefer robust defaults: `set -euo pipefail` (where applicable), quote variables, avoid unsafe globbing.
 - Hooks must fail-safe: if dependencies (e.g. `jq`) are missing, exit gracefully without breaking the session.
-- Built-in tool files use `_` prefix (e.g. `tools/loop/_*.md`, `tools/自改进/_*.md`) and are expected to be overwritten on update; user content must live in `.claude/pensieve/`.
+- Built-in tool files use `_` prefix (e.g. `tools/loop/_*.md`, `tools/self-improve/_*.md`) and are expected to be overwritten on update; user content must live in `.claude/pensieve/`.
 
 ## Local Validation
 

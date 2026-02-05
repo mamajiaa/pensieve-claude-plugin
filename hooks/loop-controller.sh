@@ -304,7 +304,7 @@ main() {
 
         if check_all_completed; then
             local self_improve_path
-            self_improve_path="$SYSTEM_SKILL_ROOT/tools/自改进/_self-improve.md"
+            self_improve_path="$SYSTEM_SKILL_ROOT/tools/self-improve/_self-improve.md"
 
             # 删除 marker，确保 Stop Hook 不再继续
             rm -f "$MARKER_FILE"

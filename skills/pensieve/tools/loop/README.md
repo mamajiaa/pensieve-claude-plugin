@@ -206,7 +206,7 @@ Agent 返回后，主窗口执行自改进：
 
 ### 流程
 
-1. 读取 `tools/自改进/_self-improve.md`
+1. 读取 `tools/self-improve/_self-improve.md`
 2. 对比 `_context.md` 事前/事后部分
 3. 填写事后 Context（偏差记录）
 4. 如有实质偏差，询问用户是否沉淀

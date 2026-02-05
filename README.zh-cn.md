@@ -330,7 +330,7 @@ pensieve/
         ├── SKILL.md
         ├── tools/
         │   ├── loop/
-        │   └── 自改进/
+        │   └── self-improve/
         ├── maxims/
         ├── decisions/
         ├── knowledge/
