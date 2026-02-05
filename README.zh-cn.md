@@ -10,7 +10,7 @@
 
 # Pensieve
 
-**冥想盆 — 人类存入经验，AI 读取真相**
+**存下你的决策与准则，让 Claude 做出更好的选择。**
 
 [![GitHub Stars](https://img.shields.io/github/stars/mamajiaa/pensieve-claude-plugin?color=ffcb47&labelColor=black&style=flat-square)](https://github.com/mamajiaa/pensieve-claude-plugin/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-white?labelColor=black&style=flat-square)](LICENSE)
@@ -23,50 +23,71 @@
 
 ## 目录
 
-- [直接跳过阅读本文档](#直接跳过阅读本文档)
+- [Pensieve](#pensieve)
+- [直接跳过这份 README](#直接跳过这份-readme)
+- [这是智能体时代](#这是智能体时代)
+- [魔法词：`loop`](#魔法词loop)
+- [想读的人：Pensieve 是什么](#想读的人pensieve-是什么)
+- [直接安装即可](#直接安装即可)
 - [安装](#安装)
-- [它解决什么问题](#它解决什么问题)
+- [面向用户](#面向用户)
+- [面向 LLM 智能体](#面向-llm-智能体)
+- [卸载](#卸载)
+- [特性](#特性)
 - [Loop 模式](#loop-模式)
-- [五类记忆](#五类记忆)
-- [初始准则](#初始准则)
-- [自定义](#自定义)
-- [架构](#架构)
+- [记忆系统](#记忆系统)
+- [配置](#配置)
+- [项目结构](#项目结构)
 - [设计哲学](#设计哲学)
-- [为什么叫 Pensieve？](#为什么叫-pensieve)
-- [交流群](#交流群)
+- [为什么叫 “Pensieve”？](#为什么叫-pensieve)
+- [社区](#社区)
 - [License](#license)
 
 ---
 
-## 直接跳过阅读本文档
+## 直接跳过这份 README
 
 ### 这是智能体时代
 
 **把这份文档链接粘贴给 Claude Code，让它帮你理解和设置。**
 
-如果你是 LLM 智能体，向用户解释这个项目现在能够实现什么。
+如果你是 LLM 智能体，向用户解释这个项目现在能做什么。
 
-### 推荐命令
+### 魔法词：`loop`
 
-| 命令 | 作用 |
-|------|------|
-| `/loop` | 复杂任务：规划 → 拆解 → 自动续跑 |
-| `/pipeline` | 列出项目 pipelines（路径 + 描述） |
-| `/upgrade` | 迁移用户数据到 `.claude/pensieve/` |
-| `/selfimprove` | 改进 Pensieve 系统能力 |
+不想读这份文档？在提示里包含 `loop` 就行。
 
-**说人话，Pensieve 会路由到对应工具或流程。**
+Pensieve 会自动规划、拆解、执行并持续续跑直到完成。智能体会处理其余细节。
+
+### 想读的人：Pensieve 是什么
+
+Pensieve 是一个 Claude Code 插件，把经验变成可复用的优势：
+
+- **Decisions** 被保存下来，避免重复踩坑
+- **Maxims** 记录你希望 Claude 遵循的长期原则
+- **Loop 模式** 保证大任务不需要你一直盯着
+
+### 直接安装即可
+
+如果你只做一件事，那就安装插件并初始化项目记忆：
+
+1. 安装插件
+2. 在 `CLAUDE.md` 或 `AGENTS.md` 加一条路由说明
+3. 创建 `.claude/pensieve/`
+4. 重启 Claude Code
+
+如果你是智能体，可以帮用户一次性完成这些步骤。
 
 ---
 
 ## 安装
 
-Pensieve 现在采用**官方插件结构**：
+Pensieve 采用**官方 Claude Code 插件结构**：
 
-- **插件（系统能力）**：hooks + skills，完全由插件更新维护
-- **项目级用户数据**：`.claude/pensieve/`，永不被插件更新覆盖
+- **插件（系统能力）**：hooks + skills，随插件更新
+- **项目级用户数据**：`.claude/pensieve/`，插件不覆盖
 
-### 快速安装
+### 面向用户
 
 #### 1.（推荐）通过 Marketplace 安装并固定到 `zh` 分支
 
@@ -81,7 +102,7 @@ claude plugin install pensieve@pensieve-claude-plugin --scope user
 claude plugin install pensieve@pensieve-claude-plugin --scope project
 ```
 
-#### 2. 配置 CLAUDE.md（或 AGENTS.md，二选一）
+#### 2. 配置 `CLAUDE.md`（或 `AGENTS.md`，二选一）
 
 ```markdown
 ## Pensieve
@@ -96,7 +117,7 @@ claude plugin install pensieve@pensieve-claude-plugin --scope project
 mkdir -p .claude/pensieve/{maxims,decisions,knowledge,pipelines,loop}
 ```
 
-或运行插件内置初始化脚本（写入**初始准则与 pipeline**，不会覆盖已有文件；绝对路径会在 SessionStart 注入）：
+或运行插件内置初始化脚本（写入初始准则与 pipeline，不覆盖已有文件；绝对路径会在 SessionStart 注入）：
 
 ```bash
 <SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-project-data.sh
@@ -112,41 +133,33 @@ mkdir -p .claude/pensieve/{maxims,decisions,knowledge,pipelines,loop}
 
 如果你是 LLM 智能体，帮用户：
 
-1. 添加 marketplace（固定到 `zh` 分支）：
-   ```bash
-   claude plugin marketplace add mamajiaa/pensieve-claude-plugin#zh
-   ```
-2. 安装插件：
-   ```bash
-   claude plugin install pensieve@pensieve-claude-plugin --scope user
-   ```
+1. 添加 marketplace（固定到 `zh` 分支）
+2. 安装插件
 3. 在 `CLAUDE.md`（或 `AGENTS.md`）中添加简短路由指引 + 自改进要求
-4. 初始化项目级用户数据：`.claude/pensieve/`
+4. 初始化 `.claude/pensieve/`
 5. 提醒用户重启 Claude Code
 
 ---
 
-## 它解决什么问题
+## 卸载
 
-**Claude Code 执行大任务时，你必须盯着屏幕，随时准备干预。**
+要移除 Pensieve：
 
-这很烦。
-
-Pensieve 的 Loop 模式让你可以：
-1. 描述任务，然后离开
-2. Stop Hook 检测到未完成任务会自动继续
-3. 每个任务在独立 subagent 中执行，主窗口不会爆上下文
-4. 结束后自动对比事前假设和实际发现，有价值的偏差会被记录
-
-**你的任务会被完成，句号。**
+1. 卸载插件：`claude plugin uninstall pensieve --scope user`（若为项目级安装则用 `--scope project`）
+2.（可选）删除项目记忆：`rm -rf .claude/pensieve`
+3. 重启 Claude Code
 
 ---
 
-## Loop 模式
+## 特性
 
-Pensieve 的核心能力。它让 Claude Code 变成一个自律的执行者。
+Pensieve 小而清晰，但很实用。它通过记忆与纪律让 Claude Code 更可靠。
 
-### 职责划分
+### Loop 模式
+
+Pensieve 的核心能力。让 Claude Code 变成一个自律的执行者。
+
+#### 职责划分
 
 | 角色 | 做什么 |
 |------|--------|
@@ -154,7 +167,7 @@ Pensieve 的核心能力。它让 Claude Code 变成一个自律的执行者。
 | **Subagent** | 执行单个 task：读 context → 干活 → 返回 |
 | **Stop Hook** | 自动循环：检测 pending task → 注入强化信息 → 继续执行 |
 
-### 执行流程
+#### 执行流程
 
 ```
 Phase 0: 简单任务判断
@@ -172,16 +185,16 @@ Phase 5: Subagent 逐个执行，Stop Hook 自动循环
 Phase 6: Stop Hook 提示自改进（可选）
 ```
 
-### 两套存储
+#### 两套存储
 
 | 存储 | 内容 | 为什么 |
 |------|------|--------|
 | `~/.claude/tasks/<uuid>/` | 任务状态（JSON） | Claude Code 原生，用于 Stop Hook 检测 |
 | `.claude/pensieve/loop/{date}-{slug}/` | 元数据 + 文档 | 项目级追踪执行过程，沉淀改进 |
 
-### 自动化程度
+#### 自动化程度
 
-用"单次 Loop 完成的任务数"衡量：
+用“单次 Loop 完成的任务数”衡量：
 
 | 任务数 | 级别 |
 |--------|------|
@@ -189,25 +202,11 @@ Phase 6: Stop Hook 提示自改进（可选）
 | 10-50 | 中等自动化 |
 | 100+ | 完全自动化（终极目标） |
 
-**目标不是一步到位，是渐进提升。**
+**目标不是一步到位，而是渐进提升。**
 
-初期自动化程度很低，但通过每次 Loop 的 self-improve，能代替你回答的问题会越来越多。
+### 记忆系统
 
----
-
-## 初始准则
-
-安装时会在 `.claude/pensieve/maxims/custom.md` 写入**项目级初始准则**，你可以自由修改或替换。  
-为保持 README 简洁，这里不展开准则内容。
-- 代码即文档，命名服务于阅读
-- 复杂性是万恶之源
-- 默认不写注释，除非需要解释"为什么"
-
----
-
-## 五类记忆
-
-Pensieve 把记忆分成五类。**不同的记忆有不同的生命周期和读取时机。**
+Pensieve 把记忆分成五类。**不同记忆有不同的生命周期和读取时机。**
 
 | 类型 | 是什么 | 什么时候读取 |
 |------|--------|--------------|
@@ -217,28 +216,28 @@ Pensieve 把记忆分成五类。**不同的记忆有不同的生命周期和读
 | **Knowledge** | 外部参考资料 | Pipeline 需要引用时 |
 | **Loop** | 当前任务的上下文 | 执行期间 |
 
-### 什么值得存入冥想盆？
+#### 什么值得存入冥想盆？
 
-**Maxim**（准则）：必须全部满足——换项目还适用？换语言还适用？换领域还适用？能指导未来未知问题？
+**Maxim（准则）**：必须全部满足——换项目还适用？换语言还适用？换领域还适用？能指导未来未知问题？
 
-**Decision**（决策）：三个黄金问题任一为"是"——删掉会犯错？三个月后能做更好选择？能作为模式教给别人？
+**Decision（决策）**：三个黄金问题任一为“是”——删掉会犯错？三个月后能做更好选择？能作为模式教给别人？
 
-**Pipeline**（流程）：重复出现的任务结构。先能跑通，再精细化。
+**Pipeline（流程）**：重复出现的任务结构。先能跑通，再精细化。
 
-### 记忆的演化
+#### 记忆的演化
 
 ```
-Loop 中的临时决策 → 经筛选 → Decision
+临时决策在 Loop 中 → 筛选 → Decision
 多次相似 Decision → 提炼 → Maxim
 外部知识 + 项目实践 → Decision
 Decision 指导 → Pipeline 改进
 ```
 
-**就像斯内普的记忆揭示了真相，你存入的记忆会帮助 Claude 理解你的意图。**
+**就像记忆揭示真相，你存入的记忆会帮助 Claude 理解你的意图。**
 
 ---
 
-## 自定义
+## 配置
 
 用 `/selfimprove` 触发自改进工具，它会引导你把经验沉淀到**项目级用户数据**中（插件更新不会覆盖）。
 
@@ -253,11 +252,11 @@ Decision 指导 → Pipeline 改进
 
 ---
 
-## 架构
+## 项目结构
 
-Pensieve 采用官方插件结构：
+Pensieve 是一个官方 Claude Code 插件：
 
-- **插件（系统能力）**：hooks + skills（随插件更新）
+- **插件（系统能力）**：hooks + skills，位于插件目录
 - **项目级用户数据**：`.claude/pensieve/`（永不覆盖）
 
 ```
@@ -299,8 +298,6 @@ pensieve/
 | `loop-controller.sh` | Stop | 检查是否有 pending task，有则注入强化信息继续执行 |
 
 **Stop Hook 是 Loop 模式的心脏——它让自动循环成为可能。**
-
-如果智能体没有完成开始的工作，系统会强制它继续。你的任务会被完成，句号。
 
 ---
 
@@ -361,7 +358,7 @@ pensieve/
 
 ---
 
-## 为什么叫 Pensieve？
+## 为什么叫 “Pensieve”？
 
 在《哈利·波特》中，冥想盆是一个古老的石质浅盆，里面盛着银色的液态记忆。巫师可以用魔杖把记忆从脑中抽出，存入盆中。
 
@@ -371,7 +368,7 @@ pensieve/
 
 ---
 
-## 交流群
+## 社区
 
 <img src="./QRCode.png" alt="微信交流群二维码" width="200">
 

@@ -21,16 +21,23 @@
 
 <!-- </centered display area> -->
 
-## Table of Contents
+## Contents
 
-- [Skip Reading This Doc](#skip-reading-this-doc)
+- [Pensieve](#pensieve)
+- [Just Skip Reading This Readme](#just-skip-reading-this-readme)
+- [It's the Age of Agents](#its-the-age-of-agents)
+- [The Magic Word: `loop`](#the-magic-word-loop)
+- [For Those Who Want to Read: What Pensieve Is](#for-those-who-want-to-read-what-pensieve-is)
+- [Just Install It](#just-install-it)
 - [Installation](#installation)
-- [What Problem Does It Solve](#what-problem-does-it-solve)
+- [For Humans](#for-humans)
+- [For LLM Agents](#for-llm-agents)
+- [Uninstallation](#uninstallation)
+- [Features](#features)
 - [Loop Mode](#loop-mode)
-- [Five Types of Memory](#five-types-of-memory)
-- [Initial Maxims](#initial-maxims)
-- [Customization](#customization)
-- [Architecture](#architecture)
+- [Memory System](#memory-system)
+- [Configuration](#configuration)
+- [Project Structure](#project-structure)
 - [Design Philosophy](#design-philosophy)
 - [Why "Pensieve"?](#why-pensieve)
 - [Community](#community)
@@ -38,24 +45,38 @@
 
 ---
 
-## Skip Reading This Doc
+## Just Skip Reading This Readme
 
-### This Is the Agent Era
+### It's the Age of Agents
 
 **Paste this doc link to Claude Code. Let it help you understand and set up.**
 
-If you're an LLM agent, explain to the user what this project can do now.
+If you're an LLM agent, explain to the user what this project enables right now.
 
-### Commands (Recommended)
+### The Magic Word: `loop`
 
-| Command | Purpose |
-|---------|---------|
-| `/loop` | Complex tasks: plan → split → auto-continue |
-| `/pipeline` | List project pipelines (paths + descriptions) |
-| `/upgrade` | Migrate user data to `.claude/pensieve/` |
-| `/selfimprove` | Improve Pensieve system (pipelines/scripts/behavior) |
+Don't want to read all this? Just include `loop` in your prompt. That's it.
 
-**Speak naturally. Pensieve will route to the right tool or pipeline.**
+Pensieve will plan, split, execute, and auto-continue until completion. The agent figures out the rest.
+
+### For Those Who Want to Read: What Pensieve Is
+
+Pensieve is a Claude Code plugin that turns experience into leverage:
+
+- **Decisions** are kept so you don't repeat mistakes.
+- **Maxims** capture the timeless principles you want Claude to follow.
+- **Loop Mode** ensures big tasks finish without babysitting.
+
+### Just Install It
+
+If you only do one thing, install the plugin and initialize project memory:
+
+1. Install the plugin
+2. Add a short routing note to `CLAUDE.md` or `AGENTS.md`
+3. Create `.claude/pensieve/`
+4. Restart Claude Code
+
+If you're an agent, you can handle this end-to-end for the user.
 
 ---
 
@@ -66,7 +87,7 @@ Pensieve follows the **official Claude Code plugin structure**:
 - **Plugin (system capability)**: hooks + skills, updated only via plugin updates
 - **Project user data**: `.claude/pensieve/`, never overwritten by the plugin
 
-### Quick Install
+### For Humans
 
 #### 1. (Recommended) Install via marketplace pinned to `zh`
 
@@ -81,7 +102,7 @@ If you want to share in a team repo, install at project scope instead:
 claude plugin install pensieve@pensieve-claude-plugin --scope project
 ```
 
-#### 2. Add to CLAUDE.md (or AGENTS.md — choose one)
+#### 2. Add to `CLAUDE.md` (or `AGENTS.md` — choose one)
 
 ```markdown
 ## Pensieve
@@ -112,41 +133,36 @@ See **[Installation Guide](docs/installation.md)** for details, **[Update Guide]
 
 If you're an LLM agent, help the user:
 
-1. Add marketplace pinned to `zh`:
-   ```bash
-   claude plugin marketplace add mamajiaa/pensieve-claude-plugin#zh
-   ```
-2. Install the plugin:
-   ```bash
-   claude plugin install pensieve@pensieve-claude-plugin --scope user
-   ```
-3. Add to `CLAUDE.md` (or `AGENTS.md`): brief Pensieve routing + Self‑Improve requirement
-4. Initialize `.claude/pensieve/` (project user data)
-5. Remind user to restart Claude Code
+1. Add marketplace pinned to `zh`
+2. Install the plugin
+3. Add routing instructions to `CLAUDE.md` or `AGENTS.md`
+4. Initialize `.claude/pensieve/`
+5. Remind the user to restart Claude Code
 
 ---
 
-## What Problem Does It Solve
+## Uninstallation
 
-**When Claude Code runs big tasks, you have to watch the screen, ready to intervene.**
+To remove Pensieve:
 
-That's annoying.
-
-Pensieve's Loop mode lets you:
-1. Describe the task, then walk away
-2. Stop Hook detects incomplete tasks and auto-continues
-3. Each task runs in an isolated subagent — main window won't blow up context
-4. After completion, auto-compares initial assumptions vs actual findings — valuable deviations get recorded
-
-**Your task will be completed. Period.**
+1. Remove the plugin:
+   - `claude plugin uninstall pensieve --scope user`
+   - Or `--scope project` if installed at project scope
+2. (Optional) Remove project memory:
+   - `rm -rf .claude/pensieve`
+3. Restart Claude Code
 
 ---
 
-## Loop Mode
+## Features
+
+Pensieve is small, opinionated, and practical. It makes Claude Code smarter by giving it memory and discipline.
+
+### Loop Mode
 
 Pensieve's core capability. It turns Claude Code into a self-disciplined executor.
 
-### Role Division
+#### Role Division
 
 | Role | What It Does |
 |------|--------------|
@@ -154,7 +170,7 @@ Pensieve's core capability. It turns Claude Code into a self-disciplined executo
 | **Subagent** | Execute single task: read context → do work → return |
 | **Stop Hook** | Auto-loop: detect pending task → inject reinforcement → continue |
 
-### Execution Flow
+#### Execution Flow
 
 ```
 Phase 0: Simple task check
@@ -172,14 +188,14 @@ Phase 5: Subagent executes one by one, Stop Hook auto-loops
 Phase 6: Stop Hook prompts self‑improve (optional)
 ```
 
-### Two Storage Systems
+#### Two Storage Systems
 
 | Storage | Content | Why |
 |---------|---------|-----|
 | `~/.claude/tasks/<uuid>/` | Task state (JSON) | Claude Code native, for Stop Hook detection |
 | `.claude/pensieve/loop/{date}-{slug}/` | Metadata + docs | Project-level tracking & learnings |
 
-### Automation Level
+#### Automation Level
 
 Measured by "tasks completed per Loop":
 
@@ -191,18 +207,7 @@ Measured by "tasks completed per Loop":
 
 **Goal isn't instant perfection, but gradual improvement.**
 
-Early automation is low, but through self-improve after each Loop, questions it can answer for you keep growing.
-
----
-
-## Initial Maxims
-
-During installation, we seed **project-level** maxims at `.claude/pensieve/maxims/custom.md`.  
-They are editable and versioned with your project, so we don’t expand them here.
-
----
-
-## Five Types of Memory
+### Memory System
 
 Pensieve divides memory into five types. **Different memories have different lifecycles and read timing.**
 
@@ -214,7 +219,7 @@ Pensieve divides memory into five types. **Different memories have different lif
 | **Knowledge** | External reference material | When Pipeline needs to reference |
 | **Loop** | Current task context | During execution |
 
-### What's Worth Storing in the Pensieve?
+#### What's Worth Storing in the Pensieve?
 
 **Maxim**: Must satisfy ALL — Still applies in different project? Different language? Different domain? Can guide unknown future problems?
 
@@ -222,7 +227,7 @@ Pensieve divides memory into five types. **Different memories have different lif
 
 **Pipeline**: Repeating task structures. Get it working first, then refine.
 
-### Memory Evolution
+#### Memory Evolution
 
 ```
 Temporary decisions in Loop → filtered → Decision
@@ -235,7 +240,7 @@ Decision guides → Pipeline improvement
 
 ---
 
-## Customization
+## Configuration
 
 Use `/selfimprove` to capture learnings into **project-level user data**.
 
@@ -250,7 +255,7 @@ Use `/selfimprove` to capture learnings into **project-level user data**.
 
 ---
 
-## Architecture
+## Project Structure
 
 Pensieve is an official Claude Code plugin:
 
@@ -296,8 +301,6 @@ pensieve/
 | `loop-controller.sh` | Stop | Check for pending tasks, inject reinforcement and continue if found |
 
 **Stop Hook is the heart of Loop mode — it makes auto-looping possible.**
-
-If the agent hasn't finished what it started, the system forces it to continue. Your task will be completed. Period.
 
 ---
 
