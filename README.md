@@ -82,7 +82,7 @@ If you're an agent, you can handle this end-to-end for the user.
 
 ## Installation
 
-Pensieve follows the **official Claude Code plugin structure**:
+Pensieve follows the Claude Code plugin structure:
 
 - **Plugin (system capability)**: hooks + skills, updated only via plugin updates
 - **Project user data**: `.claude/pensieve/`, never overwritten by the plugin
@@ -258,7 +258,7 @@ Use `/selfimprove` to capture learnings into **project-level user data**.
 
 ## Project Structure
 
-Pensieve is an official Claude Code plugin:
+Pensieve is a Claude Code plugin:
 
 - **Plugin (system capability)**: hooks + skills inside the plugin directory
 - **Project user data**: `.claude/pensieve/` (never overwritten)

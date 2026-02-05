@@ -82,7 +82,7 @@ Pensieve 是一个 Claude Code 插件，把经验变成可复用的优势：
 
 ## 安装
 
-Pensieve 采用**官方 Claude Code 插件结构**：
+Pensieve 采用 Claude Code 插件结构：
 
 - **插件（系统能力）**：hooks + skills，随插件更新
 - **项目级用户数据**：`.claude/pensieve/`，插件不覆盖
