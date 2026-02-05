@@ -31,13 +31,11 @@ claude plugin install pensieve@pensieve-claude-plugin --scope user
 claude plugin install pensieve@pensieve-claude-plugin --scope project
 ```
 
-### 2. 配置 `CLAUDE.md` / `AGENTS.md`（推荐）
+### 2. 配置 `CLAUDE.md`（推荐）
 
-> **给大模型的指令**：如果你是执行安装的智能体，请**自动创建或更新**下列文件，保持简短、明确，不要覆盖用户已有内容。
+> **给大模型的指令**：如果你是执行安装的智能体，请**自动创建或更新**该文件，保持简短、明确，不要覆盖用户已有内容。
 
-#### ✅ `CLAUDE.md`（Claude Code）
-
-在项目根目录创建或补充以下内容：
+在项目根目录创建或补充以下内容（`AGENTS.md` 与 `CLAUDE.md` 作用等价，**二选一即可**）：
 
 ```markdown
 ## Pensieve
@@ -51,23 +49,6 @@ claude plugin install pensieve@pensieve-claude-plugin --scope project
 
 当用户要求改进 Pensieve（pipeline/脚本/规则/行为）时，必须使用 Self‑Improve tool：
 `tools/self-improve/_self-improve.md`
-```
-
-#### ✅ `AGENTS.md`（其他工具通用）
-
-如果项目已有 `AGENTS.md`，请**追加**以下段落；没有则创建：
-
-```markdown
-## Pensieve
-
-在探索项目后再决定使用 Pensieve 工具；先检索再行动。
-
-工具建议：
-- `/pipeline`：列出项目 pipelines（机械输出）
-- `/loop`：复杂任务拆解并循环执行
-- `/upgrade`：迁移用户数据到 `.claude/pensieve/`
-
-改进 Pensieve 时：只走 Self‑Improve tool（`tools/self-improve/_self-improve.md`）。
 ```
 
 ### 3. 初始化项目级用户数据（推荐）
@@ -119,7 +100,7 @@ claude plugin install pensieve@pensieve-claude-plugin --scope user
 ## 卸载
 
 1. 卸载插件：`claude plugin uninstall pensieve@pensieve-claude-plugin --scope user`（或用 `/plugin` UI）
-2. （可选）删除项目级用户数据：`rm -rf .claude/pensieve`
+2. （可选）删除项目级用户数据前请先询问是否需要备份：`rm -rf .claude/pensieve`
 
 ---
 
