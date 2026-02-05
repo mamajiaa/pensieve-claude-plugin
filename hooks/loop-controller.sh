@@ -75,25 +75,17 @@ log "Hook triggered pid=$$ ppid=$PPID claude_pid=$CURRENT_CLAUDE_PID session_pid
 # 检查是否有活跃的 Loop（通过标记文件）
 # ============================================
 
-# 查找标记文件
-MARKER_FILE=""
-TASK_LIST_ID=""
-LOOP_DIR=""
-BEST_MTIME=0
+# 扫描并处理所有 marker（同一会话）
+MARKERS=()
 
 for marker in /tmp/pensieve-loop-*; do
     [[ -f "$marker" ]] || continue
 
-    # 解析标记文件
-    local_task_id=$(jq -r '.task_list_id' "$marker" 2>/dev/null) || continue
-    local_loop_dir=$(jq -r '.loop_dir' "$marker" 2>/dev/null) || continue
     local_claude_pid=$(jq -r '.claude_pid // empty' "$marker" 2>/dev/null) || true
-    local_session_pid=$(jq -r '.session_pid // empty' "$marker" 2>/dev/null) || true
-    log "marker=$(basename "$marker") task_list_id=$local_task_id loop_dir=$local_loop_dir claude_pid=$local_claude_pid session_pid=$local_session_pid"
-
-    # 只处理与当前 Claude 进程匹配的 marker；不做兼容（缺少 claude_pid 的 marker 直接忽略）
     [[ -n "$local_claude_pid" ]] || continue
     [[ -n "$CURRENT_CLAUDE_PID" ]] || continue
+
+    # 只处理当前会话的 marker
     [[ "$local_claude_pid" == "$CURRENT_CLAUDE_PID" ]] || continue
 
     # 容错：若 claude_pid 已不存活，清理 marker
@@ -103,32 +95,28 @@ for marker in /tmp/pensieve-loop-*; do
         continue
     fi
 
-    local_mtime=$(get_mtime "$marker")
-    if [[ "$MARKER_FILE" == "" || "$local_mtime" -gt "$BEST_MTIME" ]]; then
-        MARKER_FILE="$marker"
-        TASK_LIST_ID="$local_task_id"
-        LOOP_DIR="$local_loop_dir"
-        BEST_MTIME="$local_mtime"
-        log "marker candidate: $marker (mtime=$local_mtime)"
-    fi
+    MARKERS+=("$marker")
 done
 
-if [[ -z "$MARKER_FILE" ]]; then
+if [[ "${#MARKERS[@]}" -eq 0 ]]; then
     log "no marker matched, exit"
     exit 0
 fi
 
-# 从 _meta.md 读取信息
-META_FILE="$LOOP_DIR/_meta.md"
-CONTEXT_FILE="$LOOP_DIR/_context.md"
+# 以 mtime 升序遍历（更早的 loop 优先）
+sort_markers_by_mtime() {
+    for m in "$@"; do
+        printf "%s %s\n" "$(get_mtime "$m")" "$m"
+    done | sort -n | awk '{print $2}'
+}
 
-TASKS_DIR="$HOME/.claude/tasks/$TASK_LIST_ID"
-
-if [[ ! -d "$TASKS_DIR" ]]; then
-    rm -f "$MARKER_FILE"
-    log "tasks dir missing, marker removed: $TASKS_DIR"
-    exit 0
-fi
+# 初始化全局变量（每个 marker 会覆盖）
+MARKER_FILE=""
+TASK_LIST_ID=""
+LOOP_DIR=""
+META_FILE=""
+CONTEXT_FILE=""
+TASKS_DIR=""
 
 # ============================================
 # 辅助函数
@@ -279,37 +267,56 @@ EOF
 # ============================================
 
 main() {
-    if check_all_completed; then
-        # 删除标记文件
-        rm -f "$MARKER_FILE"
-        exit 0
-    fi
+    local marker
+    for marker in $(sort_markers_by_mtime "${MARKERS[@]}"); do
+        local local_task_id local_loop_dir
+        local_task_id=$(jq -r '.task_list_id' "$marker" 2>/dev/null) || continue
+        local_loop_dir=$(jq -r '.loop_dir' "$marker" 2>/dev/null) || continue
 
-    local next_task
-    if next_task=$(get_next_task); then
-        mark_in_progress "$next_task"
+        MARKER_FILE="$marker"
+        TASK_LIST_ID="$local_task_id"
+        LOOP_DIR="$local_loop_dir"
+        META_FILE="$LOOP_DIR/_meta.md"
+        CONTEXT_FILE="$LOOP_DIR/_context.md"
+        TASKS_DIR="$HOME/.claude/tasks/$TASK_LIST_ID"
 
-        local reinforcement
-        reinforcement=$(generate_reinforcement "$next_task")
+        if [[ ! -d "$TASKS_DIR" ]]; then
+            rm -f "$MARKER_FILE"
+            log "tasks dir missing, marker removed: $TASKS_DIR"
+            continue
+        fi
 
-        local task_id task_subject
-        task_id=$(jq -r '.id' "$next_task")
-        task_subject=$(jq -r '.subject' "$next_task")
-        local stats
-        stats=$(count_tasks)
-        local total completed pending in_progress
-        read -r total completed pending in_progress <<< "$stats"
+        if check_all_completed; then
+            rm -f "$MARKER_FILE"
+            continue
+        fi
 
-        jq -n \
-            --arg reason "$reinforcement" \
-            --arg msg "🔄 Loop [$completed/$total] | #$task_id $task_subject" \
-            '{
-                "decision": "block",
-                "reason": $reason,
-                "systemMessage": $msg
-            }'
-        exit 0
-    fi
+        local next_task
+        if next_task=$(get_next_task); then
+            mark_in_progress "$next_task"
+
+            local reinforcement
+            reinforcement=$(generate_reinforcement "$next_task")
+
+            local task_id task_subject
+            task_id=$(jq -r '.id' "$next_task")
+            task_subject=$(jq -r '.subject' "$next_task")
+            local stats
+            stats=$(count_tasks)
+            local total completed pending in_progress
+            read -r total completed pending in_progress <<< "$stats"
+
+            jq -n \
+                --arg reason "$reinforcement" \
+                --arg msg "🔄 Loop [$completed/$total] | #$task_id $task_subject" \
+                '{
+                    "decision": "block",
+                    "reason": $reason,
+                    "systemMessage": $msg
+                }'
+            exit 0
+        fi
+    done
 
     exit 0
 }
