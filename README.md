@@ -197,50 +197,8 @@ Early automation is low, but through self-improve after each Loop, questions it 
 
 ## Initial Maxims
 
-During installation, we seed **project-level** maxims at `.claude/pensieve/maxims/custom.md`. They are editable and versioned with your project.
-
-Top to bottom = priority — when conflicts arise, follow the one listed first.
-
-### 1. "Good Taste" — Eliminate Edge Cases
-
-> "Sometimes you can look at a problem from a different angle, rewrite it so special cases disappear, becoming normal cases."
-
-**Classic example**: Linked list delete operation, 10 lines with if-check optimized to 4 lines without conditional branches.
-
-- Eliminating edge cases always beats adding conditionals
-- Trust upstream data fully; missing data should be provided upstream, not patched
-- Good taste is intuition, built through experience
-
-### 2. "Never Break Userspace" — User-visible Behavior Unchanged
-
-> "We do not break user-visible behavior!"
-
-- Any code that unexpectedly changes user-visible behavior is a bug, no matter how "theoretically correct"
-- The kernel's job is to serve users, not educate them
-- User-visible behavior unchanged (beyond requirements) is sacred
-
-### 3. Pragmatism — Solve Real Problems
-
-> "I'm a damn pragmatist."
-
-**Classic example**: Delete 10 lines of fallback logic, throw error directly, exposing upstream data issues in tests rather than hiding them.
-
-- Solve real problems, not imagined threats
-- Expose problems proactively and directly
-- Reject "theoretically perfect" but practically complex solutions like microkernels
-- Code serves reality, not papers
-
-### 4. Simplicity Obsession — 3 Levels of Indentation and You're Done
-
-> "If you need more than 3 levels of indentation, you're screwed anyway, and should fix your program."
-
-**Classic example**: 290-line giant function split into 4 single-responsibility functions, main function becomes 10 lines of assembly logic.
-
-- Functions must be short and do one thing well
-- Don't write compatibility, fallback, temporary, backup, or mode-specific code
-- Code is documentation; naming serves reading
-- Complexity is the root of all evil
-- Default to no comments, unless explaining "why"
+During installation, we seed **project-level** maxims at `.claude/pensieve/maxims/custom.md`.  
+They are editable and versioned with your project, so we don’t expand them here.
 
 ---
 
