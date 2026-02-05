@@ -15,7 +15,7 @@
     {
       "name": "pensieve",
       "description": "Pensieve：Claude Code 的 loop 自动化 + 记忆沉淀（系统提示词在插件内，用户数据在 .claude/pensieve）",
-      "version": "0.4.21",
+      "version": "0.4.22",
       "author": {
         "name": "mamajiaa"
       },
