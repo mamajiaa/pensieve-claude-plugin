@@ -55,6 +55,7 @@ if [[ "$TASK_LIST_ID" == "default" ]]; then
     echo "请使用真实的 taskListId："
     echo "- 优先从 TaskCreate 的返回中复制"
     echo "- 如果没有看到 taskListId，说明你可能没有调用 TaskCreate 工具（只是输出了文本）；请重新调用 TaskCreate 并展开工具输出"
+    echo "- 或使用: $SYSTEM_SKILL_ROOT/scripts/find-task-list-id.sh \"初始化 loop\""
     exit 1
 fi
 
@@ -66,6 +67,7 @@ if [[ ! -d "$TASKS_DIR" ]]; then
     echo "请确保使用真实的 taskListId："
     echo "- 优先从 TaskCreate 的返回中复制"
     echo "- 如果没有看到 taskListId，请展开工具输出（例如 ctrl+o）查看返回的 JSON"
+    echo "- 或使用: $SYSTEM_SKILL_ROOT/scripts/find-task-list-id.sh \"初始化 loop\""
     exit 1
 fi
 

@@ -57,7 +57,12 @@ You are orchestrating an automated task execution loop. Break down complex work 
    - 展开工具输出（例如 `ctrl+o`）查看返回的 JSON
    - 从 JSON 中复制 `taskListId`
 
-2. Run init script to create loop directory and the agent prompt:
+2. 获取真实 taskListId（更符合 AI 直觉，避免猜 ID）：
+   ```bash
+   <SYSTEM_SKILL_ROOT>/scripts/find-task-list-id.sh "初始化 loop"
+   ```
+
+3. Run init script to create loop directory and the agent prompt:
    ```bash
    <SYSTEM_SKILL_ROOT>/scripts/init-loop.sh <taskListId> <slug>
    ```

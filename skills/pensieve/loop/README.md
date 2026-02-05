@@ -19,7 +19,13 @@ TaskCreate subject="初始化 loop" description="1. 初始化 loop 目录 2. 为
 # 返回 { taskListId: "abc-123-uuid", taskId: "1" }
 ```
 
-### Step 2: 初始化 loop 目录
+### Step 2: 获取 taskListId（更符合 AI 直觉）
+
+```bash
+<SYSTEM_SKILL_ROOT>/scripts/find-task-list-id.sh "初始化 loop"
+```
+
+### Step 3: 初始化 loop 目录
 
 ```bash
 <SYSTEM_SKILL_ROOT>/scripts/init-loop.sh <taskListId> <slug>
@@ -29,7 +35,7 @@ TaskCreate subject="初始化 loop" description="1. 初始化 loop 目录 2. 为
 
 > 注意：init-loop.sh 运行很快，这一步建议前台运行以便拿到 `LOOP_DIR` 输出；从 `0.3.2` 起不再需要后台常驻 bind-loop（Stop Hook 通过 `/tmp/pensieve-loop-<taskListId>` 自动接管）。
 
-### Step 3: 填充 context（主窗口负责）
+### Step 4: 填充 context（主窗口负责）
 
 在 loop 目录（`.claude/pensieve/loop/{date}-{slug}/`）下：
 
@@ -89,7 +95,7 @@ TaskCreate subject="初始化 loop" description="1. 初始化 loop 目录 2. 为
 [执行过程中的人工干预]
 ```
 
-### Step 4: 生成 tasks（主窗口负责）
+### Step 5: 生成 tasks（主窗口负责）
 
 根据 context 生成 tasks：
 
@@ -104,7 +110,7 @@ TaskCreate subject="初始化 loop" description="1. 初始化 loop 目录 2. 为
 - description（来源 + 做什么 + 完成条件）
 - activeForm（进行时，如"实现用户登录中"）
 
-### Step 5: 执行 tasks
+### Step 6: 执行 tasks
 
 对每个 task 调用 agent：
 
