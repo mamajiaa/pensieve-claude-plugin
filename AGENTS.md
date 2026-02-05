@@ -41,9 +41,9 @@ Project-level user data lives in `.claude/pensieve/` and is never overwritten by
 ## Local Validation
 
 - Syntax check scripts:
-  - `bash -n hooks/*.sh skills/pensieve/tools/loop/scripts/*.sh skills/pensieve/tools/loop/scripts/_lib.sh`
+  - `bash -n hooks/*.sh skills/pensieve/tools/loop/scripts/*.sh skills/pensieve/tools/loop/scripts/_lib.sh skills/pensieve/tools/pipeline/scripts/*.sh`
 - Optional lint (if installed):
-  - `shellcheck hooks/*.sh skills/pensieve/tools/loop/scripts/*.sh skills/pensieve/tools/loop/scripts/_lib.sh`
+  - `shellcheck hooks/*.sh skills/pensieve/tools/loop/scripts/*.sh skills/pensieve/tools/loop/scripts/_lib.sh skills/pensieve/tools/pipeline/scripts/*.sh`
 
 ## Editing Guidelines
 
