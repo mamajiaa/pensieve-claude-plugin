@@ -5,8 +5,8 @@
 If you installed via Marketplace:
 
 ```bash
-claude plugin marketplace update pensieve-claude-plugin
-claude plugin update pensieve@pensieve-claude-plugin --scope user
+claude plugin marketplace update kingkongshot/Pensieve
+claude plugin update pensieve@Pensieve --scope user
 ```
 
 Then restart Claude Code to apply updates.

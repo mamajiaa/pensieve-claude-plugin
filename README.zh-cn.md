@@ -12,10 +12,10 @@
 
 **存下你的决策与准则，让 Claude 做出更好的选择。**
 
-[![GitHub Stars](https://img.shields.io/github/stars/mamajiaa/pensieve-claude-plugin?color=ffcb47&labelColor=black&style=flat-square)](https://github.com/mamajiaa/pensieve-claude-plugin/stargazers)
+[![GitHub Stars](https://img.shields.io/github/stars/mamajiaa/Pensieve?color=ffcb47&labelColor=black&style=flat-square)](https://github.com/mamajiaa/Pensieve/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-white?labelColor=black&style=flat-square)](LICENSE)
 
-[English](README.md)
+[English](https://github.com/kingkongshot/Pensieve/blob/main/README.md)
 
 </div>
 
@@ -92,14 +92,14 @@ Pensieve 采用**官方 Claude Code 插件结构**：
 #### 1.（推荐）通过 Marketplace 安装并固定到 `zh` 分支
 
 ```bash
-claude plugin marketplace add mamajiaa/pensieve-claude-plugin#zh
-claude plugin install pensieve@pensieve-claude-plugin --scope user
+claude plugin marketplace add kingkongshot/Pensieve#zh
+claude plugin install pensieve@Pensieve --scope user
 ```
 
 如果你希望团队共享，把 scope 改为 `project`：
 
 ```bash
-claude plugin install pensieve@pensieve-claude-plugin --scope project
+claude plugin install pensieve@Pensieve --scope project
 ```
 
 #### 2. 配置 `CLAUDE.md`（或 `AGENTS.md`，二选一）
@@ -146,7 +146,7 @@ mkdir -p .claude/pensieve/{maxims,decisions,knowledge,pipelines,loop}
 
 要移除 Pensieve：
 
-1. 卸载插件：`claude plugin uninstall pensieve --scope user`（若为项目级安装则用 `--scope project`）
+1. 卸载插件：`claude plugin uninstall pensieve@Pensieve --scope user`（若为项目级安装则用 `--scope project`）
 2.（可选）删除项目记忆：`rm -rf .claude/pensieve`
 3. 重启 Claude Code
 

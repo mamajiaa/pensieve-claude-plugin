@@ -1,12 +1,12 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "metadata": {
-    "name": "pensieve-claude-plugin",
-    "version": "0.2.0",
+    "name": "Pensieve",
+    "version": "0.2.1",
     "description": "Pensieve marketplace (zh branch) for installing the plugin from GitHub with a pinned ref"
   },
-  "name": "pensieve-claude-plugin",
-  "version": "0.2.0",
+  "name": "Pensieve",
+  "version": "0.2.1",
   "description": "Pensieve marketplace (zh branch) for installing the plugin from GitHub with a pinned ref",
   "owner": {
     "name": "mamajiaa"
@@ -15,7 +15,7 @@
     {
       "name": "pensieve",
       "description": "Pensieve: loop automation + memory capture for Claude Code (system prompts in plugin, user data in .claude/pensieve)",
-      "version": "0.4.25",
+      "version": "0.4.26",
       "author": {
         "name": "mamajiaa"
       },

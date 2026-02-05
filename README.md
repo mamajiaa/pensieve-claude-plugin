@@ -12,10 +12,10 @@
 
 **Store your decisions and principles. Claude reads them to make better choices.**
 
-[![GitHub Stars](https://img.shields.io/github/stars/mamajiaa/pensieve-claude-plugin?color=ffcb47&labelColor=black&style=flat-square)](https://github.com/mamajiaa/pensieve-claude-plugin/stargazers)
+[![GitHub Stars](https://img.shields.io/github/stars/mamajiaa/Pensieve?color=ffcb47&labelColor=black&style=flat-square)](https://github.com/mamajiaa/Pensieve/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-white?labelColor=black&style=flat-square)](LICENSE)
 
-[Chinese README](README.zh-cn.md)
+[Chinese README](https://github.com/kingkongshot/Pensieve/blob/zh/README.zh-cn.md)
 
 </div>
 
@@ -89,17 +89,17 @@ Pensieve follows the **official Claude Code plugin structure**:
 
 ### For Humans
 
-#### 1. (Recommended) Install via marketplace pinned to `zh`
+#### 1. (Recommended) Install via marketplace pinned to `main`
 
 ```bash
-claude plugin marketplace add mamajiaa/pensieve-claude-plugin#zh
-claude plugin install pensieve@pensieve-claude-plugin --scope user
+claude plugin marketplace add kingkongshot/Pensieve#main
+claude plugin install pensieve@Pensieve --scope user
 ```
 
 If you want to share in a team repo, install at project scope instead:
 
 ```bash
-claude plugin install pensieve@pensieve-claude-plugin --scope project
+claude plugin install pensieve@Pensieve --scope project
 ```
 
 #### 2. Add to `CLAUDE.md` (or `AGENTS.md` — choose one)
@@ -133,7 +133,7 @@ See **[Installation Guide](docs/installation.md)** for details, **[Update Guide]
 
 If you're an LLM agent, help the user:
 
-1. Add marketplace pinned to `zh`
+1. Add marketplace pinned to `main`
 2. Install the plugin
 3. Add routing instructions to `CLAUDE.md` or `AGENTS.md`
 4. Initialize `.claude/pensieve/`
@@ -147,7 +147,7 @@ If you're an LLM agent, help the user:
 To remove Pensieve:
 
 1. Remove the plugin:
-   - `claude plugin uninstall pensieve --scope user`
+   - `claude plugin uninstall pensieve@Pensieve --scope user`
    - Or `--scope project` if installed at project scope
 2. (Optional) Remove project memory:
    - `rm -rf .claude/pensieve`

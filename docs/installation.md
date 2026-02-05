@@ -7,28 +7,28 @@ Pensieve uses the **official plugin structure**:
 
 ## Quick Install
 
-### 1. (Recommended) Install via Marketplace pinned to `zh`
+### 1. (Recommended) Install via Marketplace pinned to `main`
 
-This lets you pick a branch or tag (e.g., the `zh` development branch).
+This lets you pick a branch or tag (e.g., the `main` branch).
 
-Add the marketplace (pinned to `zh`):
+Add the marketplace (pinned to `main`):
 
 ```bash
-claude plugin marketplace add mamajiaa/pensieve-claude-plugin#zh
+claude plugin marketplace add kingkongshot/Pensieve#main
 ```
 
 Install the plugin (user scope):
 
 ```bash
-claude plugin install pensieve@pensieve-claude-plugin --scope user
+claude plugin install pensieve@Pensieve --scope user
 ```
 
-> `pensieve-claude-plugin` comes from the `name` field in `.claude-plugin/marketplace.json`.
+> `Pensieve` comes from the `name` field in `.claude-plugin/marketplace.json`.
 
 If you want to share in a team repo, install at project scope:
 
 ```bash
-claude plugin install pensieve@pensieve-claude-plugin --scope project
+claude plugin install pensieve@Pensieve --scope project
 ```
 
 ### 2. Configure `CLAUDE.md` (recommended)
@@ -91,7 +91,7 @@ If you previously copied system content into the project (e.g., `skills/pensieve
 If you want this in all projects, use user scope:
 
 ```bash
-claude plugin install pensieve@pensieve-claude-plugin --scope user
+claude plugin install pensieve@Pensieve --scope user
 ```
 
 ---
@@ -119,7 +119,7 @@ See **[Update Guide](update.md)**.
 
 ## Uninstall
 
-1. Uninstall plugin: `claude plugin uninstall pensieve@pensieve-claude-plugin --scope user` (or use `/plugin`)
+1. Uninstall plugin: `claude plugin uninstall pensieve@Pensieve --scope user` (or use `/plugin`)
 2. (Optional) Before deleting project data, ask the user whether they need a backup: `rm -rf .claude/pensieve`
 
 ---
