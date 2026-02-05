@@ -21,57 +21,20 @@
 
 <!-- </centered display area> -->
 
-## Why "Pensieve"?
-
-In Harry Potter, a Pensieve is an ancient stone basin filled with silvery liquid memories. Wizards can extract memories from their minds with a wand and store them in the basin.
-
-**Pensieve** combines **pensive (thoughtful)** and **sieve (filter)** — it filters and organizes thoughts.
-
-In the story, the Pensieve repeatedly becomes key to revealing truth — someone stores memories in the basin, and the viewer enters those memories, finally understanding the context and true motivations. **Without the Pensieve, the truth could never be revealed.**
-
----
-
-> [!NOTE]
->
-> **On Architecture Evolution**
->
-> We initially kept long prompts always in context. **This was a mistake.**
->
-> Long prompts make LLM outputs verbose and unpredictable. We discovered: **loading prompts only at specific stages makes responses more reliable.**
->
-> This mirrors how the Pensieve works — memories aren't always stuffed in your head, but retrieved when needed.
->
-> Now, maxims and pipelines are seeded into **project-level user data** and loaded only when needed. **Load on demand, not carry everywhere.**
-
----
-
 ## Table of Contents
 
-- [What Problem Does It Solve](#what-problem-does-it-solve)
+- [Skip Reading This Doc](#skip-reading-this-doc)
 - [Installation](#installation)
+- [What Problem Does It Solve](#what-problem-does-it-solve)
 - [Loop Mode](#loop-mode)
 - [Five Types of Memory](#five-types-of-memory)
 - [Initial Maxims](#initial-maxims)
 - [Customization](#customization)
 - [Architecture](#architecture)
 - [Design Philosophy](#design-philosophy)
+- [Why "Pensieve"?](#why-pensieve)
 - [Community](#community)
-
----
-
-## What Problem Does It Solve
-
-**When Claude Code runs big tasks, you have to watch the screen, ready to intervene.**
-
-That's annoying.
-
-Pensieve's Loop mode lets you:
-1. Describe the task, then walk away
-2. Stop Hook detects incomplete tasks and auto-continues
-3. Each task runs in an isolated subagent — main window won't blow up context
-4. After completion, auto-compares initial assumptions vs actual findings — valuable deviations get recorded
-
-**Your task will be completed. Period.**
+- [License](#license)
 
 ---
 
@@ -160,6 +123,22 @@ If you're an LLM agent, help the user:
 3. Add to `CLAUDE.md` (or `AGENTS.md`): brief Pensieve routing + Self‑Improve requirement
 4. Initialize `.claude/pensieve/` (project user data)
 5. Remind user to restart Claude Code
+
+---
+
+## What Problem Does It Solve
+
+**When Claude Code runs big tasks, you have to watch the screen, ready to intervene.**
+
+That's annoying.
+
+Pensieve's Loop mode lets you:
+1. Describe the task, then walk away
+2. Stop Hook detects incomplete tasks and auto-continues
+3. Each task runs in an isolated subagent — main window won't blow up context
+4. After completion, auto-compares initial assumptions vs actual findings — valuable deviations get recorded
+
+**Your task will be completed. Period.**
 
 ---
 
@@ -366,6 +345,18 @@ If the agent hasn't finished what it started, the system forces it to continue. 
 
 ## Design Philosophy
 
+> [!NOTE]
+>
+> **On Architecture Evolution**
+>
+> We initially kept long prompts always in context. **This was a mistake.**
+>
+> Long prompts make LLM outputs verbose and unpredictable. We discovered: **loading prompts only at specific stages makes responses more reliable.**
+>
+> This mirrors how the Pensieve works — memories aren't always stuffed in your head, but retrieved when needed.
+>
+> Now, maxims and pipelines are seeded into **project-level user data** and loaded only when needed. **Load on demand, not carry everywhere.**
+
 ### Load on Demand, Not Carry Everywhere
 
 Long prompts make LLM outputs unpredictable. Pensieve's core idea: **load only the knowledge needed at specific stages.**
@@ -406,6 +397,16 @@ Systems don't lie. Model inference does.
 3. Orchestration: Adjust order to reduce backtracking
 
 Anti-pattern: Pursuing perfection from the start, optimizing before running.
+
+---
+
+## Why "Pensieve"?
+
+In Harry Potter, a Pensieve is an ancient stone basin filled with silvery liquid memories. Wizards can extract memories from their minds with a wand and store them in the basin.
+
+**Pensieve** combines **pensive (thoughtful)** and **sieve (filter)** — it filters and organizes thoughts.
+
+In the story, the Pensieve repeatedly becomes key to revealing truth — someone stores memories in the basin, and the viewer enters those memories, finally understanding the context and true motivations. **Without the Pensieve, the truth could never be revealed.**
 
 ---
 
