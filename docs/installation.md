@@ -40,7 +40,7 @@ claude plugin install pensieve@pensieve-claude-plugin --scope project
 
 Load pensieve skill IMMEDIATELY when user expresses any intent.
 
-When user wants to improve Pensieve (add/modify pipelines, decisions, maxims, or any content), MUST use _self-improve.md pipeline.
+When user wants to improve Pensieve (add/modify pipelines, decisions, maxims, or any content), MUST use the Self‑Improve tool (`tools/self-improve/_self-improve.md`).
 ```
 
 ### 3. 初始化项目级用户数据（推荐）

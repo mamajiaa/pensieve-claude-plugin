@@ -12,9 +12,10 @@ This repo is **Pensieve**, a Claude Code knowledge/automation system with two pa
   - `inject-routes.sh` (SessionStart) — scans installed skill content and injects a “available resources” summary
   - `loop-controller.sh` (Stop) — auto-continues pending tasks in Loop mode via marker + task status
 - `skills/pensieve/` — system skill shipped in the plugin (updated via plugin updates)
-  - `tools/` — built-in tools (`loop/`, `self-improve/`)
+  - `tools/` — built-in tools (`loop/`, `self-improve/`, `pipeline/`)
     - `loop/` — loop tool markdown + scripts
     - `self-improve/` — self-improve tool markdown
+    - `pipeline/` — pipeline listing tool markdown
   - `pipelines/` — optional user-defined workflows (e.g. `review.md`)
   - `maxims/` — system principles (`_linus.md` built-in)
   - `decisions/` — decision format docs
@@ -27,6 +28,7 @@ Project-level user data lives in `.claude/pensieve/` and is never overwritten by
 - `.claude/pensieve/maxims/`
 - `.claude/pensieve/decisions/`
 - `.claude/pensieve/knowledge/`
+- `.claude/pensieve/pipelines/`
 - `.claude/pensieve/loop/`
 
 ## Conventions

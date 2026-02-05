@@ -11,7 +11,7 @@ set -euo pipefail
 PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 DATA_ROOT="$PROJECT_ROOT/.claude/pensieve"
 
-mkdir -p "$DATA_ROOT"/{maxims,decisions,knowledge,loop}
+mkdir -p "$DATA_ROOT"/{maxims,decisions,knowledge,loop,pipelines}
 
 CUSTOM_MAXIMS="$DATA_ROOT/maxims/custom.md"
 if [[ ! -f "$CUSTOM_MAXIMS" ]]; then
@@ -50,6 +50,7 @@ if [[ ! -f "$README" ]]; then
 - `decisions/`：决策记录（按 `<SYSTEM_SKILL_ROOT>/decisions/README.md` 的格式）
 - `knowledge/`：外部知识（按 `<SYSTEM_SKILL_ROOT>/knowledge/README.md` 的格式）
 - `loop/`：Loop 运行目录（每次 loop 一个子目录）
+- `pipelines/`：项目级自定义流程（可选）
 EOF
 fi
 

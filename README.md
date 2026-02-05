@@ -122,7 +122,7 @@ claude plugin install pensieve@pensieve-claude-plugin --scope project
 ```markdown
 ## Pensieve
 Load pensieve skill IMMEDIATELY when user expresses any intent.
-When user wants to improve Pensieve, MUST use _self-improve.md pipeline.
+When user wants to improve Pensieve, MUST use the Self‑Improve tool (`tools/self-improve/_self-improve.md`).
 ```
 
 #### 3. Initialize project user data (recommended)
@@ -155,7 +155,7 @@ If you're an LLM agent, help the user:
    ```bash
    claude plugin install pensieve@pensieve-claude-plugin --scope user
    ```
-3. Add to `CLAUDE.md`: `## Pensieve\nLoad pensieve skill IMMEDIATELY. To improve Pensieve, use _self-improve.md.`
+3. Add to `CLAUDE.md`: `## Pensieve\nLoad pensieve skill IMMEDIATELY. To improve Pensieve, use self-improve tool.`
 4. Initialize `.claude/pensieve/` (project user data)
 5. Remind user to restart Claude Code
 
@@ -298,13 +298,14 @@ Decision guides → Pipeline improvement
 
 ## Customization
 
-Say `capture` or `record this` to trigger the self-improve pipeline, which will guide you through capturing project learnings into **project-level user data**.
+Say `capture` or `record this` to trigger the self-improve tool, which will guide you through capturing project learnings into **project-level user data**.
 
 | Type | Location | Naming |
 |------|----------|--------|
 | Decision | `.claude/pensieve/decisions/` | `{date}-{conclusion}.md` |
 | Maxim | `.claude/pensieve/maxims/custom.md` | Edit this file |
 | Knowledge | `.claude/pensieve/knowledge/{name}/` | `content.md` |
+| Pipeline | `.claude/pensieve/pipelines/` | `{name}.md` |
 
 **Note**: System prompts (tools/scripts/system knowledge) are shipped inside the plugin and updated only via plugin updates.
 
@@ -330,7 +331,8 @@ pensieve/
         ├── SKILL.md
         ├── tools/
         │   ├── loop/
-        │   └── self-improve/
+        │   ├── self-improve/
+        │   └── pipeline/
         ├── maxims/
         ├── decisions/
         ├── knowledge/
@@ -342,6 +344,7 @@ pensieve/
         ├── maxims/
         ├── decisions/
         ├── knowledge/
+        ├── pipelines/
         └── loop/
 ```
 

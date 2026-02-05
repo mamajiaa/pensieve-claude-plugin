@@ -65,7 +65,7 @@ Pensieve/                        # 仓库（插件部分）
 |--------|----------|------|
 | "用 loop"、"loop 执行" | `_loop.md` | 自动循环执行多任务 |
 | "review"、"审查" | `review.md` | 代码审查流程 |
-| "自改进" | `_self-improve.md` | 系统自我优化 |
+| "自改进" | `tools/self-improve/_self-improve.md` | 系统自我优化 |
 
 ## Loop 模式
 

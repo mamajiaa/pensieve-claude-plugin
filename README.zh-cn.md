@@ -122,7 +122,7 @@ claude plugin install pensieve@pensieve-claude-plugin --scope project
 ```markdown
 ## Pensieve
 Load pensieve skill IMMEDIATELY when user expresses any intent.
-When user wants to improve Pensieve, MUST use _self-improve.md pipeline.
+When user wants to improve Pensieve, MUST use the Self‑Improve tool (`tools/self-improve/_self-improve.md`).
 ```
 
 #### 3. 初始化项目级用户数据（推荐）
@@ -155,7 +155,7 @@ mkdir -p .claude/pensieve/{maxims,decisions,knowledge,loop}
    ```bash
    claude plugin install pensieve@pensieve-claude-plugin --scope user
    ```
-3. 在 `CLAUDE.md` 中添加：`## Pensieve\nLoad pensieve skill IMMEDIATELY. To improve Pensieve, use _self-improve.md.`
+3. 在 `CLAUDE.md` 中添加：`## Pensieve\nLoad pensieve skill IMMEDIATELY. To improve Pensieve, use self-improve tool.`
 4. 初始化项目级用户数据：`.claude/pensieve/`
 5. 提醒用户重启 Claude Code
 
@@ -298,13 +298,14 @@ Decision 指导 → Pipeline 改进
 
 ## 自定义
 
-说 `沉淀` 或 `记录下来` 触发自改进流程，它会引导你把经验沉淀到**项目级用户数据**中（插件更新不会覆盖）。
+说 `沉淀` 或 `记录下来` 触发自改进工具，它会引导你把经验沉淀到**项目级用户数据**中（插件更新不会覆盖）。
 
 | 类型 | 位置 | 命名 |
 |------|------|------|
 | Decision | `.claude/pensieve/decisions/` | `{date}-{结论}.md` |
 | Maxim | `.claude/pensieve/maxims/custom.md` | 编辑此文件 |
 | Knowledge | `.claude/pensieve/knowledge/{name}/` | `content.md` |
+| Pipeline | `.claude/pensieve/pipelines/` | `{name}.md` |
 
 **注意**：系统提示词（tools/scripts/系统 knowledge）都在插件内，完全随插件更新维护。
 
@@ -330,7 +331,8 @@ pensieve/
         ├── SKILL.md
         ├── tools/
         │   ├── loop/
-        │   └── self-improve/
+        │   ├── self-improve/
+        │   └── pipeline/
         ├── maxims/
         ├── decisions/
         ├── knowledge/
@@ -342,6 +344,7 @@ pensieve/
         ├── maxims/
         ├── decisions/
         ├── knowledge/
+        ├── pipelines/
         └── loop/
 ```
 

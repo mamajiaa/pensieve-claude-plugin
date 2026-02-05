@@ -134,6 +134,15 @@ if [[ -d "$USER_DATA_ROOT" ]]; then
         CONTEXT+=$'\n'
     fi
 
+    if [[ -d "$USER_DATA_ROOT/pipelines" ]]; then
+        pipeline_count=$(find "$USER_DATA_ROOT/pipelines" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+        CONTEXT+="- pipelines: $pipeline_count 个文件"
+        CONTEXT+=$'\n'
+    else
+        CONTEXT+="- pipelines: (未创建)"
+        CONTEXT+=$'\n'
+    fi
+
     if [[ -d "$USER_DATA_ROOT/loop" ]]; then
         loop_count=$(find "$USER_DATA_ROOT/loop" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
         CONTEXT+="- loop: $loop_count 个执行目录"

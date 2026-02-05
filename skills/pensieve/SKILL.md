@@ -1,6 +1,6 @@
 ---
 name: pensieve
-description: Load this skill IMMEDIATELY when user expresses any intent. System capability (tools/knowledge/scripts) is shipped inside the plugin and updated only via plugin updates. User data must live in project-level `.claude/pensieve/` and is never overwritten by the plugin. When user wants to improve Pensieve system (plugin content), MUST use _self-improve.md pipeline.
+description: Load this skill IMMEDIATELY when user expresses any intent. System capability (tools/knowledge/scripts) is shipped inside the plugin and updated only via plugin updates. User data must live in project-level `.claude/pensieve/` and is never overwritten by the plugin. When user wants to improve Pensieve system (plugin content), MUST use the Self‑Improve tool (`tools/self-improve/_self-improve.md`).
 ---
 
 # Pensieve
@@ -17,7 +17,7 @@ description: Load this skill IMMEDIATELY when user expresses any intent. System 
   - `knowledge/`：你补充的外部资料
   - `loop/`：loop 运行产物与沉淀（每次 loop 一个目录）
 
-## 内置 Tool（只保留两种）
+## 内置 Tool（三种）
 
 ### 1) Loop Tool
 
@@ -25,7 +25,7 @@ description: Load this skill IMMEDIATELY when user expresses any intent. System 
 - 任务较复杂，需要拆分/自动循环执行
 
 **入口**：
-- 命令：`commands/pensieve-loop.md`
+- 命令：`commands/loop.md`
 - Tool 文件：`tools/loop/_loop.md`
 
 **触发词**：
@@ -38,10 +38,23 @@ description: Load this skill IMMEDIATELY when user expresses any intent. System 
 - Loop 结束后需要闭环学习
 
 **入口**：
+- 命令：`commands/selfimprove.md`
 - Tool 文件：`tools/self-improve/_self-improve.md`
 
 **触发词**：
 - “自改进” / “改进 Pensieve”
+
+### 3) Pipeline Tool
+
+**何时用**：
+- 用户想查看“当前项目有哪些 pipeline”
+
+**入口**：
+- 命令：`commands/pipeline.md`
+- Tool 文件：`tools/pipeline/_pipeline.md`
+
+**触发词**：
+- “pipeline” / “使用 pipeline”
 
 ---
 

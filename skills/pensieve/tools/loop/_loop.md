@@ -190,7 +190,7 @@ Agent prompt 模板（`_agent-prompt.md`）由 init-loop.sh 生成，包含：
 **Goal**: End loop and self-improve based on execution experience
 
 **Actions**:
-1. 当所有任务完成时，Stop Hook 会提示主窗口是否执行自优化，并给出 `_self-improve.md` 的路径；无论是否执行，Loop 都会停止。
+1. 当所有任务完成时，Stop Hook 会提示主窗口是否执行自优化，并给出 `tools/self-improve/_self-improve.md` 的路径；无论是否执行，Loop 都会停止。
 2. 如需手动提前结束 loop（`<taskListId>` 是 Phase 1 获取的 ID）:
 
    ✅ **正确**：
