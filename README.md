@@ -83,15 +83,16 @@ Pensieve's Loop mode lets you:
 
 If you're an LLM agent, explain to the user what this project can do now.
 
-### Magic Words
+### Commands (Recommended)
 
-| Trigger | Effect |
-|---------|--------|
-| `loop` | Auto-loop execute multiple tasks |
-| `review` | Code review pipeline |
-| `capture` / `record this` | Store new memory |
+| Command | Purpose |
+|---------|---------|
+| `/loop` | Complex tasks: plan → split → auto-continue |
+| `/pipeline` | List project pipelines (paths + descriptions) |
+| `/upgrade` | Migrate user data to `.claude/pensieve/` |
+| `/selfimprove` | Improve Pensieve system (pipelines/scripts/behavior) |
 
-**Speak naturally. Pensieve routes to the right pipeline.**
+**Speak naturally. Pensieve will route to the right tool or pipeline.**
 
 ---
 
@@ -117,18 +118,19 @@ If you want to share in a team repo, install at project scope instead:
 claude plugin install pensieve@pensieve-claude-plugin --scope project
 ```
 
-#### 2. Add to CLAUDE.md
+#### 2. Add to CLAUDE.md (or AGENTS.md — choose one)
 
 ```markdown
 ## Pensieve
-Load pensieve skill IMMEDIATELY when user expresses any intent.
-When user wants to improve Pensieve, MUST use the Self‑Improve tool (`tools/self-improve/_self-improve.md`).
+Explore the project first, then decide whether to use Pensieve tools.
+Use /pipeline → /loop for complex work. Use /upgrade for data migration.
+When improving Pensieve, MUST use `tools/self-improve/_self-improve.md`.
 ```
 
 #### 3. Initialize project user data (recommended)
 
 ```bash
-mkdir -p .claude/pensieve/{maxims,decisions,knowledge,loop}
+mkdir -p .claude/pensieve/{maxims,decisions,knowledge,pipelines,loop}
 ```
 
 Or run the plugin initializer (does not overwrite existing files). The absolute path is injected at SessionStart:
@@ -155,7 +157,7 @@ If you're an LLM agent, help the user:
    ```bash
    claude plugin install pensieve@pensieve-claude-plugin --scope user
    ```
-3. Add to `CLAUDE.md`: `## Pensieve\nLoad pensieve skill IMMEDIATELY. To improve Pensieve, use self-improve tool.`
+3. Add to `CLAUDE.md` (or `AGENTS.md`): brief Pensieve routing + Self‑Improve requirement
 4. Initialize `.claude/pensieve/` (project user data)
 5. Remind user to restart Claude Code
 
@@ -188,7 +190,7 @@ Phase 4: Split tasks, user confirms
          ↓
 Phase 5: Subagent executes one by one, Stop Hook auto-loops
          ↓
-Phase 6: end-loop.sh ends + self-improve captures learnings
+Phase 6: Stop Hook prompts self‑improve (optional)
 ```
 
 ### Two Storage Systems
@@ -196,7 +198,7 @@ Phase 6: end-loop.sh ends + self-improve captures learnings
 | Storage | Content | Why |
 |---------|---------|-----|
 | `~/.claude/tasks/<uuid>/` | Task state (JSON) | Claude Code native, for Stop Hook detection |
-| `.claude/pensieve/loop/{date}-{slug}/` | Metadata + docs | Project-level tracking, capture improvements |
+| `.claude/pensieve/loop/{date}-{slug}/` | Metadata + docs | Project-level tracking & learnings |
 
 ### Automation Level
 
@@ -298,7 +300,7 @@ Decision guides → Pipeline improvement
 
 ## Customization
 
-Say `capture` or `record this` to trigger the self-improve tool, which will guide you through capturing project learnings into **project-level user data**.
+Use `/selfimprove` to capture learnings into **project-level user data**.
 
 | Type | Location | Naming |
 |------|----------|--------|
@@ -331,12 +333,13 @@ pensieve/
         ├── SKILL.md
         ├── tools/
         │   ├── loop/
-        │   ├── self-improve/
-        │   └── pipeline/
+        │   ├── pipeline/
+        │   ├── upgrade/
+        │   └── self-improve/
         ├── maxims/
         ├── decisions/
         ├── knowledge/
-        └── pipelines/         # Optional user-defined pipelines
+        └── pipelines/         # System example pipelines (e.g. review)
 
 <project>/
 └── .claude/

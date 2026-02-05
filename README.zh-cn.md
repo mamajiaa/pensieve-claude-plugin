@@ -83,15 +83,16 @@ Pensieve 的 Loop 模式让你可以：
 
 如果你是 LLM 智能体，向用户解释这个项目现在能够实现什么。
 
-### 魔法词
+### 推荐命令
 
-| 触发词 | 效果 |
-|--------|------|
-| `loop` / `用 loop` | 自动循环执行多任务 |
-| `review` / `审查` | 代码审查流程 |
-| `沉淀` / `记录下来` | 存入新的记忆 |
+| 命令 | 作用 |
+|------|------|
+| `/loop` | 复杂任务：规划 → 拆解 → 自动续跑 |
+| `/pipeline` | 列出项目 pipelines（路径 + 描述） |
+| `/upgrade` | 迁移用户数据到 `.claude/pensieve/` |
+| `/selfimprove` | 改进 Pensieve 系统能力 |
 
-**说人话，Pensieve 会路由到对应流程。**
+**说人话，Pensieve 会路由到对应工具或流程。**
 
 ---
 
@@ -117,18 +118,19 @@ claude plugin install pensieve@pensieve-claude-plugin --scope user
 claude plugin install pensieve@pensieve-claude-plugin --scope project
 ```
 
-#### 2. 配置 CLAUDE.md
+#### 2. 配置 CLAUDE.md（或 AGENTS.md，二选一）
 
 ```markdown
 ## Pensieve
-Load pensieve skill IMMEDIATELY when user expresses any intent.
-When user wants to improve Pensieve, MUST use the Self‑Improve tool (`tools/self-improve/_self-improve.md`).
+先探索项目，再决定是否使用 Pensieve 工具。
+复杂任务：/pipeline → /loop；迁移数据：/upgrade。
+改进 Pensieve 时必须使用 `tools/self-improve/_self-improve.md`。
 ```
 
 #### 3. 初始化项目级用户数据（推荐）
 
 ```bash
-mkdir -p .claude/pensieve/{maxims,decisions,knowledge,loop}
+mkdir -p .claude/pensieve/{maxims,decisions,knowledge,pipelines,loop}
 ```
 
 或运行插件内置初始化脚本（不会覆盖已有文件；绝对路径会在 SessionStart 注入）：
@@ -155,7 +157,7 @@ mkdir -p .claude/pensieve/{maxims,decisions,knowledge,loop}
    ```bash
    claude plugin install pensieve@pensieve-claude-plugin --scope user
    ```
-3. 在 `CLAUDE.md` 中添加：`## Pensieve\nLoad pensieve skill IMMEDIATELY. To improve Pensieve, use self-improve tool.`
+3. 在 `CLAUDE.md`（或 `AGENTS.md`）中添加简短路由指引 + 自改进要求
 4. 初始化项目级用户数据：`.claude/pensieve/`
 5. 提醒用户重启 Claude Code
 
@@ -188,7 +190,7 @@ Phase 4: 拆分任务，用户确认
          ↓
 Phase 5: Subagent 逐个执行，Stop Hook 自动循环
          ↓
-Phase 6: end-loop.sh 结束 + self-improve 沉淀经验
+Phase 6: Stop Hook 提示自改进（可选）
 ```
 
 ### 两套存储
@@ -298,7 +300,7 @@ Decision 指导 → Pipeline 改进
 
 ## 自定义
 
-说 `沉淀` 或 `记录下来` 触发自改进工具，它会引导你把经验沉淀到**项目级用户数据**中（插件更新不会覆盖）。
+用 `/selfimprove` 触发自改进工具，它会引导你把经验沉淀到**项目级用户数据**中（插件更新不会覆盖）。
 
 | 类型 | 位置 | 命名 |
 |------|------|------|
@@ -331,12 +333,13 @@ pensieve/
         ├── SKILL.md
         ├── tools/
         │   ├── loop/
-        │   ├── self-improve/
-        │   └── pipeline/
+        │   ├── pipeline/
+        │   ├── upgrade/
+        │   └── self-improve/
         ├── maxims/
         ├── decisions/
         ├── knowledge/
-        └── pipelines/         # 可选的用户自定义 pipelines
+        └── pipelines/         # 系统示例流程（如 review）
 
 <project>/
 └── .claude/

@@ -8,7 +8,7 @@ Pensieve（冥想盆）是 Claude Code 的知识管理系统，核心理念：**
 
 ## 架构
 
-插件和 Skill 分离安装：
+插件和用户数据分离：
 
 ```
 Pensieve/                        # 仓库（插件部分）
@@ -24,8 +24,8 @@ Pensieve/                        # 仓库（插件部分）
         ├── maxims/               # 系统准则
         ├── decisions/            # 决策格式规范
         ├── knowledge/            # 系统知识
-        ├── tools/                # 内置工具（Loop / self-improve）
-        └── pipelines/            # 用户自定义流程（可选）
+        ├── tools/                # 内置工具（loop / pipeline / upgrade / self-improve）
+        └── pipelines/            # 系统示例流程（如 review）
 
 项目级用户数据（永不被插件更新覆盖）：
 
@@ -34,13 +34,14 @@ Pensieve/                        # 仓库（插件部分）
 ├── maxims/
 ├── decisions/
 ├── knowledge/
+├── pipelines/
 └── loop/
 ```
 
 ## 安装方式
 
-1. **插件**：通过 `.claude/settings.json` 安装（URL 插件）
-2. **用户数据**：初始化项目级目录 `.claude/pensieve/`（可用 `skills/pensieve/tools/loop/scripts/init-project-data.sh`）
+1. **插件**：通过 marketplace 安装（固定到 `zh` 分支）
+2. **用户数据**：初始化项目级目录 `.claude/pensieve/`（可用 `tools/loop/scripts/init-project-data.sh`）
 
 ## 核心脚本
 
@@ -59,13 +60,14 @@ Pensieve/                        # 仓库（插件部分）
 - `skills/pensieve/maxims/README.md` — 准则编写指南
 - `skills/pensieve/decisions/README.md` — 决策编写指南
 
-## Pensieve 触发词
+## 推荐命令
 
-| 触发词 | Pipeline | 说明 |
-|--------|----------|------|
-| "用 loop"、"loop 执行" | `_loop.md` | 自动循环执行多任务 |
-| "review"、"审查" | `review.md` | 代码审查流程 |
-| "自改进" | `tools/self-improve/_self-improve.md` | 系统自我优化 |
+| 命令 | 对应工具 | 说明 |
+|------|----------|------|
+| `/loop` | `tools/loop/_loop.md` | 自动循环执行多任务 |
+| `/pipeline` | `tools/pipeline/_pipeline.md` | 列出项目 pipelines |
+| `/upgrade` | `tools/upgrade/_upgrade.md` | 迁移用户数据 |
+| `/selfimprove` | `tools/self-improve/_self-improve.md` | 系统自我优化 |
 
 ## Loop 模式
 

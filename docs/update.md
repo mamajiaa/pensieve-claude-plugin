@@ -38,4 +38,5 @@ claude plugin update pensieve@pensieve-claude-plugin --scope user
 | `.claude/pensieve/maxims/` | 自定义准则 |
 | `.claude/pensieve/decisions/` | 决策记录 |
 | `.claude/pensieve/knowledge/` | 自定义知识 |
+| `.claude/pensieve/pipelines/` | 项目级自定义流程 |
 | `.claude/pensieve/loop/` | 历史 loop 目录 |

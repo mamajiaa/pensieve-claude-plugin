@@ -16,7 +16,7 @@ This repo is **Pensieve**, a Claude Code knowledge/automation system with two pa
     - `loop/` — loop tool markdown + scripts
     - `self-improve/` — self-improve tool markdown
     - `pipeline/` — pipeline listing tool markdown
-  - `pipelines/` — optional user-defined workflows (e.g. `review.md`)
+  - `pipelines/` — system example pipelines (e.g. `review.md`)
   - `maxims/` — system principles (`_linus.md` built-in)
   - `decisions/` — decision format docs
   - `knowledge/` — system knowledge used by tools

@@ -58,7 +58,7 @@ claude plugin install pensieve@pensieve-claude-plugin --scope project
 可选方式：
 
 ```bash
-mkdir -p .claude/pensieve/{maxims,decisions,knowledge,loop}
+mkdir -p .claude/pensieve/{maxims,decisions,knowledge,pipelines,loop}
 ```
 
 或运行插件内置初始化脚本（会补齐默认文件，且不会覆盖已有文件）：
