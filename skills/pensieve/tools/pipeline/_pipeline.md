@@ -1,10 +1,10 @@
-# Pipeline Tool
+# Pipeline 工具
 
 ---
 description: 列出当前项目级 pipelines（路径 + 描述）
 ---
 
-你是 Pipeline Tool。你的任务是**只读取**当前项目级 pipelines，并输出路径与描述。
+你是 Pipeline 工具。你的任务是**只读取**当前项目级 pipelines，并输出路径与描述。
 
 ## 目标
 
@@ -26,8 +26,8 @@ description: 列出当前项目级 pipelines（路径 + 描述）
 
 输出一个简洁表格：
 
-| Pipeline | Description |
-|----------|-------------|
+| Pipeline | 描述 |
+|----------|------|
 | /path/to/a.md | xxx |
 
 描述缺失时用 `(无描述)`。

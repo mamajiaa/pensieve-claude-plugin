@@ -1,10 +1,10 @@
 #!/bin/bash
-# Initialize project-level pensieve user data directory:
+# 初始化项目级 pensieve 用户数据目录：
 #   <project>/.claude/pensieve/
 #
-# This directory is user-owned and is NEVER overwritten by plugin updates.
+# 该目录由用户拥有，插件更新永不覆盖。
 #
-# Safe to run multiple times (idempotent).
+# 可重复执行（幂等）。
 
 set -euo pipefail
 
@@ -48,4 +48,4 @@ if [[ ! -f "$REVIEW_PIPELINE" ]]; then
 fi
 
 echo "✅ 初始化完成: $DATA_ROOT"
-echo "  - maxims/custom.md: $([[ -f "$CUSTOM_MAXIMS" ]] && echo exists || echo created)"
+echo "  - maxims/custom.md: $([[ -f "$CUSTOM_MAXIMS" ]] && echo 已存在 || echo 已创建)"

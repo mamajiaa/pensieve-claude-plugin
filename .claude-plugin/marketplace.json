@@ -3,19 +3,19 @@
   "metadata": {
     "name": "pensieve-claude-plugin",
     "version": "0.2.0",
-    "description": "Pensieve marketplace (zh branch) for installing the plugin from GitHub with a pinned ref"
+    "description": "Pensieve 市场（zh 分支），用于从 GitHub 固定引用安装插件"
   },
   "name": "pensieve-claude-plugin",
   "version": "0.2.0",
-  "description": "Pensieve marketplace (zh branch) for installing the plugin from GitHub with a pinned ref",
+  "description": "Pensieve 市场（zh 分支），用于从 GitHub 固定引用安装插件",
   "owner": {
     "name": "mamajiaa"
   },
   "plugins": [
     {
       "name": "pensieve",
-      "description": "Pensieve: loop automation + memory capture for Claude Code (system prompts in plugin, user data in .claude/pensieve)",
-      "version": "0.4.19",
+      "description": "Pensieve：Claude Code 的 loop 自动化 + 记忆沉淀（系统提示词在插件内，用户数据在 .claude/pensieve）",
+      "version": "0.4.20",
       "author": {
         "name": "mamajiaa"
       },

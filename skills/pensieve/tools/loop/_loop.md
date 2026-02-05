@@ -2,16 +2,16 @@
 description: 自动循环执行任务。当用户说"用 loop"、"loop 执行"、"使用 loop 模式"时触发。
 ---
 
-# Loop Pipeline
+# Loop 流程
 
-You are orchestrating an automated task execution loop. Break down complex work into discrete tasks, then execute them via subagents while the Stop Hook handles continuation.
+你在编排一个自动循环执行流程：将复杂任务拆成可执行的子任务，并通过 subagent 执行；Stop Hook 负责自动接续。
 
-## Core Principles
+## 核心原则
 
-- **Context isolation**: Each task runs in a subagent to prevent main window context explosion
-- **Atomic tasks**: Each task should be independently executable and verifiable
-- **User confirmation**: Always confirm context understanding before generating tasks
-- **Clean handoff**: Subagents execute one task and return; Stop Hook triggers next
+- **上下文隔离**：每个 task 由 subagent 执行，避免主窗口上下文膨胀
+- **原子任务**：每个 task 必须可独立执行与验证
+- **用户确认**：生成 tasks 前必须确认上下文理解
+- **清晰交接**：subagent 只执行一个 task 后返回；Stop Hook 触发下一个
 
 > **路径说明**：以下脚本路径相对于插件根目录（`skills/pensieve/` 的上级）。脚本内部已自定位，支持从任意工作目录调用。
 >
@@ -41,15 +41,15 @@ You are orchestrating an automated task execution loop. Break down complex work 
 
 ---
 
-## Phase 1: Initialize
+## Phase 1: 初始化
 
-**Goal**: Create task list and loop directory structure
+**目标**：创建 task 列表与 loop 目录结构
 
-**Actions**:
-1. Create placeholder task to obtain task list ID:
+**行动**：
+1. 创建占位 task 获取 taskListId：
    ```
    TaskCreate subject="初始化 loop" description="1. 初始化 loop 目录 2. 为任务构建上下文 3. 生成并执行任务"
-   # Returns { taskListId: "abc-123-uuid", taskId: "1" }
+   # 返回 { taskListId: "abc-123-uuid", taskId: "1" }
    ```
    ⚠️ **必须使用返回的真实 taskListId**（如 `5e600100-9157-4888-...`），不是 "default"。
    如果你没有看到 taskListId：
@@ -62,13 +62,13 @@ You are orchestrating an automated task execution loop. Break down complex work 
    bash <SYSTEM_SKILL_ROOT>/tools/loop/scripts/find-task-list-id.sh "初始化 loop"
    ```
 
-3. Run init script to create loop directory and the agent prompt:
+3. 运行初始化脚本创建 loop 目录与 agent prompt：
    ```bash
    bash <SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-loop.sh <taskListId> <slug>
    ```
    **slug 参数**：根据任务内容生成简短英文标识（如 `snake-game`、`auth-module`），避免中文和空格。
 
-   **IMPORTANT**: 这一步不要用 `run_in_background: true`。你需要立刻看到脚本输出的 `LOOP_DIR` 才能进入 Phase 2。
+   **重要**：这一步不要用 `run_in_background: true`。你需要立刻看到脚本输出的 `LOOP_DIR` 才能进入 Phase 2。
 
    脚本输出（记住这两个值）：
    ```
@@ -78,22 +78,22 @@ You are orchestrating an automated task execution loop. Break down complex work 
 
 ---
 
-## Phase 2: Activate Stop Hook
+## Phase 2: 激活 Stop Hook
 
-**Goal**: Ensure Stop Hook can detect active loop
+**目标**：确保 Stop Hook 能识别活跃 loop
 
 从 `0.3.2` 起，`init-loop.sh` 会自动写入 loop marker：`/tmp/pensieve-loop-<taskListId>`，Stop Hook 会据此接管。
 
-**Important**：无需再启动 `bind-loop.sh`（不再需要后台常驻进程 / `run_in_background: true`）。
+**重要**：无需再启动 `bind-loop.sh`（不再需要后台常驻进程 / `run_in_background: true`）。
 
 ---
 
-## Phase 3: Capture Context
+## Phase 3: 记录上下文
 
-**Goal**: Document the conversation context before task generation
+**目标**：在生成任务前记录对话上下文
 
-**Actions**:
-1. Create and write `LOOP_DIR/_context.md`（Phase 1 不再生成模板文件，避免“已存在文件需先 Read 才能 Write”的摩擦）:
+**行动**：
+1. 创建并写入 `LOOP_DIR/_context.md`（Phase 1 不再生成模板文件，避免“已存在文件需先 Read 才能 Write”的摩擦）：
 
 ```markdown
 # 对话上下文
@@ -123,24 +123,24 @@ You are orchestrating an automated task execution loop. Break down complex work 
 | plan | 无需 / 路径 |
 ```
 
-2. **Present context summary to user and confirm understanding before proceeding**
+2. **向用户展示上下文摘要并确认理解后再继续**
 
-3. **按需创建 requirements/design**（参考模板）:
+3. **按需创建 requirements/design**（参考模板）：
 
    | 条件 | 需要 | 模板 |
    |------|------|------|
    | 预估 6+ tasks / 跨多天 / 多模块联动 | requirements | `loop/REQUIREMENTS.template.md` |
    | 多方案权衡 / 决策影响后续开发 | design | `loop/DESIGN.template.md` |
 
-   创建后将路径填入 `_context.md` 的"文档引用"。
+   创建后将路径填入 `_context.md` 的“文档引用”。
 
 ---
 
-## Phase 4: Generate Tasks
+## Phase 4: 生成任务
 
-**Goal**: Break down work into atomic, executable tasks
+**目标**：将工作拆分为原子可执行任务
 
-**CRITICAL**: Do not proceed without user confirmation from Phase 3.
+**关键**：未获得 Phase 3 的用户确认不得继续。
 
 ### 先获取可用 pipeline（用于任务设计）
 
@@ -163,20 +163,20 @@ bash <SYSTEM_SKILL_ROOT>/tools/pipeline/scripts/list-pipelines.sh
 - 指明需要创建/修改的文件或组件
 - 涉及具体的写代码、改代码或测代码活动
 
-### Actions
+### 行动
 
 1. 拆分任务，确保每个 task 符合上述粒度标准
 2. 创建 tasks，增量构建（每个 task 在前一个基础上推进）
-3. **Present task list to user for confirmation**
+3. **向用户展示任务列表并确认**
 
 ---
 
-## Phase 5: Execute Tasks
+## Phase 5: 执行任务
 
-**Goal**: Run each task via isolated subagent
+**目标**：通过 subagent 执行每个 task
 
-**Actions**:
-1. Launch a general-purpose agent for the first pending task:
+**行动**：
+1. 为第一个 pending task 启动通用 subagent：
 
 ```
 Task(
@@ -185,23 +185,23 @@ Task(
 )
 ```
 
-Agent prompt 模板（`_agent-prompt.md`）由 init-loop.sh 生成，包含：
+`_agent-prompt.md` 模板由 init-loop.sh 生成，包含：
 - 角色定义（Linus Torvalds）
-- Context 和准则文件路径
-- 执行流程和约束
+- Context 与准则路径
+- 执行流程与约束
 
-2. Subagent 自行读取模板 → TaskGet 获取任务 → 执行 → 返回
-3. Stop Hook 检测 pending tasks → 注入简化指令 → 主窗口机械执行
+2. Subagent 读取模板 → TaskGet 获取任务 → 执行 → 返回
+3. Stop Hook 检测 pending tasks → 注入强化信息 → 主窗口机械执行
 
 ---
 
-## Phase 6: Wrap Up
+## Phase 6: 收尾
 
-**Goal**: End loop and self-improve based on execution experience
+**目标**：结束 loop，并根据执行经验自改进
 
-**Actions**:
+**行动**：
 1. 当所有任务完成时，Stop Hook 会提示主窗口是否执行自优化，并给出 `tools/self-improve/_self-improve.md` 的路径；无论是否执行，Loop 都会停止。
-2. 如需手动提前结束 loop（`<taskListId>` 是 Phase 1 获取的 ID）:
+2. 如需手动提前结束 loop（`<taskListId>` 是 Phase 1 获取的 ID）：
 
    ✅ **正确**：
    ```bash
@@ -215,19 +215,19 @@ Agent prompt 模板（`_agent-prompt.md`）由 init-loop.sh 生成，包含：
 
 ---
 
-## Phase Selection Guide
+## 阶段选择指南
 
-| Task characteristics | Phase combination |
-|---------------------|-------------------|
-| Clear, small scope | tasks |
-| Need code understanding | plan → tasks |
-| Need technical design | plan → design → tasks |
-| Unclear requirements | plan → requirements → design → tasks |
+| 任务特征 | 阶段组合 |
+|----------|----------|
+| 明确、小范围 | tasks |
+| 需要了解代码 | plan → tasks |
+| 需要技术设计 | plan → design → tasks |
+| 需求不明确 | plan → requirements → design → tasks |
 
 ---
 
-## Related Files
+## 相关文件
 
-- `tools/loop/README.md` — Detailed documentation
-- `<SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-loop.sh` — Initialize loop directory
-- `<SYSTEM_SKILL_ROOT>/tools/loop/scripts/end-loop.sh` — End loop manually
+- `tools/loop/README.md` — 详细文档
+- `<SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-loop.sh` — 初始化 loop 目录
+- `<SYSTEM_SKILL_ROOT>/tools/loop/scripts/end-loop.sh` — 手动结束 loop

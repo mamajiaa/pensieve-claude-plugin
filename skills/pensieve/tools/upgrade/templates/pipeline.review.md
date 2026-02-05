@@ -3,12 +3,12 @@ name: review
 description: |
   代码审查 pipeline。基于 Linus Torvalds 好品味哲学、John Ousterhout 设计原则、Google Code Review 标准。
 
-  Use this pipeline when:
+  适用场景：
   - 用户请求代码审查
   - 用户说"review"、"审查"、"检查代码"
   - 需要评估代码质量或设计决策
 
-  Examples:
+  示例：
   <example>
   用户: "帮我 review 这段代码"
   -> 触发此 pipeline
@@ -23,7 +23,7 @@ stages: [tasks]
 gate: auto
 ---
 
-# Code Review Pipeline
+# 代码审查 Pipeline
 
 基于三大来源的代码审查流程。
 
@@ -84,85 +84,85 @@ gate: auto
 
 ## Phase 2: 8 步审查
 
-### Step 1: 确定范围
+### 步骤 1：确定范围
 
 ```markdown
-## Step 1: 审查范围
+## 步骤 1：审查范围
 - **类型**: [文件 / Git 提交 / 代码片段]
 - **代码量**: [X 行] [WARNING 如果 >200 行]
 - **主要变更**: [一句话]
 ```
 
-### Step 2: 设计审查
+### 步骤 2：设计审查
 
 检查：代码归属、库选择、模块划分、Design It Twice
 
 ```markdown
-## Step 2: 设计审查
+## 步骤 2：设计审查
 **结论**: [PASS / WARNING / CRITICAL]
 - 是否考虑过替代方案：[是/否]
 ```
 
-### Step 3: 复杂性审查
+### 步骤 3：复杂性审查
 
 检查：变更放大、认知负荷、未知的未知、模块深度
 
 ```markdown
-## Step 3: 复杂性审查
+## 步骤 3：复杂性审查
 **结论**: [PASS / WARNING / CRITICAL]
 - **变更放大**: [是/否]
 - **认知负荷**: [低/中/高]
 - **模块深度**: [深/正常/浅]
 ```
 
-### Step 4: 代码结构审查
+### 步骤 4：代码结构审查
 
 检查：嵌套层次（<=2好, =3警告, >3禁止）、函数长度（<50好, >100禁止）、局部变量（<=5好, >10禁止）
 
 ```markdown
-## Step 4: 代码结构审查
+## 步骤 4：代码结构审查
 **结论**: [PASS / WARNING / CRITICAL]
 - **最深嵌套**: [X 层]
 - **最长函数**: [Y 行]
 - **特殊情况数**: [N 处]
 ```
 
-### Step 5: 命名与注释审查
+### 步骤 5：命名与注释审查
 
 检查：名称精确性、注释是否解释"为什么"
 
 ```markdown
-## Step 5: 命名与注释审查
+## 步骤 5：命名与注释审查
 **结论**: [PASS / WARNING / CRITICAL]
 ```
 
-### Step 6: 异常处理审查
+### 步骤 6：异常处理审查
 
 检查：防御性默认值、fallback 代码、异常聚合
 
 ```markdown
-## Step 6: 异常处理审查
+## 步骤 6：异常处理审查
 **结论**: [PASS / WARNING / CRITICAL]
 - **防御性代码**: [有/无]
 - **Fallback 代码**: [有/无]
 ```
 
-### Step 7: 破坏性分析
+### 步骤 7：破坏性分析
 
 检查：受影响功能、用户可见行为变化
 
 ```markdown
-## Step 7: 破坏性分析
+## 步骤 7：破坏性分析
 **结论**: [PASS / WARNING / CRITICAL]
 - **用户可见行为变化**: [有/无]
 ```
 
-### Step 8: 测试审查
+### 步骤 8：测试审查
 
 检查：测试覆盖、测试有效性
 
 ```markdown
-## Step 8: 测试审查
+## 步骤 8：测试审查
 **结论**: [PASS / WARNING / CRITICAL]
 ```
 

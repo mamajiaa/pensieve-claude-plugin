@@ -111,15 +111,15 @@ Pipeline 定义回路，Tasks 是回路中的具体行动。
 ### 文件格式
 
 ```markdown
-# Pipeline Name
+# Pipeline 名称
 
 ---
 description: 简要描述。当用户说"触发词1"、"触发词2"时触发。
 ---
 
-角色定位：You are [doing what]...
+角色定位：你是[做什么的]...
 
-## Core Principles
+## 核心原则
 
 - **原则1**: 说明
 - **原则2**: 说明
@@ -128,9 +128,9 @@ description: 简要描述。当用户说"触发词1"、"触发词2"时触发。
 
 ## Phase 1: 阶段名
 
-**Goal**: 这个阶段要达成什么
+**目标**：这个阶段要达成什么
 
-**Actions**:
+**行动**：
 1. 具体动作
 2. 具体动作
 
@@ -140,17 +140,17 @@ description: 简要描述。当用户说"触发词1"、"触发词2"时触发。
 
 ## Phase 2: 阶段名
 
-**Goal**: 这个阶段要达成什么
+**目标**：这个阶段要达成什么
 
 **CRITICAL**: 关键警告（如果有）
 
-**Actions**:
+**行动**：
 1. 具体动作
-2. **Present to user and wait for confirmation**
+2. **向用户展示并等待确认**
 
 ---
 
-## Related Files
+## 相关文件
 
 - `相关文件路径` — 说明
 ```
@@ -160,77 +160,77 @@ description: 简要描述。当用户说"触发词1"、"触发词2"时触发。
 | 元素 | 说明 |
 |------|------|
 | `description` | 在 frontmatter 中，包含触发词 |
-| 角色定位 | "You are..." 开头，明确 Claude 的角色 |
-| Core Principles | 3-5 条核心原则，前置 |
+| 角色定位 | 以“你是...”开头，明确 Claude 的角色 |
+| 核心原则 | 3-5 条核心原则，前置 |
 | Phase（而非 Step） | 每个阶段用 `---` 分隔 |
-| **Goal** | 每个 Phase 必须有目标 |
-| **Actions** | 编号列表，具体动作 |
+| **目标** | 每个 Phase 必须有目标 |
+| **行动** | 编号列表，具体动作 |
 | **CRITICAL** / **DO NOT SKIP** | 关键步骤的强标记 |
-| 用户确认点 | "Wait for confirmation" 明确标注 |
+| 用户确认点 | 明确标注“等待确认” |
 
 ### 示例
 
 ```markdown
-# Review Pipeline
+# 代码审查 Pipeline
 
 ---
 description: 代码审查流程。当用户说"审查代码"、"review"、"帮我看看这个改动"时触发。
 ---
 
-You are conducting a systematic code review, balancing thoroughness with pragmatism.
+你正在进行系统性的代码审查，在彻底性与务实性之间平衡。
 
-## Core Principles
+## 核心原则
 
-- **Evidence-based**: Every issue must cite specific code
-- **Severity-aware**: Distinguish critical bugs from nitpicks
-- **Actionable**: Provide concrete fix suggestions
+- **证据驱动**：每个问题都要引用具体代码
+- **严重性意识**：区分关键问题与细枝末节
+- **可执行**：给出明确可落实的改进建议
 
 ---
 
-## Phase 1: Understand Changes
+## Phase 1: 理解变更
 
-**Goal**: Get complete picture of what changed
+**目标**：完整理解变更内容
 
-**Actions**:
-1. Read the diff or specified commits
-2. List all modified files
-3. Identify the scope (single feature, refactor, bugfix, etc.)
+**行动**：
+1. 阅读 diff 或指定提交
+2. 列出所有修改的文件
+3. 判断变更范围（单一功能/重构/修复等）
 
 **验证**：能列出所有变更的文件和变更类型
 
 ---
 
-## Phase 2: Systematic Review
+## Phase 2: 系统化审查
 
-**Goal**: Check each file against review criteria
+**目标**：逐文件对照审查标准
 
-**Actions**:
-1. Load review knowledge: `knowledge/taste-review/`
-2. For each file, check against criteria
-3. Record findings with severity: PASS / WARNING / CRITICAL
+**行动**：
+1. 载入审查知识：`knowledge/taste-review/`
+2. 对每个文件逐条检查
+3. 记录结果：PASS / WARNING / CRITICAL
 
-**CRITICAL**: Every WARNING/CRITICAL must cite specific line numbers.
+**CRITICAL**：每个 WARNING/CRITICAL 必须引用具体行号。
 
 **验证**：每个检查项都有结论
 
 ---
 
-## Phase 3: Report
+## Phase 3: 报告
 
-**Goal**: Deliver actionable review summary
+**目标**：输出可执行的审查结论
 
-**Actions**:
-1. Summarize findings by severity
-2. Provide overall assessment
-3. **Present report to user**
+**行动**：
+1. 按严重性汇总发现
+2. 给出整体评估
+3. **向用户呈现报告**
 
 **验证**：报告包含所有发现和改进建议
 
 ---
 
-## Related Files
+## 相关文件
 
-- `knowledge/taste-review/` — Review criteria and checklist
+- `knowledge/taste-review/` — 审查标准与清单
 ```
 
 ## 注意事项

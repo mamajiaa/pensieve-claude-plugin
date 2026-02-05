@@ -69,7 +69,7 @@ get_shell_pid() {
 
 CURRENT_SESSION_PID="$(get_shell_pid || true)"
 CURRENT_CLAUDE_PID="$(get_claude_pid || true)"
-log "Hook triggered pid=$$ ppid=$PPID claude_pid=$CURRENT_CLAUDE_PID session_pid=$CURRENT_SESSION_PID"
+log "Hook 触发 pid=$$ ppid=$PPID claude_pid=$CURRENT_CLAUDE_PID session_pid=$CURRENT_SESSION_PID"
 
 # ============================================
 # 检查是否有活跃的 Loop（通过标记文件）
@@ -91,7 +91,7 @@ for marker in /tmp/pensieve-loop-*; do
     # 容错：若 claude_pid 已不存活，清理 marker
     if ! kill -0 "$local_claude_pid" 2>/dev/null; then
         rm -f "$marker"
-        log "stale marker removed: $marker claude_pid=$local_claude_pid"
+        log "清理过期 marker: $marker claude_pid=$local_claude_pid"
         continue
     fi
 
@@ -99,7 +99,7 @@ for marker in /tmp/pensieve-loop-*; do
 done
 
 if [[ "${#MARKERS[@]}" -eq 0 ]]; then
-    log "no marker matched, exit"
+    log "未匹配到 marker，退出"
     exit 0
 fi
 
@@ -156,7 +156,7 @@ read_pipeline() {
     if [[ -f "$META_FILE" ]]; then
         sed -n '/^---$/,/^---$/p' "$META_FILE" | grep "^pipeline:" | sed 's/^pipeline: *//'
     else
-        echo "unknown"
+        echo "未知"
     fi
 }
 
@@ -343,7 +343,7 @@ main() {
             fi
 
             rm -f "$MARKER_FILE"
-            log "tasks dir missing, marker removed: $TASKS_DIR"
+            log "任务目录不存在，已移除 marker: $TASKS_DIR"
             continue
         fi
 
