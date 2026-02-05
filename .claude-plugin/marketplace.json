@@ -15,7 +15,7 @@
     {
       "name": "pensieve",
       "description": "Pensieve: loop automation + memory capture for Claude Code (system prompts in plugin, user data in .claude/pensieve)",
-      "version": "0.4.12",
+      "version": "0.4.13",
       "author": {
         "name": "mamajiaa"
       },

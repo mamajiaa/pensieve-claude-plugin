@@ -143,7 +143,7 @@ mkdir -p .claude/pensieve/{maxims,decisions,knowledge,pipelines,loop}
 
 说 `loop` 验证安装成功。
 
-详见 **[安装指南](docs/installation.md)**。更新请看 **[更新指南](docs/update.md)**。
+详见 **[安装指南](docs/installation.md)**、**[更新指南](docs/update.md)** 与 **[卸载](docs/installation.md#卸载)**。
 
 ### 面向 LLM 智能体
 

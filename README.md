@@ -143,7 +143,7 @@ Or run the plugin initializer (does not overwrite existing files). The absolute 
 
 Say `loop` to verify installation.
 
-See **[Installation Guide](docs/installation.md)** for details. For updates, see **[Update Guide](docs/update.md)**.
+See **[Installation Guide](docs/installation.md)** for details, **[Update Guide](docs/update.md)** for updates, and **[Uninstall](docs/installation.md#卸载)** for removal.
 
 ### For LLM Agents
 
