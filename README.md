@@ -164,13 +164,13 @@ Pensieve 的核心能力。让 Claude Code 变成一个自律的执行者。
 ```
 Phase 0: 简单任务判断
          ↓ 复杂任务走 loop
-Phase 1: 创建占位任务 + init-loop.sh
+Phase 1: init-loop.sh 初始化目录（prepare-only）
          ↓
-Phase 2: init-loop.sh 写入 marker（Stop Hook 自动接管）
+Phase 2: 填充 _context.md（交互历史、最终共识、理解与假设）
          ↓
-Phase 3: 填充 _context.md（交互历史、最终共识、理解与假设）
+Phase 3: 拆分任务，用户确认
          ↓
-Phase 4: 拆分任务，用户确认
+Phase 4: 创建真实 task 后执行 --bind（Stop Hook 接管）
          ↓
 Phase 5: Subagent 逐个执行，Stop Hook 自动循环
          ↓
