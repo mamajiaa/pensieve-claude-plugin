@@ -15,7 +15,7 @@
 [![GitHub Stars](https://img.shields.io/github/stars/kingkongshot/Pensieve?color=ffcb47&labelColor=black&style=flat-square)](https://github.com/kingkongshot/Pensieve/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-white?labelColor=black&style=flat-square)](LICENSE)
 
-[Chinese README](https://github.com/kingkongshot/Pensieve/blob/zh/README.zh-cn.md)
+[Chinese README](https://github.com/kingkongshot/Pensieve/blob/zh/README.md)
 
 </div>
 
