@@ -164,13 +164,13 @@ Pensieve's core capability. It turns Claude Code into a self-disciplined executo
 ```
 Phase 0: Simple task check
          ↓ Complex tasks go to loop
-Phase 1: Create placeholder task + init-loop.sh
+Phase 1: init-loop.sh prepares the directory (prepare-only)
          ↓
-Phase 2: init-loop.sh writes marker (Stop Hook activates automatically)
+Phase 2: Fill _context.md (history, final consensus, assumptions)
          ↓
-Phase 3: Fill _context.md (interaction history, final consensus, understanding & assumptions)
+Phase 3: Split tasks and confirm with user
          ↓
-Phase 4: Split tasks, user confirms
+Phase 4: Create real tasks, then run --bind (Stop Hook takes over)
          ↓
 Phase 5: Subagent executes one by one, Stop Hook auto-loops
          ↓
