@@ -24,7 +24,37 @@ plugin_root_from_script() {
     cd "$skill_root/../.." && pwd                     # ... (plugin root)
 }
 
+to_posix_path() {
+    local raw_path="$1"
+    [[ -n "$raw_path" ]] || {
+        echo ""
+        return 0
+    }
+
+    # Convert Windows-style paths (e.g. C:\foo or C:/foo) for Git Bash/MSYS.
+    if [[ "$raw_path" =~ ^[A-Za-z]:[\\/].* ]]; then
+        if command -v cygpath >/dev/null 2>&1; then
+            cygpath -u "$raw_path"
+            return 0
+        fi
+
+        local drive rest drive_lower
+        drive="${raw_path:0:1}"
+        rest="${raw_path:2}"
+        rest="${rest//\\//}"
+        drive_lower="$(printf '%s' "$drive" | tr 'A-Z' 'a-z')"
+        echo "/$drive_lower$rest"
+        return 0
+    fi
+
+    echo "$raw_path"
+}
+
 project_root() {
+    if [[ -n "${CLAUDE_PROJECT_DIR:-}" ]]; then
+        to_posix_path "$CLAUDE_PROJECT_DIR"
+        return 0
+    fi
     git rev-parse --show-toplevel 2>/dev/null || pwd
 }
 

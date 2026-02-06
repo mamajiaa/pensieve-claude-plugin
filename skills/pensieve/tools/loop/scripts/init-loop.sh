@@ -52,6 +52,7 @@ fail_task_list_id() {
 
 resolve_loop_dir() {
     local loop_ref="$1"
+    loop_ref="$(to_posix_path "$loop_ref")"
     local loop_dir=""
 
     if [[ -d "$loop_ref" ]]; then
@@ -65,6 +66,21 @@ resolve_loop_dir() {
     fi
 
     (cd "$loop_dir" && pwd)
+}
+
+iso_timestamp() {
+    local py
+    py="$(python_bin || true)"
+    if [[ -n "$py" ]]; then
+        "$py" - <<'PY'
+from datetime import datetime, timezone
+print(datetime.now(timezone.utc).isoformat())
+PY
+        return 0
+    fi
+
+    # Portable fallback for environments without Python.
+    date -u +"%Y-%m-%dT%H:%M:%SZ"
 }
 
 create_loop_dir() {
@@ -93,7 +109,7 @@ write_marker() {
     local loop_dir="$2"
     local marker_file="/tmp/pensieve-loop-$task_list_id"
     local timestamp
-    timestamp=$(date -Iseconds)
+    timestamp="$(iso_timestamp)"
     local claude_pid session_pid
     claude_pid="$(find_claude_pid || true)"
     session_pid="$(find_claude_session_pid || true)"

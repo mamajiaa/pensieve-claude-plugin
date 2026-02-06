@@ -60,5 +60,24 @@ if [[ "${#matches[@]}" -eq 0 ]]; then
 fi
 
 # Pick the most recently modified directory
-latest_dir=$(ls -dt "${matches[@]}" | head -1)
+pick_latest_dir() {
+    if [[ -n "$PYTHON_BIN" ]]; then
+        "$PYTHON_BIN" - "$@" <<'PY'
+import os
+import sys
+
+dirs = [p for p in sys.argv[1:] if p]
+if not dirs:
+    sys.exit(1)
+
+latest = max(dirs, key=os.path.getmtime)
+print(latest)
+PY
+        return 0
+    fi
+
+    ls -dt "$@" | head -1
+}
+
+latest_dir="$(pick_latest_dir "${matches[@]}")"
 basename "$latest_dir"

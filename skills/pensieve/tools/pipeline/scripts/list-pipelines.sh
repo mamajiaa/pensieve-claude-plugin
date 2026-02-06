@@ -3,8 +3,11 @@
 
 set -euo pipefail
 
-project_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-pipeline_dir="$project_root/.claude/pensieve/pipelines"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../../loop/scripts/_lib.sh"
+
+project_root_path="$(project_root)"
+pipeline_dir="$project_root_path/.claude/pensieve/pipelines"
 
 if [[ ! -d "$pipeline_dir" ]]; then
   echo "No project pipelines found"
