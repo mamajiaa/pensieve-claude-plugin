@@ -6,7 +6,7 @@ Executable workflows that define a full loop from input to validation.
 
 ## Purpose
 
-Pipelines exist to **build verifiable execution loops**.
+Pipelines exist to **build verifiable execution loops and deterministic task blueprints**.
 
 **Pipelines orchestrate flow — they do not aggregate information.**  
 All background information should live elsewhere and be **referenced**:
@@ -95,10 +95,10 @@ Reach baseline → refine (tools, sequencing)
 
 | Type | Essence | Focus |
 |------|---------|-------|
-| Pipeline | Execution loop | "How to validate" (loop + metrics) |
-| Tasks | Concrete actions | "What to do" (current step) |
+| Pipeline | Task blueprint + validation loop | "What to create and in which order" |
+| Tasks | Runtime instances | "Execute this specific step now" |
 
-Pipelines define the loop; tasks are the actions inside it.
+Pipelines should directly provide task templates; runtime tasks are instantiated from that template.
 
 ## Writing Guide
 
@@ -134,27 +134,38 @@ Role: You are [doing what]...
 
 ---
 
-## Phase 1: Phase Name
+## Task Blueprint
 
-**Goal**: What this phase should achieve
+### Task 1: Task Name
 
-**Actions**:
+**Goal**: What this task should achieve
+
+**Read Inputs**:
+1. Required file/path
+2. Required file/path
+
+**Steps**:
 1. Specific action
 2. Specific action
 
-**Validation**: How to verify completion
+**Done When**: Objective completion criteria
 
 ---
 
-## Phase 2: Phase Name
+### Task 2: Task Name
 
-**Goal**: What this phase should achieve
+**Goal**: What this task should achieve
+
+**Read Inputs**:
+1. Previous task output
 
 **CRITICAL**: Key warning (if any)
 
-**Actions**:
+**Steps**:
 1. Specific action
 2. **Present to user and wait for confirmation**
+
+**Done When**: Objective completion criteria
 
 ---
 
@@ -171,9 +182,11 @@ Role: You are [doing what]...
 | Role line | Starts with "You are..." and defines Claude's role |
 | Core Principles | 1–3 short operational rules |
 | No knowledge dump | Long background belongs in Knowledge/Maxims/Decisions/Skills |
-| Phases (not Steps) | Each phase separated by `---` |
-| **Goal** | Every phase must have a goal |
-| **Actions** | Numbered, concrete steps |
+| Task Blueprint | Must include explicit `Task 1/2/3...` in order |
+| **Goal** | Every task must have a goal |
+| **Read Inputs** | Required files/paths must be explicit |
+| **Steps** | Numbered, concrete steps |
+| **Done When** | Completion criteria must be testable |
 | **CRITICAL** / **DO NOT SKIP** | Strong markers for key steps |
 | User confirmation | Explicit "Wait for confirmation" |
 
@@ -196,44 +209,57 @@ description: Code review flow. Triggered by "review code", "review", "check this
 
 ---
 
-## Phase 1: 理解变更
+## Task Blueprint
+
+### Task 1: 理解变更范围
 
 **Goal**: Get a complete picture of what changed
 
-**Actions**:
+**Read Inputs**:
+1. User-provided diff/commit/PR scope
+2. `knowledge/taste-review/content.md`
+
+**Steps**:
 1. Read the diff or specified commits
 2. List all modified files
 3. Identify scope (feature, refactor, bugfix, etc.)
 
-**Validation**: Can list all modified files and change types
+**Done When**: Can list all modified files and change types
 
 ---
 
-## Phase 2: 系统化审查
+### Task 2: 系统化审查
 
-**目标**：逐文件对照审查标准
+**Goal**: 逐文件对照审查标准
 
-**Actions**:
-1. Load review knowledge: `knowledge/taste-review/`
-2. Apply the checklist from knowledge (no extra theory here)
-3. Record findings with severity: PASS / WARNING / CRITICAL
+**Read Inputs**:
+1. Task 1 output file list
+2. `knowledge/taste-review/content.md`
 
 **CRITICAL**：每个 WARNING/CRITICAL 必须引用具体行号。
 
-**Validation**: Each check has a conclusion
+**Steps**:
+1. Apply the checklist from knowledge (no extra theory here)
+2. Record findings with severity: PASS / WARNING / CRITICAL
+3. Track user-visible behavior change risk
+
+**Done When**: Each file has evidence-backed conclusion
 
 ---
 
-## Phase 3: 报告
+### Task 3: 报告
 
 **Goal**: Deliver an actionable review summary
 
-**行动**：
-1. 按严重性汇总发现
-2. 给出整体评估
-3. **向用户呈现报告**
+**Read Inputs**:
+1. Task 2 findings
 
-**Validation**: Report includes all findings and improvement suggestions
+**Steps**:
+1. 按严重性汇总发现
+2. 给出整体评估和修复建议
+3. **向用户呈现报告并等待确认**
+
+**Done When**: Report includes all findings and prioritized fixes
 
 ---
 

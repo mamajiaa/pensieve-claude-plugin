@@ -62,7 +62,7 @@ Option A:
 mkdir -p .claude/pensieve/{maxims,decisions,knowledge,pipelines,loop}
 ```
 
-Option B (recommended): run the initializer (seeds **initial maxims + pipeline**, never overwrites existing files):
+Option B (recommended): run the initializer (seeds **initial maxims + review pipeline**, never overwrites existing files):
 
 ```bash
 <SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-project-data.sh
@@ -129,11 +129,11 @@ See **[Update Guide](update.md)**.
 After installation:
 
 1. Restart Claude Code
-2. Say `loop` — it should trigger the Loop pipeline
+2. Say `loop` — it should trigger the Loop tool workflow
 3. Check `/help` for the `pensieve` skill
 
 > Note: `init-loop.sh` only creates the loop directory and `_agent-prompt.md`.  
-> `_context.md` is created and filled in Phase 3 by the main window.
+> `_context.md` is created and filled in Phase 2 by the main window.
 
 ---
 
