@@ -1,41 +1,41 @@
-# 自改进 Pipeline
+# Self-Improve Pipeline
 
 ---
 description: Knowledge capture workflow. Trigger when loop completes or user says "capture", "record", or "save".
 ---
 
-你在帮助把经验与模式沉淀到 Pensieve 的知识系统中。
+You are helping capture learnings and patterns into Pensieve's knowledge system.
 
-**系统提示词**（tools/scripts/系统 knowledge）位于插件内部，随插件更新维护。
+**System prompts** (tools/scripts/system knowledge) live in the plugin and are updated only via plugin updates.
 
-**用户数据**位于项目级 `.claude/pensieve/`，永不被插件更新覆盖。
+**User data** lives in project-level `.claude/pensieve/` and is never overwritten by the plugin.
 
-判断哪些内容值得保留、如何分类，并按正确格式写入。
+Determine what's worth preserving, categorize it correctly, and write it in the proper format.
 
-## 核心原则
+## Core Principles
 
-- **必须用户确认**：绝不自动沉淀，先询问
-- **先读后写**：创建任何文件前必须阅读对应 README
-- **删除优于新增**：系统越简单越可靠
-- **分类正确**：内容必须匹配正确的知识类型
+- **User confirmation required**: Never auto-capture — always ask first
+- **Read before write**: Must read the target README before creating any file
+- **Deletion over addition**: Simpler system is more reliable
+- **Right category**: Match content to the correct knowledge type
 
 ---
 
-## Phase 1: 理解意图
+## Phase 1: Understand Intent
 
-**目标**：澄清用户想沉淀什么
+**Goal**: Clarify what the user wants to capture
 
-**行动**：
-1. 识别来源：
-   - Loop 偏差（预期 vs 实际）
-   - 执行中发现的模式
-   - 用户明确指令
-   - 外部参考资料
+**Actions**:
+1. Identify the source:
+   - Loop deviation (expected vs actual)
+   - Discovered pattern during work
+   - Explicit user instruction
+   - External reference material
 
-2. 如有需要，追问：
-   - 具体要沉淀的洞见是什么？
-   - 触发这个洞见的事件是什么？
-   - 这条经验有多通用？
+2. Ask clarifying questions if needed:
+   - What specific insight should be captured?
+   - What triggered this realization?
+   - How general is this learning?
 
 ---
 
@@ -63,41 +63,19 @@ If the user declines, skip this phase and continue.
 
 ## Phase 3: Categorize
 
-**目标**：找出当前项目 Pensieve 的优化点
+**Goal**: Determine the correct knowledge type
 
-**行动**：
-1. 询问用户是否需要体检：
-   - “要不要我检查一下当前 `.claude/pensieve/` 的内容是否有优化空间？”
-2. 若用户同意：
-   - 先阅读各目录 README：
-     - `<SYSTEM_SKILL_ROOT>/maxims/README.md`
-     - `<SYSTEM_SKILL_ROOT>/decisions/README.md`
-     - `<SYSTEM_SKILL_ROOT>/pipelines/README.md`
-     - `<SYSTEM_SKILL_ROOT>/knowledge/README.md`
-   - 检查 `.claude/pensieve/` 下对应文件
-   - 标注格式不符合、缺字段、过期内容或分类不当
-   - 输出简洁的 review 报告并给出修正建议
-3. **未经用户明确批准，不做任何修改**
+**Actions**:
+1. Evaluate content against each category:
 
-用户拒绝则跳过本阶段，继续下一步。
+| Type | Characteristics | README |
+|------|-----------------|--------|
+| **maxim** | Universal principles — applies across projects, languages, domains | `maxims/README.md` |
+| **decision** | Context-dependent choices — specific to situation or project | `decisions/README.md` |
+| **pipeline** | Executable workflows — repeatable process with clear steps | `pipelines/README.md` |
+| **knowledge** | External references — docs, tutorials, specifications | `knowledge/README.md` |
 
----
-
-## Phase 3: 分类
-
-**目标**：确定正确的知识类型
-
-**行动**：
-1. 对照每一类的标准：
-
-| 类型 | 特征 | README |
-|------|------|--------|
-| **maxim** | 普遍原则，跨项目/语言/领域 | `maxims/README.md` |
-| **decision** | 情境相关的选择 | `decisions/README.md` |
-| **pipeline** | 可执行流程，步骤清晰可复用 | `pipelines/README.md` |
-| **knowledge** | 外部资料，文档/教程/规范 | `knowledge/README.md` |
-
-2. **向用户呈现分类建议**：
+2. **Present categorization to user**:
    ```markdown
    ## Capture Recommendation
 
@@ -108,38 +86,38 @@ If the user declines, skip this phase and continue.
    Do you agree?
    ```
 
-**关键**：未获得用户确认不得继续。
+**CRITICAL**: Wait for user confirmation before proceeding.
 
 ---
 
 ## Phase 4: Read Target README
 
-**目标**：掌握该类别的格式与标准
+**Goal**: Understand the exact format and criteria for the chosen category
 
-**不得跳过**：README 定义了：
-- 沉淀标准（什么值得写）
-- 文件格式要求
-- 命名规范
-- 示例
+**DO NOT SKIP**: This phase is mandatory. The README defines:
+- Capture criteria (what's worth capturing)
+- File format requirements
+- Naming conventions
+- Examples
 
-**行动**：
-1. 阅读对应 README：
+**Actions**:
+1. Read the corresponding README:
    ```
    Read <SYSTEM_SKILL_ROOT>/{type}/README.md
    ```
 
-2. 校验内容是否符合 README 标准
+2. Verify the content meets the capture criteria defined in README
 
-3. 若不符合，向用户说明并询问如何处理
+3. If content doesn't meet criteria, explain to user and ask how to proceed
 
 ---
 
 ## Phase 5: Draft Content
 
-**目标**：严格按 README 格式写草稿
+**Goal**: Write content following the README format exactly
 
-**行动**：
-1. 按 README 规范写草稿
+**Actions**:
+1. Draft the file content following README specifications
 
 2. Choose the target location:
    - **pipeline** → `.claude/pensieve/pipelines/{name}.md` (project user data)
@@ -147,7 +125,7 @@ If the user declines, skip this phase and continue.
    - **decision** → `.claude/pensieve/decisions/{date}-{conclusion}.md` (project user data)
    - **knowledge** → `.claude/pensieve/knowledge/{name}/content.md` (project user data)
 
-3. **向用户展示草稿**：
+3. **Present draft to user for review**:
    ```markdown
    ## Draft Preview
 
@@ -160,24 +138,24 @@ If the user declines, skip this phase and continue.
    Write it?
    ```
 
-**关键**：未获得用户批准不得写入。
+**CRITICAL**: Wait for user approval before writing.
 
 ---
 
 ## Phase 6: Write
 
-**目标**：落盘沉淀
+**Goal**: Persist the knowledge
 
-**必须先获得 Phase 4 批准**。
+**DO NOT START WITHOUT USER APPROVAL** from Phase 4.
 
-**行动**：
-1. 写入 `{target_path}`
-2. 向用户确认写入成功
-3. 提示相关后续动作（如更新引用此内容的文件）
+**Actions**:
+1. Write the file to `{target_path}`
+2. Confirm successful write to user
+3. Suggest any related follow-up actions (e.g., update other files that reference this)
 
 ---
 
-## 知识演化
+## Knowledge Evolution
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -187,14 +165,14 @@ If the user declines, skip this phase and continue.
 │  └─────────────┘   └─────────────┘   └─────────────┘   └─────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
 
-演化路径：decision → 重复模式 → maxim → 指导 → pipeline
+Evolution path: decision → repeated pattern → maxim → guides → pipeline
 ```
 
 ---
 
-## 相关文件
+## Related Files
 
-- `maxims/README.md` — Maxim 格式与标准
-- `decisions/README.md` — Decision 格式与标准
-- `pipelines/README.md` — Pipeline 格式与标准
-- `knowledge/README.md` — Knowledge 格式与标准
+- `maxims/README.md` — Maxim format and criteria
+- `decisions/README.md` — Decision format and criteria
+- `pipelines/README.md` — Pipeline format and criteria
+- `knowledge/README.md` — Knowledge format and criteria

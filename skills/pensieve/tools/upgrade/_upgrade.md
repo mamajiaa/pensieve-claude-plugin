@@ -1,4 +1,4 @@
-# 升级工具
+# Upgrade Tool
 
 ---
 description: Guide user data upgrade to project-level `.claude/pensieve/` structure

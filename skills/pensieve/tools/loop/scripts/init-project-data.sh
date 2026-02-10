@@ -1,10 +1,10 @@
 #!/bin/bash
-# 初始化项目级 pensieve 用户数据目录：
+# Initialize project-level Pensieve user data directory:
 #   <project>/.claude/pensieve/
 #
-# 该目录由用户拥有，插件更新永不覆盖。
+# This directory is user-owned and never overwritten by plugin updates.
 #
-# 可重复执行（幂等）。
+# Safe to run repeatedly (idempotent).
 
 set -euo pipefail
 

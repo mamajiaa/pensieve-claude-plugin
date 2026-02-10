@@ -1,92 +1,92 @@
 ---
 name: review
 description: |
-  代码审查 pipeline。基于 Linus Torvalds 的品味哲学、John Ousterhout 的设计原则与 Google Code Review 标准。
+  Code review pipeline. Based on Linus Torvalds' taste philosophy, John Ousterhout's design principles, and Google Code Review standards.
 
-  在以下情况使用此 pipeline：
-  - 用户明确要求代码审查
-  - 用户说“review”“代码审查”“帮我检查代码”
-  - 需要评估代码质量或设计决策
+  Use this pipeline when:
+  - The user requests a code review
+  - The user says "review", "code review", or "check my code"
+  - You need to assess code quality or design decisions
 
-  示例：
+  Examples:
   <example>
-  User: "帮我 review 这段代码"
-  -> 触发此 pipeline
+  User: "Review this code for me"
+  -> trigger this pipeline
   </example>
   <example>
-  User: "检查这个 PR"
-  -> 触发此 pipeline
+  User: "Check this PR"
+  -> trigger this pipeline
   </example>
 
-signals: ["review", "code review", "check code", "code quality", "代码审查", "审查代码", "检查代码", "代码质量", "review一下"]
+signals: ["review", "code review", "check code", "code quality"]
 stages: [tasks]
 gate: auto
 ---
 
-# 代码审查 Pipeline
+# Code Review Pipeline
 
-这个 pipeline 负责把代码审查直接映射成可执行 task 列表。审查标准与深层依据统一放在 Knowledge 中。
+This pipeline maps code review directly into an executable task list. All criteria and deeper rationale live in Knowledge.
 
-**Knowledge 参考**：`<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md`
+**Knowledge reference**: `<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md`
 
 ---
 
-## Task Blueprint（按顺序创建任务）
+## Task Blueprint (Create in order)
 
-### Task 1：准备审查上下文
+### Task 1: Prepare Review Context
 
-**目标**：明确审查边界，避免漏审
+**Goal**: Clarify review boundaries and avoid missing scope
 
-**读取输入**：
-1. 用户指定的文件 / 提交 / PR 范围
+**Read Inputs**:
+1. User-provided files / commits / PR scope
 2. `<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md`
 
-**执行步骤**：
-1. 确认审查范围（文件 / 提交 / 代码片段）
-2. 识别技术语言、业务约束与风险点
-3. 输出待审文件清单（按优先级）
+**Steps**:
+1. Confirm review scope (files / commits / snippets)
+2. Identify technical constraints, business constraints, and risk points
+3. Output a prioritized review file list
 
-**完成标准**：范围清晰，且有可执行的待审文件列表
+**Done When**: Scope is clear and the review file list is executable
 
 ---
 
-### Task 2：逐文件审查并记录证据
+### Task 2: Review Files and Capture Evidence
 
-**目标**：基于统一标准形成逐文件结论
+**Goal**: Produce per-file conclusions against a unified standard
 
-**读取输入**：
-1. Task 1 产出的待审文件清单
+**Read Inputs**:
+1. Review file list from Task 1
 2. `<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md`
 
-**执行步骤**：
-1. 对每个文件执行审查清单（不在此重复理论）
-2. 按严重级别记录结论：PASS / WARNING / CRITICAL
-3. 对每条 WARNING/CRITICAL 标注精确代码位置
-4. 记录用户可见行为变化风险（若有）
+**Steps**:
+1. Apply the review checklist to each file (do not repeat theory here)
+2. Record results with severity: PASS / WARNING / CRITICAL
+3. Cite exact code locations for each WARNING/CRITICAL
+4. Record user-visible behavior change risks (if any)
 
-**完成标准**：每个文件都有带证据结论，且高风险问题可定位
-
----
-
-### Task 3：生成可执行审查报告
-
-**目标**：给出可落地的整改建议与优先级
-
-**读取输入**：
-1. Task 2 的审查记录
-
-**执行步骤**：
-1. 按严重级别汇总关键问题
-2. 提供具体修复建议或重写方案
-3. 明确指出任何用户可见行为变化与回归风险
-4. 给出推荐修复顺序（先 CRITICAL，再 WARNING）
-
-**完成标准**：报告包含完整发现、定位证据、修复建议与优先级
+**Done When**: Each file has evidence-backed conclusions and high-risk issues are locatable
 
 ---
 
-## 执行规则（给 loop 用）
+### Task 3: Produce Actionable Review Report
 
-1. 命中此 pipeline 时，按 Task 1 → Task 2 → Task 3 的顺序创建任务。
-2. 默认 1:1 映射创建，不合并、不跳步。
-3. 若信息缺失，在当前 task 内补齐，不额外新建 phase。
+**Goal**: Deliver actionable fixes and clear priority
+
+**Read Inputs**:
+1. Review notes from Task 2
+
+**Steps**:
+1. Summarize key issues by severity
+2. Provide concrete fix suggestions or rewrite options
+3. Explicitly call out user-visible behavior and regression risks
+4. Provide recommended fix order (CRITICAL first, then WARNING)
+
+**Done When**: Report includes findings, evidence, fix suggestions, and clear priority
+
+---
+
+## Execution Rules (for loop)
+
+1. When this pipeline is selected, create tasks in Task 1 -> Task 2 -> Task 3 order.
+2. Default to a 1:1 mapping. Do not merge or skip tasks.
+3. If information is missing, fill it inside the current mapped task instead of creating extra phases.

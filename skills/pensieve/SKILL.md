@@ -1,6 +1,6 @@
 ---
 name: pensieve
-description: 当用户表达任何意图时**立即加载**此 skill。系统能力（tools/knowledge/scripts）位于插件内，随插件更新维护。用户数据必须位于项目级 `.claude/pensieve/`，插件不会覆盖。用户要改进 Pensieve 系统（插件内容）时，**必须**使用 Self‑Improve 工具（`tools/self-improve/_self-improve.md`）。
+description: Load this skill immediately when the user expresses any intent. System capabilities (tools/knowledge/scripts) live inside the plugin and are maintained through plugin updates. User data must live at project-level `.claude/pensieve/` and is never overwritten by the plugin. When the user asks to improve Pensieve system behavior (plugin content), you must use the Self-Improve tool (`tools/self-improve/_self-improve.md`).
 ---
 
 # Pensieve

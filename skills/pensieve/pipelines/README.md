@@ -119,7 +119,7 @@ Pipelines should directly provide task templates; runtime tasks are instantiated
 ### File Format
 
 ```markdown
-# Pipeline 名称
+# Pipeline Name
 
 ---
 description: Short summary. Triggered when user says "trigger1", "trigger2".
@@ -127,7 +127,7 @@ description: Short summary. Triggered when user says "trigger1", "trigger2".
 
 Role: You are [doing what]...
 
-## 核心原则
+## Core Principles
 
 - **Principle 1**: short, operational
 - **Principle 2**: short, operational
@@ -169,7 +169,7 @@ Role: You are [doing what]...
 
 ---
 
-## 相关文件
+## Related Files
 
 - `path/to/file` — description
 ```
@@ -193,15 +193,15 @@ Role: You are [doing what]...
 ### Example
 
 ```markdown
-# 代码审查 Pipeline
+# Review Pipeline
 
 ---
 description: Code review flow. Triggered by "review code", "review", "check this change".
 ---
 
-你正在进行系统性的代码审查，在彻底性与务实性之间平衡。
+You are conducting a systematic code review, balancing thoroughness with pragmatism.
 
-## 核心原则
+## Core Principles
 
 - **Evidence‑based**: Every issue must cite specific code
 - **Severity‑aware**: Distinguish critical bugs from nitpicks
@@ -211,7 +211,7 @@ description: Code review flow. Triggered by "review code", "review", "check this
 
 ## Task Blueprint
 
-### Task 1: 理解变更范围
+### Task 1: Understand Changes
 
 **Goal**: Get a complete picture of what changed
 
@@ -228,15 +228,15 @@ description: Code review flow. Triggered by "review code", "review", "check this
 
 ---
 
-### Task 2: 系统化审查
+### Task 2: Systematic Review
 
-**Goal**: 逐文件对照审查标准
+**Goal**: Check each file against review criteria
 
 **Read Inputs**:
 1. Task 1 output file list
 2. `knowledge/taste-review/content.md`
 
-**CRITICAL**：每个 WARNING/CRITICAL 必须引用具体行号。
+**CRITICAL**: Every WARNING/CRITICAL must cite specific line numbers.
 
 **Steps**:
 1. Apply the checklist from knowledge (no extra theory here)
@@ -247,7 +247,7 @@ description: Code review flow. Triggered by "review code", "review", "check this
 
 ---
 
-### Task 3: 报告
+### Task 3: Report
 
 **Goal**: Deliver an actionable review summary
 
@@ -255,17 +255,17 @@ description: Code review flow. Triggered by "review code", "review", "check this
 1. Task 2 findings
 
 **Steps**:
-1. 按严重性汇总发现
-2. 给出整体评估和修复建议
-3. **向用户呈现报告并等待确认**
+1. Summarize findings by severity
+2. Provide overall assessment and concrete fix suggestions
+3. **Present the report to the user and wait for confirmation**
 
 **Done When**: Report includes all findings and prioritized fixes
 
 ---
 
-## 相关文件
+## Related Files
 
-- `knowledge/taste-review/` — 审查标准与清单
+- `knowledge/taste-review/` — Review criteria and checklist
 ```
 
 ## Notes

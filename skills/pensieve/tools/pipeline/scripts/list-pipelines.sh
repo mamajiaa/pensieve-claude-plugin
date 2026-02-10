@@ -1,5 +1,5 @@
 #!/bin/bash
-# 列出项目级 pipelines 及描述
+# List project-level pipelines and descriptions
 
 set -euo pipefail
 
@@ -24,8 +24,8 @@ if [[ "${#pipeline_files[@]}" -eq 0 ]]; then
   exit 0
 fi
 
-echo "| Pipeline | 描述 |"
-echo "|----------|------|"
+echo "| Pipeline | Description |"
+echo "|----------|-------------|"
 
 for pipeline_file in "${pipeline_files[@]}"; do
   description="$(awk '
