@@ -1,4 +1,4 @@
-# Upgrade Tool
+# 升级工具
 
 ---
 description: Guide user data upgrade to project-level `.claude/pensieve/` structure
@@ -7,6 +7,7 @@ description: Guide user data upgrade to project-level `.claude/pensieve/` struct
 You are the Upgrade Tool. Your job is to explain the ideal user data directory structure and guide migration from old layouts to the new one. You do not decide user content; you only define paths and rules.
 
 Hard rule: clean up old plugin naming first, then migrate user data. Do not keep old and new naming in parallel.
+Hard rule: after upgrade/migration, run one mandatory self-improve pass as a post-upgrade self-check.
 
 ## Target Structure (Project-Level, Never Overwritten by Plugin)
 
@@ -120,6 +121,10 @@ If multiple keys exist, do not keep compatibility keys. Leave only the new key.
    - different: append with migration marker or create `*.migrated.md`
 10. Clean old system copies listed above.
 11. Output a migration report (old path -> new path).
+12. Mandatory post-upgrade self-check:
+   - run `/selfimprove` once
+   - perform one optimization pass based on the self-check result
+   - treat migration as incomplete until this step is done
 
 ## Plugin Cleanup and Update Commands (In Order)
 

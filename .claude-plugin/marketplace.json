@@ -9,7 +9,7 @@
   "version": "0.2.5",
   "description": "Pensieve marketplace (zh branch) for installing the plugin from GitHub with a pinned ref",
   "owner": {
-    "name": "mamajiaa"
+    "name": "kingkongshot"
   },
   "plugins": [
     {
@@ -17,7 +17,7 @@
       "description": "Pensieve: loop automation + memory capture for Claude Code (system prompts in plugin, user data in .claude/pensieve)",
       "version": "0.4.30",
       "author": {
-        "name": "mamajiaa"
+        "name": "kingkongshot"
       },
       "source": "./",
       "category": "productivity"

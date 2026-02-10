@@ -133,7 +133,17 @@ Before splitting tasks, list all project pipelines and descriptions to see if an
 bash <SYSTEM_SKILL_ROOT>/tools/pipeline/scripts/list-pipelines.sh
 ```
 
-If a relevant pipeline exists, base task design on it; otherwise split normally.
+If a relevant pipeline exists, read it first and check whether it contains an explicit task blueprint.
+
+**Task blueprint detection**:
+- Contains `## Task Blueprint`
+- Contains ordered headings like `### Task 1`, `### Task 2`, `### Task 3`
+
+**Hard rule**:
+- If task blueprint exists, create runtime tasks in the same order with a 1:1 mapping.
+- Do not merge/split/reorder unless user explicitly asks.
+- If any detail is missing, fill it inside that mapped task instead of inventing new phases.
+- Only when no explicit task blueprint exists, fall back to normal task splitting.
 
 ### Task granularity standard
 
@@ -149,11 +159,12 @@ Each task must:
 ### Actions
 
 1. Read project maxims and extract constraints for task design
-2. Split tasks with the above granularity
-3. Ensure each task has explicit acceptance criteria aligned with maxims
-4. Create tasks incrementally (each task builds on the previous)
-5. **Present the task list to the user for confirmation**
-6. Create the first real task
+2. Check relevant pipeline for explicit task blueprint
+3. If blueprint exists, create tasks with 1:1 ordered mapping; otherwise split tasks with the above granularity
+4. Ensure each task has explicit acceptance criteria aligned with maxims
+5. Create tasks incrementally (each task builds on the previous)
+6. **Present the task list to the user for confirmation**
+7. Create the first real task
 
 ---
 

@@ -1,4 +1,4 @@
-# Pipeline Tool
+# Pipeline 工具
 
 ---
 description: List project-level pipelines (path + description)
@@ -26,8 +26,8 @@ Project pipelines live at:
 
 Output a concise table:
 
-| Pipeline | Description |
-|----------|-------------|
+| Pipeline | 描述 |
+|----------|------|
 | /path/to/a.md | xxx |
 
 Use `(no description)` when missing.

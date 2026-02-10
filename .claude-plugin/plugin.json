@@ -3,9 +3,9 @@
   "version": "0.4.30",
   "description": "Pensieve — humans store experience, AI reads the truth",
   "author": {
-    "name": "mamajiaa"
+    "name": "kingkongshot"
   },
-  "repository": "https://github.com/mamajiaa/pensieve-claude-plugin",
+  "repository": "https://github.com/kingkongshot/Pensieve",
   "license": "MIT",
   "keywords": [
     "loop",
