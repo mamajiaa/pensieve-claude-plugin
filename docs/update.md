@@ -1,55 +1,48 @@
-# Update Guide
+# 更新指南
 
-## Plugin (Marketplace)
+## 插件更新（Marketplace）
 
-If you installed via Marketplace:
+如果你通过 Marketplace 安装：
 
 ```bash
 claude plugin marketplace update kingkongshot/Pensieve
 claude plugin update pensieve@kingkongshot-marketplace --scope user
 ```
 
-Then restart Claude Code to apply updates.
+然后重启 Claude Code 使更新生效。
 
-> If you installed with project scope, replace `--scope user` with `--scope project`.
+> 如果你是项目级安装，请把 `--scope user` 改为 `--scope project`。
 
-If you installed via `.claude/settings.json` URL, restart Claude Code to get updates.
-
----
-
-## System Skills
-
-System prompts (tools/scripts/system knowledge) are packaged inside the plugin and update with the plugin.
+如果你是通过 `.claude/settings.json` URL 安装，重启 Claude Code 即可拉取更新。
 
 ---
 
-## After Updating
+## 系统 Skills
 
-Restart Claude Code and say `loop` to verify the update.
+系统提示词（tools/scripts/system knowledge）随插件打包，并跟随插件更新。
 
-**Mandatory post-upgrade self-check (required):**
-Run `/doctor` once after every upgrade to perform a README-driven health check.
-Treat the upgrade as incomplete until this doctor run is done.
+---
 
-Then:
-- Even with legacy/dirty data, prefer running `/upgrade` first.
-- If doctor reports migration/structure issues, run `/upgrade` and re-check with `/doctor`.
-- If doctor passes, run `/selfimprove` only when you want to capture new learnings.
+## 更新后流程
 
-推荐执行顺序：
+重启 Claude Code 后，输入 `loop` 验证更新是否生效。
+
+**升级后强制自检（必须）：**
+每次升级后必须运行一次 `/doctor` 做基于 README 的体检。
+在 doctor 跑完前，升级视为未完成。
+
+然后：
+- 即使存在历史脏数据，也优先先执行 `/upgrade`
+- 如果 doctor 报告迁移/结构问题，运行 `/upgrade` 后再次执行 `/doctor`
+- 如果 doctor 通过，按需再执行 `/selfimprove` 沉淀经验
+
+推荐顺序：
 1. 升级插件并重启 Claude Code
 2. 运行一次 `/doctor`（必须）
 3. 若 doctor 报错，运行 `/upgrade` 后再跑 `/doctor`
 4. 需要沉淀经验时再运行 `/selfimprove`
 
-If you are guiding the user, remind them they only need a few commands:
-- `/loop`
-- `/doctor`
-- `/selfimprove`
-- `/pipeline`
-- `/upgrade`
-
-如果你在引导用户，提醒他们只需掌握几个基础命令：
+如果你在指导用户，提醒他们只需掌握几个命令：
 - `/loop`
 - `/doctor`
 - `/selfimprove`
@@ -58,14 +51,14 @@ If you are guiding the user, remind them they only need a few commands:
 
 ---
 
-## Preserved User Data
+## 用户数据保留策略
 
-Project user data in `.claude/pensieve/` is never overwritten by plugin updates:
+项目级用户数据 `.claude/pensieve/` 不会被插件更新覆盖：
 
-| Directory | Content |
+| 目录 | 内容 |
 |------|------|
-| `.claude/pensieve/maxims/` | Custom maxims |
-| `.claude/pensieve/decisions/` | Decisions |
-| `.claude/pensieve/knowledge/` | Custom knowledge |
-| `.claude/pensieve/pipelines/` | Project pipelines |
-| `.claude/pensieve/loop/` | Loop history |
+| `.claude/pensieve/maxims/` | 自定义准则 |
+| `.claude/pensieve/decisions/` | 决策记录 |
+| `.claude/pensieve/knowledge/` | 自定义知识 |
+| `.claude/pensieve/pipelines/` | 项目 pipelines |
+| `.claude/pensieve/loop/` | loop 历史 |

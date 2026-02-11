@@ -126,12 +126,12 @@ function is_generated_graph(rel) {
 BEGIN {
     node_count = 0
     edge_count = 0
-    cats[1] = "root";      cat_title["root"] = "Root"
-    cats[2] = "maxims";    cat_title["maxims"] = "Maxims"
-    cats[3] = "decisions"; cat_title["decisions"] = "Decisions"
-    cats[4] = "knowledge"; cat_title["knowledge"] = "Knowledge"
-    cats[5] = "pipelines"; cat_title["pipelines"] = "Pipelines"
-    cats[6] = "loop";      cat_title["loop"] = "Loop"
+    cats[1] = "root";      cat_title["root"] = "根目录"
+    cats[2] = "maxims";    cat_title["maxims"] = "准则"
+    cats[3] = "decisions"; cat_title["decisions"] = "决策"
+    cats[4] = "knowledge"; cat_title["knowledge"] = "知识"
+    cats[5] = "pipelines"; cat_title["pipelines"] = "流程"
+    cats[6] = "loop";      cat_title["loop"] = "循环"
 }
 {
     if (FNR == 1) {
@@ -187,12 +187,12 @@ END {
         else base_map[base] = ""
     }
 
-    print "# Pensieve User Data Graph"
+    print "# Pensieve 用户数据图谱"
     print ""
-    print "- Generated: " generated_at
-    print "- Root: `" root "`"
-    if (include_loop == "1") print "- Included categories: maxims, decisions, knowledge, pipelines, loop"
-    else print "- Included categories: maxims, decisions, knowledge, pipelines"
+    print "- 生成时间: " generated_at
+    print "- 根目录: `" root "`"
+    if (include_loop == "1") print "- 包含分类: maxims, decisions, knowledge, pipelines, loop"
+    else print "- 包含分类: maxims, decisions, knowledge, pipelines"
     print ""
     print "```mermaid"
     print "graph LR"
@@ -253,16 +253,16 @@ END {
 
     print "```"
     print ""
-    print "## Summary"
+    print "## 摘要"
     print ""
-    print "- Notes scanned: " node_count
-    print "- Links found: " edge_count
-    print "- Links resolved: " resolved
-    print "- Links unresolved: " unresolved
+    print "- 扫描笔记数: " node_count
+    print "- 发现链接数: " edge_count
+    print "- 已解析链接: " resolved
+    print "- 未解析链接: " unresolved
 
     if (unresolved > 0) {
         print ""
-        print "## Unresolved Links"
+        print "## 未解析链接"
         print ""
         for (i = 1; i <= unresolved; i++) {
             print "- `" unresolved_src[i] "` -> `[[" unresolved_tok[i] "]]`"

@@ -1,303 +1,219 @@
-# Pipelines
+# Pipelines（流程）
 
-Executable workflows that define a full loop from input to validation.
+可执行工作流，用于定义从输入到验证再到输出的闭环。
 
-> Note: Built‑in tools were moved to `tools/`; the plugin no longer ships pipelines. Initial pipelines are seeded at install/migration into `.claude/pensieve/pipelines/` and are user‑editable.
+> 说明：内置工具已迁移到 `tools/`。插件不再内置 pipelines。初始 pipelines 在安装/迁移时种子化到 `.claude/pensieve/pipelines/`，用户可编辑。
 
-## Purpose
+## 目的
 
-Pipelines exist to **build verifiable execution loops and deterministic task blueprints**.
+Pipeline 的目标是构建**可验证的执行闭环**，而不是堆信息。
 
-**Pipelines orchestrate flow — they do not aggregate information.**  
-All background information should live elsewhere and be **referenced**:
+Pipeline 负责编排流程，不负责存储知识。背景信息应拆到其他载体并通过链接引用：
 
-- **Knowledge**: external references, checklists, best practices
-- **Maxims**: universal principles and values
-- **Decisions**: context‑specific choices and rationale
-- **External skills/tools**: heavy instructions or specialized workflows
+- **Knowledge**：外部标准、参考资料、检查项
+- **Maxims**：跨场景原则
+- **Decisions**：上下文决策与理由
+- **外部 skills/tools**：专用能力与重指令
 
-A pipeline is not a checklist; it's a closed‑loop system that matches how LLMs work:
-
-```
-Input → Execute → Validate → Output
-         ↑      ↓
-         └── Feedback ──┘
-```
-
-### What makes a good pipeline
-
-| Trait | Why it matters (LLM view) |
-|-------|----------------------------|
-| **Closed loop** | LLMs drift; they need a clear start and end |
-| **Real signals** | Validate via actual outputs, not code inference |
-| **File‑based logs** | Traceable; errors map to concrete steps |
-| **Testable** | Verifies correctness without "feelings" |
-| **Tool‑friendly** | Identify steps where tools remove uncertainty |
-
-### Validation must be based on real feedback
-
-**Anti‑pattern**: read code → "seems correct" → continue
-
-**Correct**: execute code → get real output → read output → validate
-
-| Validation type | Real feedback source |
-|-----------------|----------------------|
-| Build | Compiler output, build logs |
-| Tests | Test results, coverage reports |
-| Runtime | App logs, error stacks |
-| Integration | API responses, DB state |
-
-**Key**: Use real runtime feedback, not model inference. Systems don't lie; model inference does.
-
-## Capture Criteria
-
-Ask yourself: **If this workflow isn't solidified, what decisions will be repeated?**
-
-### Do we need a new pipeline?
-
-**First ask**: Can we solve this by composing existing pipelines?
-
-| Situation | Action |
-|-----------|--------|
-| Existing pipeline combo works | Re‑order/compose; do not add |
-| Missing a validation step | Add to an existing pipeline |
-| Entirely different execution loop | Create a new pipeline |
-
-### Signals that it's worth capturing
-
-| Signal | Explanation |
-|--------|-------------|
-| Multiple loops share similar task structure | Steps stabilized; extract a pipeline |
-| A step is repeatedly missed | Use a pipeline to enforce completeness |
-| Execution depends on multiple knowledge sources | Pipeline should stitch them together |
-
-### Evolution path
+闭环模型：
 
 ```
-Reach baseline → refine (tools, sequencing)
+Input -> Execute -> Validate -> Output
+         ^        |
+         +-- Feedback --+
 ```
 
-1. **Baseline**: It runs, with basic validation—even if manual
-2. **Tooling**: Turn repeated/fragile steps into tools
-3. **Sequencing**: Reorder steps to reduce backtracking
+## 好的 Pipeline 长什么样
 
-**Anti‑pattern**: Perfectionism up front; optimizing before it ever runs.
+| 特征 | 价值（LLM 视角） |
+|---|---|
+| 闭环明确 | 防止漂移，清楚知道何时开始/结束 |
+| 使用真实信号 | 用真实输出验证，而非“看起来对” |
+| 文件化留痕 | 可追溯，能定位问题步骤 |
+| 可测试 | 不依赖“感觉正确” |
+| 工具友好 | 明确哪些步骤应借助工具降不确定性 |
 
-## Relationships & Evolution
+## 验证必须依赖真实反馈
 
-| Direction | Description |
-|-----------|-------------|
-| Pipeline ← Knowledge | External standards guide execution |
-| Pipeline → Tasks | Pipeline defines the loop; tasks are concrete actions |
-| Pipeline ↔ Decision | Decisions formed during execution can refine pipelines |
+反模式：读代码 -> 感觉正确 -> 继续
 
-## Linking Rule (Required for Pipelines)
+正确方式：执行 -> 拿到输出/日志 -> 基于结果判断
 
-Every pipeline should include at least one explicit link in its body so readers can trace why the flow exists.
+| 验证类型 | 真实反馈来源 |
+|---|---|
+| 构建 | 编译输出、构建日志 |
+| 测试 | 测试结果、覆盖率 |
+| 运行时 | 应用日志、错误栈 |
+| 集成 | API 响应、DB 状态 |
 
-Recommended fields:
-- `基于`：which decision/knowledge this pipeline depends on
-- `导致`：which outputs/follow-up workflows this pipeline triggers
-- `相关`：nearby pipelines or references
+关键点：优先系统反馈，不依赖模型臆断。
 
-### Pipeline vs Tasks
+## 捕获标准
 
-| Type | Essence | Focus |
-|------|---------|-------|
-| Pipeline | Task blueprint + validation loop | "What to create and in which order" |
-| Tasks | Runtime instances | "Execute this specific step now" |
+核心问题：**如果不固化这个流程，哪些决策会被反复重做？**
 
-Pipelines should directly provide task templates; runtime tasks are instantiated from that template.
+### 是否需要新建 pipeline
 
-## Writing Guide
+先判断：能否通过组合现有 pipeline 解决？
 
-### Directory Structure
+| 情况 | 动作 |
+|---|---|
+| 现有 pipeline 组合可覆盖 | 组合/重排，不新增 |
+| 仅缺少验证步骤 | 在现有 pipeline 增补 |
+| 执行闭环完全不同 | 新建 pipeline |
+
+### 适合沉淀的信号
+
+| 信号 | 说明 |
+|---|---|
+| 多个 loop 出现相同任务结构 | 步骤已稳定，可抽象 |
+| 某步骤反复漏掉 | 需要 pipeline 强制约束 |
+| 依赖多个知识来源协同 | 需要流程统一编排 |
+
+### 演化路径
+
+1. 先达到可运行基线（哪怕验证先手动）
+2. 再把脆弱/重复步骤工具化
+3. 最后做步骤重排，减少回退
+
+反模式：还没跑通就追求“完美设计”。
+
+## 关系与演化
+
+| 方向 | 说明 |
+|---|---|
+| Pipeline <- Knowledge | 外部标准约束流程 |
+| Pipeline -> Tasks | Pipeline 定义蓝图，Task 执行实例 |
+| Pipeline <-> Decision | 执行中的决策可反哺流程 |
+
+## 链接规则（Pipeline 强制）
+
+每条 pipeline 正文至少包含一条显式链接，用于追溯来源与影响。
+
+推荐字段：
+- `基于`：依赖哪些 decision/knowledge
+- `导致`：触发哪些输出或后续流程
+- `相关`：相邻流程或关联主题
+
+## Pipeline 与 Tasks 区分
+
+| 类型 | 本质 | 关注点 |
+|---|---|---|
+| Pipeline | 任务蓝图 + 验证闭环 | “按什么顺序做什么” |
+| Tasks | 运行时实例 | “现在执行哪一步” |
+
+Pipeline 应直接产出可实例化任务模板。
+
+## 编写规范
+
+### 目录结构
 
 ```
 .claude/pensieve/pipelines/
 ├── {name}.md
 ```
 
-### Naming Convention
+### 命名约定
 
-| Prefix | Type | Notes |
-|--------|------|------|
-| `_` | discouraged | plugin no longer ships pipelines |
-| none | user‑defined | project/business workflows, e.g. `review.md` |
+| 前缀 | 类型 | 说明 |
+|---|---|---|
+| `_` | 不推荐 | 插件已不内置 pipeline |
+| 无前缀 | 用户定义 | 项目/业务流程，如 `review.md` |
 
-### File Format
+### 文件模板
 
 ```markdown
 # Pipeline 名称
 
 ---
-description: Short summary. Triggered when user says "trigger1", "trigger2".
+description: 简要说明。触发词如 "trigger1", "trigger2"。
 ---
 
 Role: You are [doing what]...
 
 ## 核心原则
 
-- **Principle 1**: short, operational
-- **Principle 2**: short, operational
+- **Principle 1**: 简短可执行
+- **Principle 2**: 简短可执行
 
 ---
 
 ## Task Blueprint
 
-### Task 1: Task Name
+### Task 1: 任务名
 
-**Goal**: What this task should achieve
+**Goal**: 本任务目标
 
 **Read Inputs**:
-1. Required file/path
-2. Required file/path
+1. 必读文件/路径
+2. 必读文件/路径
 
 **Steps**:
-1. Specific action
-2. Specific action
+1. 具体动作
+2. 具体动作
 
-**Done When**: Objective completion criteria
+**Done When**: 可验证的完成条件
 
 ---
 
-### Task 2: Task Name
+### Task 2: 任务名
 
-**Goal**: What this task should achieve
+**Goal**: 本任务目标
 
 **Read Inputs**:
-1. Previous task output
+1. 上一步输出
 
-**CRITICAL**: Key warning (if any)
+**CRITICAL**: 关键警告（如有）
 
 **Steps**:
-1. Specific action
-2. **Present to user and wait for confirmation**
+1. 具体动作
+2. **向用户展示并等待确认**
 
-**Done When**: Objective completion criteria
+**Done When**: 可验证的完成条件
 
 ---
 
-### Task 3: Capture Durable Conclusion (Optional)
+### Task 3: 沉淀结论（可选）
 
-**Goal**: Preserve reusable conclusions from this run
+**Goal**: 保存可复用结论
 
 **Read Inputs**:
-1. Previous task outputs
+1. 前序任务输出
 
 **Steps**:
-1. If the conclusion is a project choice, capture/update a `decision`
-2. If the conclusion is external/reference knowledge, capture/update `knowledge`
-3. Add links using `基于/导致/相关`
-4. If no durable conclusion exists, record \"no capture\"
+1. 项目选择写入/更新 `decision`
+2. 外部资料写入/更新 `knowledge`
+3. 补充 `基于/导致/相关` 链接
+4. 若无需沉淀，明确记录 "no capture"
 
-**Done When**: Capture result is explicit (written or skipped with reason)
+**Done When**: 明确写入或明确跳过原因
 
 ---
 
 ## 相关文件
 
-- `path/to/file` — description
+- `path/to/file` — 说明
 ```
 
-### Format Checklist
+### 格式检查清单
 
-| Element | Notes |
-|---------|------|
-| `description` | In frontmatter; include trigger words |
-| Role line | Starts with "You are..." and defines Claude's role |
-| Core Principles | 1–3 short operational rules |
-| No knowledge dump | Long background belongs in Knowledge/Maxims/Decisions/Skills |
-| Task Blueprint | Must include explicit `Task 1/2/3...` in order |
-| **Goal** | Every task must have a goal |
-| **Read Inputs** | Required files/paths must be explicit |
-| **Steps** | Numbered, concrete steps |
-| **Done When** | Completion criteria must be testable |
-| **CRITICAL** / **DO NOT SKIP** | Strong markers for key steps |
-| User confirmation | Explicit "Wait for confirmation" |
-| Links | Pipeline body should include at least one meaningful link |
+| 要素 | 要求 |
+|---|---|
+| `description` | 位于 frontmatter，包含触发词 |
+| Role 行 | 以 "You are..." 开头定义角色 |
+| 核心原则 | 1-3 条，短且可执行 |
+| 不堆知识 | 长背景放到 Knowledge/Maxims/Decisions/Skills |
+| Task Blueprint | 必须显式 `Task 1/2/3...` 顺序 |
+| **Goal** | 每个任务必须有 |
+| **Read Inputs** | 文件/路径必须写清 |
+| **Steps** | 编号、具体、可执行 |
+| **Done When** | 必须可验证 |
+| **CRITICAL** / **DO NOT SKIP** | 关键步骤强提示 |
+| 用户确认 | 显式写“等待确认” |
+| 链接 | 正文至少一条有效链接 |
 
-### Example
+## 备注
 
-```markdown
-# 代码审查 Pipeline
-
----
-description: Code review flow. Triggered by "review code", "review", "check this change".
----
-
-你正在进行系统性的代码审查，在彻底性与务实性之间平衡。
-
-## 核心原则
-
-- **Evidence‑based**: Every issue must cite specific code
-- **Severity‑aware**: Distinguish critical bugs from nitpicks
-- **Actionable**: Provide concrete fix suggestions
-
----
-
-## Task Blueprint
-
-### Task 1: 理解变更范围
-
-**Goal**: Get a complete picture of what changed
-
-**Read Inputs**:
-1. User-provided diff/commit/PR scope
-2. `knowledge/taste-review/content.md`
-
-**Steps**:
-1. Read the diff or specified commits
-2. List all modified files
-3. Identify scope (feature, refactor, bugfix, etc.)
-
-**Done When**: Can list all modified files and change types
-
----
-
-### Task 2: 系统化审查
-
-**Goal**: 逐文件对照审查标准
-
-**Read Inputs**:
-1. Task 1 output file list
-2. `knowledge/taste-review/content.md`
-
-**CRITICAL**：每个 WARNING/CRITICAL 必须引用具体行号。
-
-**Steps**:
-1. Apply the checklist from knowledge (no extra theory here)
-2. Record findings with severity: PASS / WARNING / CRITICAL
-3. Track user-visible behavior change risk
-
-**Done When**: Each file has evidence-backed conclusion
-
----
-
-### Task 3: 报告
-
-**Goal**: Deliver an actionable review summary
-
-**Read Inputs**:
-1. Task 2 findings
-
-**Steps**:
-1. 按严重性汇总发现
-2. 给出整体评估和修复建议
-3. **向用户呈现报告并等待确认**
-
-**Done When**: Report includes all findings and prioritized fixes
-
----
-
-## 相关文件
-
-- `knowledge/taste-review/` — 审查标准与清单
-```
-
-## Notes
-
-- Pipelines must **fit the project** — there is no universal best pipeline
-- Early projects: simple pipelines, loose validation
-- Mature projects: refined pipelines, strict validation
-- Improvements come from real execution feedback, not speculation
+- Pipeline 应轻量且可执行
+- 每次只解决一个闭环问题，避免超大流程
+- 不确定时先最小可运行版本，再迭代

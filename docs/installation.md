@@ -1,94 +1,94 @@
-# Installation Guide
+# 安装指南
 
-Pensieve uses the **official plugin structure**:
+Pensieve 使用**官方插件结构**：
 
-- **Plugin (system capability)**: hooks + skills, updated only via plugin updates
-- **Project user data**: `.claude/pensieve/`, never overwritten by the plugin
+- **插件（系统能力）**：hooks + skills，仅通过插件升级更新
+- **项目用户数据**：`.claude/pensieve/`，永不被插件覆盖
 
-## Quick Install
+## 快速安装
 
-### 1. (Recommended) Install via Marketplace pinned to `main`
+### 1.（推荐）通过 Marketplace 安装并固定到 `main`
 
-This lets you pick a branch or tag (e.g., the `main` branch).
+这样可以按分支或标签安装（例如 `main`）。
 
-Add the marketplace (pinned to `main`):
+添加 marketplace（固定 `main`）：
 
 ```bash
 claude plugin marketplace add kingkongshot/Pensieve#main
 ```
 
-Install the plugin (user scope):
+安装插件（用户级）：
 
 ```bash
 claude plugin install pensieve@kingkongshot-marketplace --scope user
 ```
 
-> `kingkongshot-marketplace` comes from the `name` field in `.claude-plugin/marketplace.json`.
+> `kingkongshot-marketplace` 来自 `.claude-plugin/marketplace.json` 的 `name` 字段。
 
-If you want to share in a team repo, install at project scope:
+如果你希望在团队仓库共享，可按项目级安装：
 
 ```bash
 claude plugin install pensieve@kingkongshot-marketplace --scope project
 ```
 
-### 2. Configure `CLAUDE.md` (recommended)
+### 2. 配置 `CLAUDE.md`（推荐）
 
-> **Instruction to LLMs**: If you are the agent doing installation, **create or update** this file. Keep it short and do not overwrite existing content.
+> **给 LLM 的指令**：如果你是执行安装的 agent，请**创建或更新**该文件。保持简洁，不覆盖已有内容。
 
-Add this to the project root (`CLAUDE.md` only):
+在项目根目录添加（仅 `CLAUDE.md`）：
 
 ```markdown
 ## Pensieve
 
-Explore the project first, then decide whether to use Pensieve tools.
+先探索项目，再决定是否使用 Pensieve 工具。
 
-When the user needs a structured workflow:
-- Use `/pipeline` to list project pipelines
-- Use `/loop` for split + auto-loop execution
-- Use `/upgrade` to migrate user data
+当用户需要结构化工作流时：
+- 使用 `/pipeline` 列出项目 pipelines
+- 使用 `/loop` 进行拆解 + 自动循环执行
+- 使用 `/upgrade` 迁移用户数据
 
-When the user asks to improve Pensieve (pipelines/scripts/rules/behavior),
-you MUST use the Self‑Improve tool:
+当用户要求改进 Pensieve（pipelines/scripts/rules/behavior）时，
+必须使用 Self‑Improve 工具：
 `tools/self-improve/_self-improve.md`
 ```
 
-### 3. Initialize project user data (recommended)
+### 3. 初始化项目用户数据（推荐）
 
-Project user data lives at `.claude/pensieve/` (never overwritten by plugin updates).
+项目用户数据位于 `.claude/pensieve/`（插件升级不会覆盖）。
 
-Option A:
+方式 A：
 
 ```bash
 mkdir -p .claude/pensieve/{maxims,decisions,knowledge,pipelines,loop}
 ```
 
-Option B (recommended): run the initializer (seeds **initial maxims + review pipeline**, never overwrites existing files):
+方式 B（推荐）：运行初始化脚本（会种子化**初始 maxims + review pipeline**，不会覆盖已有文件）：
 
 ```bash
 <SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-project-data.sh
 ```
 
-> `<SYSTEM_SKILL_ROOT>` is injected by the SessionStart hook as an absolute path.
+> `<SYSTEM_SKILL_ROOT>` 由 SessionStart hook 注入为绝对路径。
 
-### 4. Restart Claude Code
+### 4. 重启 Claude Code
 
-Say `loop` to verify the installation.
-
----
-
-## Legacy Migration
-
-If you previously copied system content into the project (e.g., `skills/pensieve/`), use **/upgrade** to migrate and clean:
-
-- Merge project-level maxims
-- Migrate preset pipeline
-- Remove legacy system copies (README and `_*.md`)
+输入 `loop` 验证安装。
 
 ---
 
-## User Scope Install
+## 历史迁移
 
-If you want this in all projects, use user scope:
+如果你之前把系统内容复制到了项目里（例如 `skills/pensieve/`），请使用 **/upgrade** 做迁移和清理：
+
+- 合并项目级 maxims
+- 迁移预置 pipeline
+- 移除历史系统副本（README 与 `_*.md`）
+
+---
+
+## 用户级安装
+
+如果你希望对所有项目生效，使用用户级安装：
 
 ```bash
 claude plugin install pensieve@kingkongshot-marketplace --scope user
@@ -96,63 +96,63 @@ claude plugin install pensieve@kingkongshot-marketplace --scope user
 
 ---
 
-## For LLM Agents
+## 给 LLM Agent 的说明
 
-If you are an LLM agent:
-1. Install the plugin
-2. Initialize `.claude/pensieve/`
-3. **Tell the user they only need a few basic commands**:
+如果你是 LLM agent：
+1. 安装插件
+2. 初始化 `.claude/pensieve/`
+3. **告诉用户只需掌握几个基础命令**：
    - `/loop`
    - `/doctor`（安装后可选体检；升级后必跑）
    - `/selfimprove`
    - `/pipeline`
    - `/upgrade`
 
-Keep the explanation short; the goal is to reduce user cognitive load.
+说明保持简短，目标是降低用户认知负担。
 
 ---
 
-## Updates
+## 更新
 
-See **[Update Guide](update.md)**.
-
----
-
-## Uninstall
-
-1. Uninstall plugin: `claude plugin uninstall pensieve@kingkongshot-marketplace --scope user` (or use `/plugin`)
-2. (Optional) Before deleting project data, ask the user whether they need a backup: `rm -rf .claude/pensieve`
+参见 **[更新指南](update.md)**。
 
 ---
 
-## Verify Installation
+## 卸载
 
-After installation:
-
-1. Restart Claude Code
-2. Say `loop` — it should trigger the Loop tool workflow
-3. Check `/help` for the `pensieve` skill
-
-> Note: `init-loop.sh` only creates the loop directory and `_agent-prompt.md`.  
-> `_context.md` is created and filled in Phase 2 by the main window.
+1. 卸载插件：`claude plugin uninstall pensieve@kingkongshot-marketplace --scope user`（或使用 `/plugin`）
+2. （可选）删除项目数据前先询问用户是否需要备份：`rm -rf .claude/pensieve`
 
 ---
 
-## FAQ
+## 验证安装
 
-### Nothing happens after install?
+安装后：
 
-1. Confirm Claude Code is restarted
-2. Check `.claude/settings.json`
-3. Use `/plugin` to verify the plugin is enabled
+1. 重启 Claude Code
+2. 输入 `loop`，应触发 Loop 工具流程
+3. 通过 `/help` 确认 `pensieve` skill 已可见
 
-### Hooks not firing?
+> 说明：`init-loop.sh` 只会创建 loop 目录与 `_agent-prompt.md`。  
+> `_context.md` 在 Phase 2 由主窗口创建并填充。
 
-1. Use `/hooks` to confirm SessionStart/Stop hooks are active
+---
 
-### Skill not loading?
+## 常见问题
 
-System skills ship inside the plugin. If it still doesn’t load:
+### 安装后没有反应？
 
-1. Restart Claude Code
-2. Check plugin is enabled (`/plugin`)
+1. 确认已重启 Claude Code
+2. 检查 `.claude/settings.json`
+3. 使用 `/plugin` 确认插件已启用
+
+### Hooks 没有触发？
+
+1. 使用 `/hooks` 确认 SessionStart/Stop hooks 已启用
+
+### Skill 没有加载？
+
+系统 skills 随插件分发。如果仍未加载：
+
+1. 重启 Claude Code
+2. 检查插件是否启用（`/plugin`）

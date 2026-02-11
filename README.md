@@ -48,10 +48,10 @@
 
 大模型会按步骤自动完成安装、初始化与校验。
 
-- [Installation Guide](docs/installation.md)
-- [Update Guide](docs/update.md)
-- [Upgrade Tool](skills/pensieve/tools/upgrade/_upgrade.md)
-- [Uninstall Section](docs/installation.md#uninstall)
+- [安装指南](docs/installation.md)
+- [更新指南](docs/update.md)
+- [升级工具](skills/pensieve/tools/upgrade/_upgrade.md)
+- [卸载说明](docs/installation.md#卸载)
 
 ## 为什么这套方式更稳
 
@@ -94,6 +94,6 @@
 
 <img src="./QRCode.png" alt="微信交流群二维码" width="200">
 
-## License
+## 许可证
 
 MIT

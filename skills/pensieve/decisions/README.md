@@ -1,100 +1,99 @@
-# Decisions
+# Decisions（决策）
 
-Historical choices made in specific situations. Capture: "In X context, we chose Y because Z."
+记录特定上下文下的项目选择：在什么情境下，为什么选择了什么。
 
-## Purpose
+## 目的
 
-Decisions exist to **avoid repeating mistakes**.
+Decision 的核心价值是减少重复犯错。
 
-Recording past choices and reasons ensures that when similar situations arise:
-- You know what was chosen
-- You know why it was chosen
-- You know why alternatives were rejected
+当类似问题再次出现时，团队应能快速回答：
+- 当时做了什么选择
+- 为什么这么选
+- 为什么没选其他方案
 
-## Capture Criteria
+## 捕获标准
 
-### Core Standard
+### 核心判断
 
-> A decision belongs in global decisions/ only if it clearly reduces future regression risk, improves readability or collaboration, and can be taught as a "simple, testable, reusable pattern."
+> 只有当一条决策能显著降低回归风险、提升可读性或协作效率，并可沉淀成“可复用模式”时，才应进入全局 `decisions/`。
 
-### Three Golden Questions
+### 三个黄金问题
 
-1. **If we delete this, will we be more likely to make mistakes later?**
-2. **Would someone three months later make a better choice after reading it?**
-3. **Can it be taught as a reusable pattern?**
+1. **删掉它后，未来是否更容易犯错？**
+2. **三个月后的人看完它，能做出更好决策吗？**
+3. **它能被讲清楚并复用吗？**
 
-Any clear "yes" → worth capturing  
-All "uncertain" → keep in loop directory
+任一明确“是”即可保留；如果都不明确，先留在 loop 临时目录。
 
-### Five Value Dimensions
+### 五个价值维度
 
-| Dimension | Question |
-|----------|----------|
-| Long‑term impact | Does it reduce a class of bugs? |
-| Readability | Does it create a transferable taste rule? |
-| Locality | Does it define module boundaries or responsibilities? |
-| Collaboration signal | Was it explicitly decided by the user or repeatedly confirmed? |
-| Noise check | The three golden questions above |
+| 维度 | 问题 |
+|---|---|
+| 长期影响 | 能否减少一类缺陷？ |
+| 可读性 | 能否沉淀为可迁移的“代码品味”？ |
+| 局部性 | 是否明确了模块边界与职责？ |
+| 协作信号 | 是否来自用户明确决策或多次确认？ |
+| 噪声过滤 | 是否通过上面的三个黄金问题？ |
 
-## Relationships & Evolution
+## 关系与演化
 
-| Direction | Description |
-|-----------|-------------|
-| Decision → Maxim | Repeated decisions → distilled into maxims |
-| Knowledge → Decision | External knowledge + project practice → decisions |
-| Loop → Decision | Temporary loop decisions → filtered and promoted |
+| 方向 | 说明 |
+|---|---|
+| Decision -> Maxim | 重复决策可上升为准则 |
+| Knowledge -> Decision | 外部知识与项目实践结合后形成决策 |
+| Loop -> Decision | loop 中临时决策经过筛选后晋升 |
 
-### Storage Locations
+### 存储位置
 
-| Stage | Location | Notes |
-|-------|----------|-------|
-| During loop | `.claude/pensieve/loop/{name}/_decisions/` | Temporary; tied to loop lifecycle |
-| After loop | `.claude/pensieve/decisions/` | Project user data (never overwritten) |
+| 阶段 | 位置 | 说明 |
+|---|---|---|
+| loop 期间 | `.claude/pensieve/loop/{name}/_decisions/` | 临时，随 loop 生命周期 |
+| loop 结束后 | `.claude/pensieve/decisions/` | 项目级用户数据（永不覆盖） |
 
-### Decision Levels
+### 决策层级
 
-| Level | Characteristics | Scope |
-|-------|-----------------|-------|
-| Hard rule | Violating it causes regressions | Cross‑project universal |
-| Coding taste | Reduces special cases; easier to reason | Implementation guidance |
-| Team preference | Depends on context | Team‑level; must be labeled |
+| 层级 | 特征 | 作用范围 |
+|---|---|---|
+| Hard rule | 违反会导致回归 | 跨项目普适 |
+| Coding taste | 降低特殊分支、提高可推理性 | 实现指导 |
+| Team preference | 强依赖团队上下文 | 必须显式标注 |
 
-## Linking Rule (Required)
+## 链接规则（强制）
 
-Decisions are the backbone of project knowledge. Every decision note must include links to related context.
+Decision 是知识网络主干。每条 decision 必须包含上下文链接。
 
-Use these link fields:
-- `基于`：what prior context this decision depends on
-- `导致`：what this decision changes or triggers
-- `相关`：parallel topics worth checking together
+链接字段：
+- `基于`：依赖哪些前置上下文
+- `导致`：会触发哪些后续变化
+- `相关`：建议一起阅读的平行主题
 
-Hard rule:
-- At least one of the three fields must contain a valid `[[linked-note]]`.
+Hard rule：
+- 三个字段中至少一个必须包含有效 `[[linked-note]]`。
 
-## Writing Guide
+## 编写规范
 
-### Directory Structure
+### 目录结构
 
 ```
 .claude/pensieve/decisions/{date}-{statement}.md
 ```
 
-Naming rules:
-- Filename is a one‑sentence conclusion (declarative)
-- The filename tells "what was decided"
-- The file explains "why it was decided"
+命名规则：
+- 文件名使用一句话结论（陈述句）
+- 文件名回答“决定了什么”
+- 文件内容解释“为什么这样决定”
 
-Examples:
+示例：
 - `2026-01-22-ban-javascript-in-core-module.md`
 - `2026-01-22-do-not-break-user-visible-behavior.md`
 
-### File Format
+### 文件格式
 
 ```markdown
-# {Decision Title}
+# {决策标题}
 
-## One-line Conclusion
-> [State the final decision in one sentence]
+## 一句话结论
+> [用一句话说明最终决策]
 
 ## 上下文链接
 - 基于：[[前置决策或知识]]
@@ -102,53 +101,53 @@ Examples:
 - 相关：[[相关主题]]
 
 ## Context
-What situation triggered this decision?
+触发这条决策的背景是什么？
 
 ## Problem
-What real problem does it solve? (not imagined)
+它解决的真实问题是什么？（不是想象问题）
 
 ## Alternatives Considered
-- Option A: xxx (why not)
-- Option B: xxx (why not)
+- 方案 A: xxx（为何不用）
+- 方案 B: xxx（为何不用）
 
 ## Decision
-What was chosen, and why?
+最终选择了什么，为什么？
 
 ## Consequence
-- What risks are reduced?
-- What better choices can future maintainers make?
+- 降低了哪些风险？
+- 让后续维护者可以做出哪些更好选择？
 
 ## Key Files
-- `path/to/file` - related implementation/document
+- `path/to/file` - 相关实现或文档
 ```
 
-### Example
+### 示例
 
 ```markdown
-# Avoid special‑case branches when deleting linked‑list nodes
+# 避免删除链表节点时使用特殊分支
 
 ## Context
-While maintaining legacy code, the list deletion logic had a typical "head‑node special case" branch.
+维护遗留代码时，删除逻辑存在“头节点特殊分支”。
 
 ## Problem
-This approach has two issues:
-- The logic splits into two paths; readers must mentally merge them to verify correctness.
-- Any change must consider both "head node" and "non‑head node" versions, increasing errors.
+该实现有两个问题：
+- 逻辑分裂成两条路径，审查时需要脑内合并。
+- 后续变更必须同时覆盖“头节点”和“非头节点”，错误率上升。
 
 ## Alternatives Considered
-- Keep the current implementation: maintain a loop with special‑case branches.
-- Rewrite using a pointer‑to‑pointer so all nodes follow the same path.
+- 保留现状：继续维护特殊分支。
+- 使用 pointer-to-pointer：让所有节点走同一路径。
 
 ## Decision
-Rewrite using a pointer‑to‑pointer to eliminate the head‑node special case.
+改为 pointer-to-pointer，消除头节点特殊分支。
 
 ## Consequence
-- Every deletion path uses the same logic, easier to review.
-- Future maintainers don’t need to simulate two code paths.
+- 删除路径统一，审查更容易。
+- 维护者无需再模拟两套分支。
 ```
 
-## Notes
+## 备注
 
-- Decisions are **context‑dependent** and must include Context
-- A decision without Alternatives Considered is incomplete — it means no real trade‑off was considered
-- Team‑preference decisions must be labeled to avoid being mistaken as universal rules
+- Decision 强依赖上下文，必须写清 Context
+- 没有 Alternatives Considered 的决策通常不完整
+- 团队偏好型决策必须明确标注，避免被误当成普适规则
