@@ -1,8 +1,8 @@
 ---
-description: 查看项目图谱摘要与 pipelines 列表
+description: List project pipelines (paths + descriptions)
 allowed-tools: ["Bash"]
 ---
 
-先显示 graph 摘要，再输出 pipelines 列表（机械执行，不做额外推理）：
+Output project pipelines directly (mechanical, no extra reasoning):
 
-!`${CLAUDE_PLUGIN_ROOT}/skills/pensieve/tools/pipeline/scripts/show-pipelines-graph.sh`
+!`${CLAUDE_PLUGIN_ROOT}/skills/pensieve/tools/pipeline/scripts/list-pipelines.sh`

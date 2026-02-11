@@ -16,22 +16,22 @@ if [[ -d "$USER_DATA_ROOT" && -f "$GRAPH_SCRIPT" ]]; then
   bash "$GRAPH_SCRIPT" --root "$USER_DATA_ROOT" --output "$GRAPH_FILE" >/dev/null 2>&1 || true
 fi
 
-echo "## 用户数据图谱"
+echo "## User Data Graph"
 if [[ -f "$GRAPH_FILE" ]]; then
-  notes_count="$(sed -n 's/^- 扫描笔记数: //p' "$GRAPH_FILE" | head -n 1)"
-  links_found="$(sed -n 's/^- 发现链接数: //p' "$GRAPH_FILE" | head -n 1)"
-  links_resolved="$(sed -n 's/^- 已解析链接: //p' "$GRAPH_FILE" | head -n 1)"
-  links_unresolved="$(sed -n 's/^- 未解析链接: //p' "$GRAPH_FILE" | head -n 1)"
+  notes_count="$(sed -n 's/^- Notes scanned: //p' "$GRAPH_FILE" | head -n 1)"
+  links_found="$(sed -n 's/^- Links found: //p' "$GRAPH_FILE" | head -n 1)"
+  links_resolved="$(sed -n 's/^- Links resolved: //p' "$GRAPH_FILE" | head -n 1)"
+  links_unresolved="$(sed -n 's/^- Links unresolved: //p' "$GRAPH_FILE" | head -n 1)"
 
-  echo "- 图谱文件: $GRAPH_FILE"
-  [[ -n "$notes_count" ]] && echo "- 扫描笔记数: $notes_count"
-  [[ -n "$links_found" ]] && echo "- 发现链接数: $links_found"
-  [[ -n "$links_resolved" ]] && echo "- 已解析链接: $links_resolved"
-  [[ -n "$links_unresolved" ]] && echo "- 未解析链接: $links_unresolved"
+  echo "- Graph file: $GRAPH_FILE"
+  [[ -n "$notes_count" ]] && echo "- Notes scanned: $notes_count"
+  [[ -n "$links_found" ]] && echo "- Links found: $links_found"
+  [[ -n "$links_resolved" ]] && echo "- Links resolved: $links_resolved"
+  [[ -n "$links_unresolved" ]] && echo "- Links unresolved: $links_unresolved"
 else
-  echo "- 图谱文件: (未生成)"
+  echo "- Graph file: (not generated)"
 fi
 
 echo
-echo "## Pipelines 列表"
+echo "## Pipelines"
 "$SCRIPT_DIR/list-pipelines.sh"

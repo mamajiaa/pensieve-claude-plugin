@@ -1,99 +1,118 @@
 > [!TIP]
 >
-> 不想读文档？安装好后，直接对 Claude 说：`用 loop 完成开发`
+> Don't want to read docs? After installation, tell Claude: `use loop to finish this task`.
 
 <div align="center">
 
 # Pensieve
 
-**让每次干预都成为自动化的机会。**
+**Turn every intervention into an automation opportunity.**
 
 [![GitHub Stars](https://img.shields.io/github/stars/kingkongshot/Pensieve?color=ffcb47&labelColor=black&style=flat-square)](https://github.com/kingkongshot/Pensieve/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-white?labelColor=black&style=flat-square)](LICENSE)
 
-[English README](https://github.com/mamajiaa/pensieve-claude-plugin/blob/main/README.md)
+[Chinese README](https://github.com/mamajiaa/pensieve-claude-plugin/blob/zh/README.md)
 
 </div>
 
-## 如果你正在查找 linus 引导词
+## For Users Looking for the Linus Prompt
 
-你熟悉的那套方法还在，并且已经升级成可执行系统：
+That methodology is still here and now delivered as an executable system:
 
-- Linus 风格准则已成为默认行动规则
-- 关键能力挂在 Claude Code 执行链（skills / hooks / task / agent）
-- 审查能力以 `review` pipeline + knowledge 形式落地
+- Linus-style engineering principles are embedded as default execution rules
+- Core capabilities are mounted on the Claude Code runtime chain (`skills / hooks / task / agent`)
+- Code review is shipped as `run-when-reviewing-code` pipeline + knowledge
 
-你拿到的是工程能力级封装：提示词、流程和执行机制一起交付。
+You get a full engineering package: prompting, workflow, and execution mechanics together.
 
-## 为什么需要 linus 提示词？
+## What You Get Immediately
 
-- **更强破局能力**：顽固 bug 优先走根因修复，不走补丁堆叠
-- **更高代码品味**：输出更简洁、可维护、可验证
-- **更硬的代码审查**：`review` pipeline 执行 linus 一致的标准
-- **更稳的长会话表现**：按需加载减少上下文噪音，提示词不在塞爆上下文
-- **更少人工盯流程**：`/loop` 自动拆解并续跑任务，让每一次对话都改进 pipeline
+- **Stronger breakthrough ability**: stubborn bugs move toward root-cause fixes
+- **Higher code quality**: cleaner, verifiable, maintainable output
+- **Harder code review**: the `run-when-reviewing-code` pipeline enforces a consistent standard
+- **More stable long sessions**: on-demand loading keeps context lean
+- **Less manual babysitting**: `/loop` splits, runs, and auto-continues tasks
 
-## 30 秒开始
+## 30-Second Start
 
-1. 安装插件
-2. 初始化 `.claude/pensieve/`
-3. 重启 Claude Code
-4. 输入 `loop`
+1. Install the plugin
+2. Initialize `.claude/pensieve/`
+3. Restart Claude Code
+4. Type `loop`
 
-快速入口（推荐自动化）：
+Quick path (automation-first):
 
-把本 README 链接或全文贴给大模型，并直接下达指令：
+Share this README link or full text with your model and give this instruction:
 
-`按 README 完成 Pensieve 安装与初始化；完成后汇报执行结果。`
+`Complete Pensieve installation and initialization based on this README, then report the result.`
 
-大模型会按步骤自动完成安装、初始化与校验。
+The model can execute installation, initialization, and verification steps automatically.
 
-- [安装指南](docs/installation.md)
-- [更新指南](docs/update.md)
-- [升级工具](skills/pensieve/tools/upgrade/_upgrade.md)
-- [卸载说明](docs/installation.md#卸载)
+- [Installation Guide](docs/installation.md)
+- [Update Guide](docs/update.md)
+- [Upgrade Tool](skills/pensieve/tools/upgrade/_upgrade.md)
+- [Uninstall Section](docs/installation.md#uninstall)
 
-## 为什么这套方式更稳
+## Why This Stays Reliable
 
-### 1. 默认准则驱动执行
+### 1. Default principles drive execution
 
-系统默认强调：根因修复、简化分支、控制复杂度、拒绝低质量实现。
+The system defaults prioritize root-cause repair, branch simplification, complexity control, and quality thresholds.
 
-### 2. 按需加载上下文
+### 2. Context is loaded on demand
 
-不同阶段加载不同内容：执行时读 maxims，审查时读审查 pipeline/knowledge，迁移时读 upgrade。
+Each phase loads only what it needs: maxims for execution, review pipeline/knowledge for auditing, upgrade tool for migration.
 
-### 3. 绑定 Claude Code 原生能力
+### 3. Built on Claude Code native capabilities
 
-- **Skills**：路由意图到工具
-- **Hooks**：SessionStart 注入路由，Stop 负责自动续跑
-- **Task**：任务状态驱动流程节奏
-- **Agent**：主窗口拆解，子代理执行
+- **Skills**: route intent to the right tool
+- **Hooks**: SessionStart injects routes, Stop handles auto-continue
+- **Task**: task state drives execution rhythm
+- **Agent**: main window decomposes work, sub-agents execute
 
-这样设计有两个直接收益：
+This design gives two direct benefits:
 
-- **更轻量**：复用 Claude Code 原生执行链，减少额外封装和维护负担
-- **升级红利**：Claude Code 原生能力升级时，Pensieve 可同步获得改进
+- **Lighter architecture**: native execution chain reduces wrapper complexity and maintenance overhead
+- **Upgrade compounding**: Pensieve gains from Claude Code native improvements over time
 
-## 只需要学会几个简单的命令
+## Minimal Commands to Learn
 
-- `/loop`：复杂任务拆解 + 自动循环执行，直接说“使用 loop 完成“
-- `/doctor`：按 README 规范做用户数据体检，输出固定格式报告
-- `/pipeline`：查看并调用项目 pipelines
-- `/selfimprove`：沉淀经验并改进系统行为（不负责迁移体检）
-- `/upgrade`：迁移历史用户数据到当前标准（迁移后用 `/doctor` 复检）
+- `/loop`: split complex work and execute in auto-loop mode
+- `/doctor`: run README-driven user-data health checks
+- `/pipeline`: list and invoke project pipelines
+- `/selfimprove`: turn lessons into system-level improvements
+- `/upgrade`: migrate and validate legacy structure to current standard
 
-## 适合什么场景
+## Best Fit Scenarios
 
-- 顽固 bug 长时间修不动
-- 高标准 code review
-- 复杂项目的长周期迭代
-- 团队想把个人经验固化为默认流程
+- Stubborn bugs that keep recurring
+- High-standard code review workflows
+- Long-running, complex project iterations
+- Teams that want to encode personal craft into default process
 
-## 社区
+## What Belongs in the Pensieve?
 
-<img src="./QRCode.png" alt="微信交流群二维码" width="200">
+**Maxim**: should pass all checks. Still valid across projects? across languages? across domains? useful for future unknown problems?
 
-## 许可证
+**Decision**: keep it if any one of these is true. Would deleting it cause repeat mistakes? Would it help make a better choice in 3 months? Could you teach it as a reusable pattern?
+
+**Pipeline**: any task shape that appears repeatedly. Make it runnable first, then refine.
+
+## How Memory Evolves
+
+```text
+Temporary decisions in Loop -> filtered -> Decision
+Repeated similar Decisions -> distilled -> Maxim
+External knowledge + project practice -> Decision
+Decisions guide -> Pipeline improvement
+```
+
+Like memory revealing truth, what you store helps Claude understand your intent.
+
+## Community
+
+<img src="./QRCode.png" alt="WeChat group QR code" width="200">
+
+## License
 
 MIT

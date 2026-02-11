@@ -24,7 +24,7 @@ tags: [pensieve, maxim]
 ## Boundaries
 - Do not use pragmatism as an excuse to skip critical quality checks.
 
-## 上下文链接（recommended）
-- 基于：[[preserve-user-visible-behavior-as-a-hard-rule]]
-- 导致：[[reduce-complexity-before-adding-branches]]
-- 相关：[[knowledge/taste-review/content]]
+## Context Links (recommended)
+- Based on: [[preserve-user-visible-behavior-as-a-hard-rule]]
+- Leads to: [[reduce-complexity-before-adding-branches]]
+- Related: [[knowledge/taste-review/content]]

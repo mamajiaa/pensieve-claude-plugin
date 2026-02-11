@@ -1,108 +1,174 @@
 # Self-Improve Pipeline
 
 ---
-description: Capture reusable learnings into project Pensieve user data. Trigger on loop completion or user intents like "capture", "record", "save".
+description: Knowledge capture workflow. Trigger when loop completes or user says "capture", "record", or "save".
 ---
 
-You are helping capture learnings and patterns into Pensieve user data categories: `maxim / decision / pipeline / knowledge`.
-
-你在帮助把经验与模式沉淀到 Pensieve 的四类用户数据中：`maxim / decision / pipeline / knowledge`。
+You are helping capture learnings and patterns into Pensieve's knowledge system.
 
 **System prompts** (tools/scripts/system knowledge) live in the plugin and are updated only via plugin updates.
 
 **User data** lives in project-level `.claude/pensieve/` and is never overwritten by the plugin.
 
-## Scope / 职责边界（Hard Rule）
+Determine what's worth preserving, categorize it correctly, and write it in the proper format.
 
-- `/selfimprove` only handles capture and refinement, not full migration audits.
-- `/selfimprove` 只负责沉淀与改进，不负责全量迁移体检。
-- Migration and structure compliance checks belong to `/doctor`.
-- 迁移与结构合规体检由 `/doctor` 负责。
-- If major structure/path issues are found, recommend `/doctor` first, then `/upgrade` if needed.
-- 若发现旧路径并行、目录缺失或大面积格式问题，先建议运行 `/doctor`，必要时转 `/upgrade`。
+## Core Principles
 
-## Core Principles / 核心原则
+- **User confirmation required**: Never auto-capture — always ask first
+- **Read before write**: Must read the target README before creating any file
+- **Deletion over addition**: Simpler system is more reliable
+- **Right category**: Match content to the correct knowledge type
 
-- **User confirmation required / 必须用户确认**: Never auto-capture.
-- **Read before write / 先读后写**: Read target README before writing.
-- **Stable categories / 分类稳定**: Only use `maxim / decision / pipeline / knowledge`.
-- **Conclusion first / 结论优先**: Title + opening line must stand alone.
-- **Traceable links / 关系可追溯**: Use `基于/导致/相关` links.
-- **One maxim per file / 准则单文件**: Do not rely on `custom.md` index.
-- **Pipeline is orchestration / 流程只做编排**: Keep theory in linked files.
+---
 
-## Link Strength / 关联强度（Hard Rule）
+## Phase 1: Understand Intent
 
-- `decision`: at least one valid link is required.
-- `pipeline`: at least one valid link is required.
-- `knowledge`: links are recommended.
-- `maxim`: source links are recommended.
+**Goal**: Clarify what the user wants to capture
 
-## Phase 1: Understand Intent / 理解意图
+**Actions**:
+1. Identify the source:
+   - Loop deviation (expected vs actual)
+   - Discovered pattern during work
+   - Explicit user instruction
+   - External reference material
 
-**Goal / 目标**: Clarify what should be captured.
+2. Ask clarifying questions if needed:
+   - What specific insight should be captured?
+   - What triggered this realization?
+   - How general is this learning?
 
-**Actions / 行动**:
-1. Identify source: loop deviation, runtime pattern, explicit user intent, or external reference.
-2. Distill one core conclusion sentence.
-3. Decide the most suitable category.
+---
 
-## Phase 2: Propose Category and Confirm / 分类建议并确认
+## Phase 2: Audit Existing Pensieve (Optional)
 
-**Goal / 目标**: Give minimal and correct categorization.
+**Goal**: Find improvement opportunities in current project Pensieve data
 
-**Actions / 行动**:
-1. Match against categories:
-   - `maxim`: cross-context long-term principle
-   - `decision`: context-specific project choice
-   - `pipeline`: executable workflow blueprint
-   - `knowledge`: external method/reference
-2. Present recommendation and ask user confirmation.
-3. Do not write anything before confirmation.
+**Actions**:
+1. Ask the user if they want a Pensieve audit:
+   - "Want me to review your current `.claude/pensieve/` contents for improvements?"
+2. If yes:
+   - Read each category README:
+     - `<SYSTEM_SKILL_ROOT>/maxims/README.md`
+     - `<SYSTEM_SKILL_ROOT>/decisions/README.md`
+     - `<SYSTEM_SKILL_ROOT>/pipelines/README.md`
+     - `<SYSTEM_SKILL_ROOT>/knowledge/README.md`
+   - Review the corresponding project files under `.claude/pensieve/`
+   - Flag format violations, missing fields, outdated content, or mis‑categorized items
+   - Provide a concise review report with suggested fixes
+3. **Do not edit anything without explicit user approval**
 
-**Path Rules / 路径规则**:
-- `maxim`: `.claude/pensieve/maxims/{one-sentence-conclusion}.md`
-- `decision`: `.claude/pensieve/decisions/{date}-{conclusion}.md`
-- `pipeline`: `.claude/pensieve/pipelines/run-when-*.md`
-- `knowledge`: `.claude/pensieve/knowledge/{name}/content.md`
+If the user declines, skip this phase and continue.
 
-## Phase 3: Read Target Spec / 读取目标规范
+---
 
-**Goal / 目标**: Follow existing rules, no new concepts.
+## Phase 3: Categorize
 
-**Actions / 行动**:
-1. Read target README:
-   - `<SYSTEM_SKILL_ROOT>/maxims/README.md`
-   - `<SYSTEM_SKILL_ROOT>/decisions/README.md`
-   - `<SYSTEM_SKILL_ROOT>/pipelines/README.md`
-   - `<SYSTEM_SKILL_ROOT>/knowledge/README.md`
-2. Apply link-strength rules to draft.
+**Goal**: Determine the correct knowledge type
 
-## Phase 4: Draft / 草稿输出
+**Actions**:
+1. Evaluate content against each category:
 
-**Goal / 目标**: Produce write-ready content.
+| Type | Characteristics | README |
+|------|-----------------|--------|
+| **maxim** | Universal principles — applies across projects, languages, domains | `maxims/README.md` |
+| **decision** | Context-dependent choices — specific to situation or project | `decisions/README.md` |
+| **pipeline** | Executable workflows — repeatable process with clear steps | `pipelines/README.md` |
+| **knowledge** | External references — docs, tutorials, specifications | `knowledge/README.md` |
 
-**Actions / 行动**:
-1. Use conclusion-style title.
-2. Keep a one-line conclusion near top.
-3. Include essential body and key references only.
-4. Apply link requirements:
-   - decision/pipeline: at least one valid `[[...]]`
-   - knowledge/maxim: optional but recommended
-5. For pipeline drafts, self-check:
-   - Which paragraphs do not affect task orchestration?
-   - Have those paragraphs been moved to `knowledge/decision/maxim` with links?
-6. Show draft and wait for user confirmation.
+2. **Present categorization to user**:
+   ```markdown
+   ## Capture Recommendation
 
-## Phase 5: Write and Backlink / 写入与回链
+   [Content summary] → Recommend **[type]**
 
-**Goal / 目标**: Persist content and keep graph connected.
+   Reason: [Explanation based on README criteria]
 
-**Actions / 行动**:
-1. Write to target path.
-2. If a new `maxim` is added, link to related `decision/knowledge/pipeline`.
-3. Add reverse links in related notes when needed.
-4. Confirm written paths and changed links to user.
+   Do you agree?
+   ```
+
+**CRITICAL**: Wait for user confirmation before proceeding.
+
+---
+
+## Phase 4: Read Target README
+
+**Goal**: Understand the exact format and criteria for the chosen category
+
+**DO NOT SKIP**: This phase is mandatory. The README defines:
+- Capture criteria (what's worth capturing)
+- File format requirements
+- Naming conventions
+- Examples
+
+**Actions**:
+1. Read the corresponding README:
+   ```
+   Read <SYSTEM_SKILL_ROOT>/{type}/README.md
+   ```
+
+2. Verify the content meets the capture criteria defined in README
+
+3. If content doesn't meet criteria, explain to user and ask how to proceed
+
+---
+
+## Phase 5: Draft Content
+
+**Goal**: Write content following the README format exactly
+
+**Actions**:
+1. Draft the file content following README specifications
+
+2. Choose the target location:
+   - **pipeline** → `.claude/pensieve/pipelines/run-when-*.md` (project user data)
+   - **maxim** → `.claude/pensieve/maxims/{name}.md` (project user data)
+   - **decision** → `.claude/pensieve/decisions/{date}-{conclusion}.md` (project user data)
+   - **knowledge** → `.claude/pensieve/knowledge/{name}/content.md` (project user data)
+
+3. **Present draft to user for review**:
+   ```markdown
+   ## Draft Preview
+
+   File: `{target_path}`
+
+   ---
+   [draft content]
+   ---
+
+   Write it?
+   ```
+
+**CRITICAL**: Wait for user approval before writing.
+
+---
+
+## Phase 6: Write
+
+**Goal**: Persist the knowledge
+
+**DO NOT START WITHOUT USER APPROVAL** from Phase 4.
+
+**Actions**:
+1. Write the file to `{target_path}`
+2. Confirm successful write to user
+3. Suggest any related follow-up actions (e.g., update other files that reference this)
+
+---
+
+## Knowledge Evolution
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  ┌─────────────┐   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐  │
+│  │   maxims/   │   │ decisions/  │   │ pipelines/  │   │ knowledge/  │  │
+│  │  future guide│ ←│ past lessons│   │ workflows   │   │ external in │  │
+│  └─────────────┘   └─────────────┘   └─────────────┘   └─────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+
+Evolution path: decision → repeated pattern → maxim → guides → pipeline
+```
+
+---
 
 ## Related Files
 

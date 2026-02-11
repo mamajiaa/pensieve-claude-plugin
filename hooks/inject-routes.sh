@@ -160,10 +160,10 @@ if [[ -d "$USER_DATA_ROOT" ]]; then
 
     GRAPH_FILE="$USER_DATA_ROOT/graph.md"
     if [[ -f "$GRAPH_FILE" ]]; then
-        notes_count="$(sed -n 's/^- 扫描笔记数: //p' "$GRAPH_FILE" | head -n 1)"
-        links_found="$(sed -n 's/^- 发现链接数: //p' "$GRAPH_FILE" | head -n 1)"
-        links_resolved="$(sed -n 's/^- 已解析链接: //p' "$GRAPH_FILE" | head -n 1)"
-        links_unresolved="$(sed -n 's/^- 未解析链接: //p' "$GRAPH_FILE" | head -n 1)"
+        notes_count="$(sed -n 's/^- Notes scanned: //p' "$GRAPH_FILE" | head -n 1)"
+        links_found="$(sed -n 's/^- Links found: //p' "$GRAPH_FILE" | head -n 1)"
+        links_resolved="$(sed -n 's/^- Links resolved: //p' "$GRAPH_FILE" | head -n 1)"
+        links_unresolved="$(sed -n 's/^- Links unresolved: //p' "$GRAPH_FILE" | head -n 1)"
 
         CONTEXT+="- graph: \`$GRAPH_FILE\`"
         CONTEXT+=$'\n'

@@ -66,11 +66,6 @@ In the loop directory (`.claude/pensieve/loop/{date}-{slug}/`):
 | design | none / path |
 | plan | none / path |
 
-### Context Links (optional)
-- 基于：[[前置决策或知识]]
-- 导致：[[后续决策、流程或文档]]
-- 相关：[[相关主题]]
-
 ---
 
 ## Post-Context
@@ -91,7 +86,8 @@ In the loop directory (`.claude/pensieve/loop/{date}-{slug}/`):
 
 Before splitting tasks, read project maxims:
 
-- All files under `<USER_DATA_ROOT>/maxims/` (`*.md`)
+- `<USER_DATA_ROOT>/maxims/custom.md` (if present)
+- Any other files under `<USER_DATA_ROOT>/maxims/`
 
 Then generate tasks based on context + maxims:
 
@@ -215,7 +211,6 @@ Pre‑assumptions → execution → post‑deviations → capture learnings
 3. Fill Post‑Context (deviations)
 4. If meaningful deviation exists, ask user to capture
 5. Upon consent, write using README format
-6. If captured as `decision`/`pipeline`, ensure at least one `基于/导致/相关` link is present
 
 ### Post-Context Example
 

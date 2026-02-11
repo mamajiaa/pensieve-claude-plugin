@@ -5,86 +5,86 @@ description: Load this skill immediately when the user expresses any intent. Sys
 
 # Pensieve
 
-将用户意图路由到正确的工具或 pipeline。
+Route user intent to the right tool/pipeline.
 
-## 设计约定
+## Design conventions
 
-- **系统能力（随插件更新）**：位于 `skills/pensieve/`
-  - tools / scripts / system knowledge / 格式 README
-  - **不内置 pipelines / maxims 内容**
-- **用户数据（项目级，永不覆盖）**：`.claude/pensieve/`
-  - `maxims/`：团队准则（每条准则一个文件）
-  - `decisions/`：项目决策记录
-  - `knowledge/`：外部参考知识
-  - `pipelines/`：项目 pipelines（安装时种子化）
-  - `loop/`：loop 运行产物（每次 loop 一个目录）
+- **System capability (updated via plugin)**: inside `skills/pensieve/`
+  - tools / scripts / system knowledge / format READMEs
+  - **No built‑in pipelines / maxims content**
+- **User data (project-level, never overwritten)**: `.claude/pensieve/`
+  - `maxims/`: your team principles (one maxim per file)
+  - `decisions/`: project decision records
+  - `knowledge/`: external references you add
+  - `pipelines/`: project pipelines (seeded on install)
+  - `loop/`: loop run outputs (one dir per loop)
 
-## 内置工具（5）
+## Built-in Tools (5)
 
-### 1) Loop 工具
+### 1) Loop Tool
 
-**适用场景**：
-- 任务复杂，需要拆解并自动循环执行
+**When to use**:
+- The task is complex and needs split + auto‑loop execution
 
-**入口**：
-- Command：`commands/loop.md`
-- Tool file：`tools/loop/_loop.md`
+**Entry**:
+- Command: `commands/loop.md`
+- Tool file: `tools/loop/_loop.md`
 
-**触发词**：
+**Triggers**:
 - `loop` / "use loop"
 
-### 2) Self‑Improve 工具
+### 2) Self‑Improve Tool
 
-**适用场景**：
-- 用户要求改进 Pensieve（pipelines/scripts/rules/behavior）
-- loop 结束后做复盘与改进
+**When to use**:
+- User asks to improve Pensieve (pipelines/scripts/rules/behavior)
+- After a loop ends for feedback & improvement
 
-**入口**：
-- Command：`commands/selfimprove.md`
-- Tool file：`tools/self-improve/_self-improve.md`
+**Entry**:
+- Command: `commands/selfimprove.md`
+- Tool file: `tools/self-improve/_self-improve.md`
 
-**触发词**：
+**Triggers**:
 - "self‑improve" / "improve Pensieve"
 
-### 3) Pipeline 工具
+### 3) Pipeline Tool
 
-**适用场景**：
-- 用户想查看当前项目可用 pipelines
+**When to use**:
+- User wants to list pipelines for the current project
 
-**入口**：
-- Command：`commands/pipeline.md`
-- Tool file：`tools/pipeline/_pipeline.md`
+**Entry**:
+- Command: `commands/pipeline.md`
+- Tool file: `tools/pipeline/_pipeline.md`
 
-**触发词**：
+**Triggers**:
 - "pipeline" / "use pipeline"
 
-### 4) Doctor 工具
+### 4) Doctor Tool
 
-**适用场景**：
-- 升级后的强制验证（结构/格式合规）
-- 安装后的可选快速体检
-- 用户要求做用户数据体检
+**When to use**:
+- Mandatory post-upgrade validation (structure/format compliance)
+- Optional post-install health check
+- User asks to validate user-data quality
 
-**入口**：
-- Command：`commands/doctor.md`
-- Tool file：`tools/doctor/_doctor.md`
+**Entry**:
+- Command: `commands/doctor.md`
+- Tool file: `tools/doctor/_doctor.md`
 
-**触发词**：
-- "doctor" / "health check" / "检查格式" / "检查迁移"
+**Triggers**:
+- "doctor" / "health check" / "format check" / "migration check"
 
-### 5) Upgrade 工具
+### 5) Upgrade Tool
 
-**适用场景**：
-- 用户需要把历史数据迁移到 `.claude/pensieve/`
-- 用户询问目标用户数据结构
+**When to use**:
+- User needs to migrate legacy data into `.claude/pensieve/`
+- User asks for the ideal user-data structure
 
-**入口**：
-- Command：`commands/upgrade.md`
-- Tool file：`tools/upgrade/_upgrade.md`
+**Entry**:
+- Command: `commands/upgrade.md`
+- Tool file: `tools/upgrade/_upgrade.md`
 
-**触发词**：
+**Triggers**:
 - "upgrade" / "migrate user data"
 
 ---
 
-SessionStart 会在运行时注入**系统能力路径**与**项目用户数据路径**，作为单一事实源。
+SessionStart injects the **system capability path** and **project user‑data path** into context as the single source of truth at runtime.

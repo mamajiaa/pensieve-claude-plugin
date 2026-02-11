@@ -1,11 +1,11 @@
 ---
-description: 使用 Loop 工具（自动循环执行任务）
+description: Use Loop tool (auto‑loop task execution)
 argument-hint: [slug]
 allowed-tools: ["Task", "Read", "Write", "Edit", "Bash", "Grep", "Glob"]
 ---
 
-使用 Loop 工具（完整流程见工具文件）：
+Use the Loop tool (full process in tool file):
 
 @${CLAUDE_PLUGIN_ROOT}/skills/pensieve/tools/loop/_loop.md
 
-如果用户提供 `$1`，将其作为 `slug` 传给 `init-loop.sh`。
+If the user provides `$1`, pass it as `slug` to `init-loop.sh`.

@@ -208,7 +208,7 @@ issues: list[Issue] = []
 files = list_markdown_files(root)
 
 if not root.exists():
-    issues.append(Issue("MUST_FIX", "FM-000", str(root), "用户数据根目录不存在"))
+    issues.append(Issue("MUST_FIX", "FM-000", str(root), "User data root directory does not exist"))
 
 for p in files:
     rel = str(p.relative_to(root))
@@ -220,7 +220,7 @@ for p in files:
                     "MUST_FIX",
                     "FM-301",
                     rel,
-                    "legacy pipeline 文件名 `review.md` 已废弃，必须改为 `run-when-*.md`（推荐 `run-when-reviewing-code.md`）",
+                    "Legacy pipeline filename `review.md` is deprecated; rename to `run-when-*.md` (recommended: `run-when-reviewing-code.md`)",
                 )
             )
         elif not pipeline_name_re.match(p.name):
@@ -229,7 +229,7 @@ for p in files:
                     "MUST_FIX",
                     "FM-302",
                     rel,
-                    "pipeline 文件名必须为 `run-when-*.md`，从文件名可直接判断触发场景",
+                    "Pipeline filename must match `run-when-*.md` so invocation intent is clear from the name",
                 )
             )
 
@@ -238,43 +238,43 @@ for p in files:
 
     if fm is None:
         if fm_state == "unclosed":
-            issues.append(Issue("MUST_FIX", "FM-101", rel, "frontmatter 起始存在但未闭合（缺少结束 ---）"))
+            issues.append(Issue("MUST_FIX", "FM-101", rel, "frontmatter starts but is not closed (missing ending ---)"))
         else:
-            issues.append(Issue("MUST_FIX", "FM-102", rel, "缺少 frontmatter（必须添加统一顶部元数据）"))
+            issues.append(Issue("MUST_FIX", "FM-102", rel, "missing frontmatter (required unified top-level metadata)"))
         continue
 
     for err in parse_errors:
-        issues.append(Issue("MUST_FIX", "FM-103", rel, f"frontmatter 语法错误: {err}"))
+        issues.append(Issue("MUST_FIX", "FM-103", rel, f"frontmatter syntax error: {err}"))
 
     missing = [k for k in required_keys if k not in fm]
     if missing:
-        issues.append(Issue("MUST_FIX", "FM-104", rel, f"缺少必填字段: {', '.join(missing)}"))
+        issues.append(Issue("MUST_FIX", "FM-104", rel, f"missing required fields: {', '.join(missing)}"))
 
     v_type = fm.get("type")
     if isinstance(v_type, str) and v_type and v_type not in allowed_types:
-        issues.append(Issue("MUST_FIX", "FM-201", rel, f"type 非法: {v_type}（允许: {', '.join(sorted(allowed_types))}）"))
+        issues.append(Issue("MUST_FIX", "FM-201", rel, f"invalid type: {v_type} (allowed:  {', '.join(sorted(allowed_types))}）"))
 
     v_status = fm.get("status")
     if isinstance(v_status, str) and v_status and v_status not in allowed_status:
-        issues.append(Issue("MUST_FIX", "FM-202", rel, f"status 非法: {v_status}（允许: {', '.join(sorted(allowed_status))}）"))
+        issues.append(Issue("MUST_FIX", "FM-202", rel, f"invalid status: {v_status} (allowed:  {', '.join(sorted(allowed_status))}）"))
 
     v_id = fm.get("id")
     if isinstance(v_id, str) and v_id and not id_re.match(v_id):
-        issues.append(Issue("MUST_FIX", "FM-203", rel, "id 非法（仅允许小写字母/数字/中划线，且不能以中划线开头）"))
+        issues.append(Issue("MUST_FIX", "FM-203", rel, "invalid id (allow only lowercase letters/digits/hyphen; cannot start with hyphen)"))
 
     for key in ["created", "updated"]:
         v = fm.get(key)
         if isinstance(v, str) and v and not valid_date(v):
-            issues.append(Issue("MUST_FIX", "FM-204", rel, f"{key} 非法（应为 YYYY-MM-DD）"))
+            issues.append(Issue("MUST_FIX", "FM-204", rel, f"{key} is invalid (must be YYYY-MM-DD)"))
 
     v_tags = fm.get("tags")
     if v_tags is not None and not isinstance(v_tags, list):
-        issues.append(Issue("MUST_FIX", "FM-205", rel, "tags 非法（应为数组，如 [pensieve, maxim]）"))
+        issues.append(Issue("MUST_FIX", "FM-205", rel, "invalid tags (must be an array, e.g. [pensieve, maxim])"))
 
 must_fix = [x for x in issues if x.level == "MUST_FIX"]
 should_fix = [x for x in issues if x.level == "SHOULD_FIX"]
 
-print("# Frontmatter 快检报告")
+print("# Frontmatter Quick Check Report")
 print()
 print(f"- Root: `{root}`")
 print(f"- Files scanned: {len(files)}")

@@ -1,118 +1,94 @@
-# Maxims（准则）
+# Maxims
 
-跨项目、跨场景的长期行动原则。
+Universal guiding principles that apply across projects and contexts.
 
-## 目的
+## Purpose
 
-Maxim 不是技术细节，而是团队“默认行为”的抽象：
+Maxims are **character**, not technical details:
 
-- 跨项目：不依赖单一仓库
-- 跨问题：面对未知问题仍可指导决策
-- 可传承：新人读完即可执行
+- Cross‑project: not tied to a specific stack
+- Cross‑problem: guide unknown future problems
+- Transcendent: abstract enough to apply broadly
 
-Maxim 的价值是降低决策成本，避免每次从零推导。
+Maxims exist to **reduce decision cost**. When facing new problems, they provide direction without re‑deriving from scratch.
 
-> 说明：插件不内置固定 maxim 文件。安装/迁移时会在 `.claude/pensieve/maxims/` 种子化初始准则，用户可自由编辑。
+> **Note**: The plugin ships no maxim files. Install/migration seeds initial maxims in `.claude/pensieve/maxims/` that users can freely edit.
 
-## 捕获标准
+## Capture Criteria
 
-### 自检问题
+### Self‑check
 
-以下问题都为“是”，才适合作为 maxim：
+All must be "yes" to qualify as a maxim:
 
-1. **与项目无关**：换项目仍成立？
-2. **与语言无关**：换语言仍成立？
-3. **与领域无关**：换技术域仍成立？
-4. **能指导未来**：对未知问题仍有指导性？
-5. **可一句话表达**：能说清楚且可执行？
+1. **Project‑agnostic**: Would this still apply in a different project?
+2. **Language‑agnostic**: Would this still apply in a different language?
+3. **Domain‑agnostic**: Would this still apply in a different technical domain?
+4. **Future‑guiding**: Would it guide decisions for unknown problems?
+5. **Sayable**: Can it be expressed clearly in one sentence?
 
-任一“否”更适合记为 `decision`，而非 `maxim`。
+Any "no" → capture as a decision, not a maxim.
 
-## 关系与演化
+### Writing Philosophy (Wittgenstein)
 
-| 方向 | 说明 |
-|---|---|
-| Decision -> Maxim | 重复出现的决策可上升为准则 |
-| Maxim <-> Knowledge | 准则可吸收外部最佳实践 |
+- **The limits of my language mean the limits of my world** — maxims must be precise
+- **Whereof one cannot speak, thereof one must be silent** — don’t capture what you cannot express clearly
+- **Meaning is use** — the value of a maxim is whether it guides action
 
-## 编写规范
+## Relationships & Evolution
 
-### 目录结构（项目级）
+| Direction | Description |
+|-----------|-------------|
+| Decision → Maxim | Repeated decisions → distilled into maxims |
+| Maxim ↔ Knowledge | Maxims can internalize external best practices |
+
+**Order equals priority**: Maxims are ordered top‑to‑bottom; when they conflict, earlier ones win.
+
+## Writing Guide
+
+### Directory Structure (Project Level)
 
 ```
-.claude/pensieve/maxims/
-├── {maxim-conclusion-a}.md
-└── {maxim-conclusion-b}.md
+.claude/pensieve/maxims/custom.md
 ```
 
-说明：
-- 不再要求 `custom.md` 索引。
-- 每条 maxim 一个独立文件。
+### File Format
 
-### 单条准则文件格式（推荐）
-
-每条 maxim 建议包含：
-- **标题**：一句话结论
-- **单行结论**：可直接执行的明确结论
-- **指导规则 / 边界**：何时适用、何时不适用
+Each maxim includes:
+- **Title line**: maxim name + core quote
+- **Expanded points**: guidance, examples, boundaries
 
 ```markdown
-# {一句话结论}
+1. "Maxim Name" - Label "Core quote"
 
-## 一句话结论
-> {团队可直接执行的一句话}
-
-## 指导规则
-- Rule 1
-- Rule 2
-
-## 边界
-- 以下情况不适用...
-
-## 上下文链接（推荐）
-- 基于：[[相关 decision 或 knowledge]]
-- 导致：[[相关 pipeline 或后续 decision]]
-- 相关：[[相关 maxim]]
+Classic example: XXX
+Guidance point
+Guidance point
+Boundary note
 ```
 
-### 冲突处理（无索引模式）
-
-当两条 maxim 冲突时，按以下顺序判断：
-
-1. 更具体场景的 maxim 优先于更抽象 maxim
-2. 有明确 `decision`/`knowledge` 追溯证据的 maxim 优先
-3. 仍冲突时，补一条 `decision` 明确当前项目优先级
-
-### 示例
+### Example
 
 ```markdown
-# Preserve user-visible behavior as a hard rule
+1. "Good Taste" — Your first maxim: "Rewrite it so the special case goes away and becomes the normal case."
 
-## 一句话结论
-> 任何未预期的用户可见行为变化都应视为缺陷。
+Classic example: linked‑list deletion — reduce 10 lines with ifs to 4 lines without conditionals
+Eliminate edge cases rather than adding conditionals
+Good taste is intuition built from experience
 
-## 指导规则
-- 重构期间保持用户可见行为稳定。
-- 如果必须改变行为，必须显式说明并评审。
+2. "Never break userspace" — Your iron rule: "We do not break user‑visible behavior!"
 
-## 边界
-- 仅在用户明确批准变更时允许改变行为。
+Any code that unexpectedly changes user‑visible behavior is a bug
+The kernel serves users, it does not educate them
 ```
 
-## 备注
+## Notes
 
-- Maxim 应保持稀缺，不要高频新增
-- 如果某条 maxim 经常被改写，说明抽象层级可能不对
-- 链接是推荐项（非强制），但建议保留来源脉络
-
-推荐追溯格式：
-
-```markdown
-Derived from: [[2026-01-22-do-not-break-user-visible-behavior]], [[knowledge/taste-review/content]]
-```
+- Maxims are **scarce** — do not add frequently
+- When adding, consider insertion position (it indicates priority)
+- Once established, maxims should rarely change — frequent edits imply weak abstraction
 
 ---
 
-## Maxim 文件位置
+## Maxim Files
 
-- 项目级条目：`.claude/pensieve/maxims/*.md`（永不覆盖）
+- Project‑level custom: `.claude/pensieve/maxims/custom.md` (never overwritten)

@@ -24,7 +24,7 @@ tags: [pensieve, maxim]
 ## Boundaries
 - Explicitly approved behavior changes are allowed when documented and reviewed.
 
-## 上下文链接（recommended）
-- 基于：[[eliminate-special-cases-by-redesigning-data-flow]]
-- 导致：[[prefer-pragmatic-solutions-over-theoretical-completeness]]
-- 相关：[[knowledge/taste-review/content]]
+## Context Links (recommended)
+- Based on: [[eliminate-special-cases-by-redesigning-data-flow]]
+- Leads to: [[prefer-pragmatic-solutions-over-theoretical-completeness]]
+- Related: [[knowledge/taste-review/content]]
