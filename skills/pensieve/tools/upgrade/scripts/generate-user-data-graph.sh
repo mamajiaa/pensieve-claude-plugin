@@ -9,19 +9,17 @@ source "$SCRIPT_DIR/../../loop/scripts/_lib.sh"
 usage() {
     cat <<'USAGE'
 Usage:
-  generate-user-data-graph.sh [--root <path>] [--output <path>] [--include-loop]
+  generate-user-data-graph.sh [--root <path>] [--output <path>]
 
 Options:
   --root <path>      Scan root. Default: <project>/.claude/pensieve
   --output <path>    Output markdown file. Default: <root>/graph.md
-  --include-loop     Include .claude/pensieve/loop/** in the graph
   -h, --help         Show this help
 USAGE
 }
 
 ROOT=""
 OUTPUT=""
-INCLUDE_LOOP=0
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -34,10 +32,6 @@ while [[ $# -gt 0 ]]; do
             [[ $# -ge 2 ]] || { echo "Missing value for --output" >&2; exit 1; }
             OUTPUT="$2"
             shift 2
-            ;;
-        --include-loop)
-            INCLUDE_LOOP=1
-            shift
             ;;
         -h|--help)
             usage
@@ -84,8 +78,7 @@ run_awk() {
 awk \
     -v root="$ROOT" \
     -v output="$OUTPUT" \
-    -v generated_at="$GENERATED_AT" \
-    -v include_loop="$INCLUDE_LOOP" '
+    -v generated_at="$GENERATED_AT" '
 function trim(s) {
     sub(/^[[:space:]]+/, "", s)
     sub(/[[:space:]]+$/, "", s)
@@ -102,9 +95,7 @@ function category(rel, arr, n) {
     return arr[1]
 }
 function allowed(cat) {
-    if (cat == "root" || cat == "maxims" || cat == "decisions" || cat == "knowledge" || cat == "pipelines") return 1
-    if (include_loop == "1" && cat == "loop") return 1
-    return 0
+    return (cat == "root" || cat == "maxims" || cat == "decisions" || cat == "knowledge" || cat == "pipelines")
 }
 function basename_noext(path, arr, n) {
     n = split(path, arr, "/")
@@ -131,7 +122,6 @@ BEGIN {
     cats[3] = "decisions"; cat_title["decisions"] = "决策"
     cats[4] = "knowledge"; cat_title["knowledge"] = "知识"
     cats[5] = "pipelines"; cat_title["pipelines"] = "流程"
-    cats[6] = "loop";      cat_title["loop"] = "循环"
 }
 {
     if (FNR == 1) {
@@ -191,14 +181,12 @@ END {
     print ""
     print "- 生成时间: " generated_at
     print "- 根目录: `" root "`"
-    if (include_loop == "1") print "- 包含分类: maxims, decisions, knowledge, pipelines, loop"
-    else print "- 包含分类: maxims, decisions, knowledge, pipelines"
+    print "- 包含分类: maxims, decisions, knowledge, pipelines"
     print ""
     print "```mermaid"
     print "graph LR"
 
-    max_cat = (include_loop == "1" ? 6 : 5)
-    for (ci = 1; ci <= max_cat; ci++) {
+    for (ci = 1; ci <= 5; ci++) {
         cat = cats[ci]
         if (!(cat in member_list) || member_list[cat] == "") continue
 

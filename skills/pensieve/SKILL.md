@@ -13,7 +13,7 @@ description: 当用户表达任何意图时**立即加载**此 skill。系统能
   - tools / scripts / system knowledge / 格式 README
   - **不内置 pipelines / maxims 内容**
 - **用户数据（项目级，永不覆盖）**：`.claude/pensieve/`
-  - `maxims/`：团队准则（如 `custom.md`）
+  - `maxims/`：团队准则（每条准则一个文件）
   - `decisions/`：项目决策记录
   - `knowledge/`：外部参考知识
   - `pipelines/`：项目 pipelines（安装时种子化）

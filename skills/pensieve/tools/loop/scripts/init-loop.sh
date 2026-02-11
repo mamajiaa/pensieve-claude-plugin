@@ -252,8 +252,7 @@ Do not rely on a single file when context has multiple artifacts.
 ## Maxims
 
 Project‑level maxims (not shipped by the plugin, user‑editable):
-- \`$DATA_ROOT/maxims/custom.md\` (ignore if missing)
-- Any other maxim files under \`$DATA_ROOT/maxims/\`
+- Read all maxim files under \`$DATA_ROOT/maxims/\` (\`*.md\`)
 
 ## Current Task
 

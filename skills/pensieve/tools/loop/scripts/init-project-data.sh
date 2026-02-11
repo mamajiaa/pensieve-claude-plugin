@@ -19,11 +19,6 @@ TEMPLATES_ROOT="$PLUGIN_ROOT/skills/pensieve/tools/upgrade/templates"
 
 mkdir -p "$DATA_ROOT"/{maxims,decisions,knowledge,loop,pipelines}
 
-CUSTOM_MAXIMS="$DATA_ROOT/maxims/custom.md"
-if [[ ! -f "$CUSTOM_MAXIMS" ]]; then
-  cp "$TEMPLATES_ROOT/maxims.initial.md" "$CUSTOM_MAXIMS"
-fi
-
 TEMPLATE_MAXIMS_DIR="$TEMPLATES_ROOT/maxims"
 if [[ -d "$TEMPLATE_MAXIMS_DIR" ]]; then
   for template_maxim in "$TEMPLATE_MAXIMS_DIR"/*.md; do
@@ -46,7 +41,7 @@ This directory is the project‑level Pensieve user data area:
 
 ## Structure
 
-- `maxims/`: your maxims (keep `custom.md`)
+- `maxims/`: your maxims (one maxim per file)
 - `decisions/`: decision records (format: `<SYSTEM_SKILL_ROOT>/decisions/README.md`)
 - `knowledge/`: external knowledge (format: `<SYSTEM_SKILL_ROOT>/knowledge/README.md`)
 - `loop/`: loop runs (one folder per loop)
@@ -59,4 +54,8 @@ if [[ ! -f "$REVIEW_PIPELINE" ]]; then
 fi
 
 echo "✅ Initialization complete: $DATA_ROOT"
-echo "  - maxims/custom.md: $([[ -f "$CUSTOM_MAXIMS" ]] && echo exists || echo created)"
+MAXIM_COUNT=0
+if [[ -d "$DATA_ROOT/maxims" ]]; then
+  MAXIM_COUNT="$(find "$DATA_ROOT/maxims" -maxdepth 1 -type f -name '*.md' | wc -l | tr -d ' ')"
+fi
+echo "  - maxims/*.md: $MAXIM_COUNT files present"

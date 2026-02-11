@@ -125,9 +125,8 @@ If user insists on loop → continue to Phase 1
 
 ### Load maxims first (mandatory)
 
-Before splitting tasks, read project maxims from:
-- `<USER_DATA_ROOT>/maxims/custom.md` (if present)
-- Any other maxim files under `<USER_DATA_ROOT>/maxims/`
+Before splitting tasks, read all project maxims from:
+- All maxim files under `<USER_DATA_ROOT>/maxims/` (`*.md`)
 
 Use maxims to shape task boundaries and acceptance criteria.
 

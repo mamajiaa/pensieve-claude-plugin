@@ -35,36 +35,21 @@ Maxim 的价值是降低决策成本，避免每次从零推导。
 | Decision -> Maxim | 重复出现的决策可上升为准则 |
 | Maxim <-> Knowledge | 准则可吸收外部最佳实践 |
 
-**顺序即优先级**：从上到下优先级递减；冲突时以前者为准。
-
 ## 编写规范
 
 ### 目录结构（项目级）
 
 ```
 .claude/pensieve/maxims/
-├── custom.md                     # 索引 + 优先级顺序
-├── {maxim-conclusion-a}.md       # 一条准则一个文件
+├── {maxim-conclusion-a}.md
 └── {maxim-conclusion-b}.md
 ```
 
-### 索引文件（`custom.md`）
+说明：
+- 不再要求 `custom.md` 索引。
+- 每条 maxim 一个独立文件。
 
-`custom.md` 只做索引，不承载全部正文：
-
-```markdown
-# 准则索引
-
-## 优先级顺序
-1. [[eliminate-special-cases-by-redesigning-data-flow]]
-2. [[preserve-user-visible-behavior-as-a-hard-rule]]
-3. [[prefer-pragmatic-solutions-over-theoretical-completeness]]
-
-## 备注
-- 准则冲突时，优先执行更靠前的条目。
-```
-
-### 单条准则文件格式
+### 单条准则文件格式（推荐）
 
 每条 maxim 建议包含：
 - **标题**：一句话结论
@@ -90,6 +75,14 @@ Maxim 的价值是降低决策成本，避免每次从零推导。
 - 相关：[[相关 maxim]]
 ```
 
+### 冲突处理（无索引模式）
+
+当两条 maxim 冲突时，按以下顺序判断：
+
+1. 更具体场景的 maxim 优先于更抽象 maxim
+2. 有明确 `decision`/`knowledge` 追溯证据的 maxim 优先
+3. 仍冲突时，补一条 `decision` 明确当前项目优先级
+
 ### 示例
 
 ```markdown
@@ -109,7 +102,6 @@ Maxim 的价值是降低决策成本，避免每次从零推导。
 ## 备注
 
 - Maxim 应保持稀缺，不要高频新增
-- 新增时要考虑插入位置（即优先级）
 - 如果某条 maxim 经常被改写，说明抽象层级可能不对
 - 链接是推荐项（非强制），但建议保留来源脉络
 
@@ -123,5 +115,4 @@ Derived from: [[2026-01-22-do-not-break-user-visible-behavior]], [[knowledge/tas
 
 ## Maxim 文件位置
 
-- 项目级索引：`.claude/pensieve/maxims/custom.md`（永不覆盖）
 - 项目级条目：`.claude/pensieve/maxims/*.md`（永不覆盖）

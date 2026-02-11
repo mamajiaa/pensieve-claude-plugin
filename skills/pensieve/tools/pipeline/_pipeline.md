@@ -1,13 +1,16 @@
 # Pipeline 工具
 
 ---
-description: List project-level pipelines (path + description)
+description: 先展示项目图谱摘要，再展示 project-level pipelines（path + description）
 ---
 
-You are the Pipeline tool. Your task is to **only read** project-level pipelines and output their paths and descriptions.
+You are the Pipeline tool. Your task is to **only read** project-level data and output:
+1) user-data graph summary
+2) project pipeline paths + descriptions
 
 ## Goals
 
+- Generate/read the project user-data graph summary
 - Locate the project pipelines directory
 - List all pipeline files
 - Extract each pipeline's `description`
@@ -24,7 +27,12 @@ Project pipelines live at:
 
 ## Output Format
 
-Output a concise table:
+Output two sections in order:
+
+1. Graph summary:
+   - graph path
+   - notes scanned / links found / resolved / unresolved
+2. Pipeline table:
 
 | Pipeline | 描述 |
 |----------|------|
@@ -36,7 +44,7 @@ Use `(no description)` when missing.
 
 Call the script and output its result verbatim:
 
-!`${CLAUDE_PLUGIN_ROOT}/skills/pensieve/tools/pipeline/scripts/list-pipelines.sh`
+!`${CLAUDE_PLUGIN_ROOT}/skills/pensieve/tools/pipeline/scripts/show-pipelines-graph.sh`
 
 ## Constraints
 

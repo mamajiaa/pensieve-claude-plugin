@@ -91,8 +91,7 @@ In the loop directory (`.claude/pensieve/loop/{date}-{slug}/`):
 
 Before splitting tasks, read project maxims:
 
-- `<USER_DATA_ROOT>/maxims/custom.md` (if present)
-- Any other files under `<USER_DATA_ROOT>/maxims/`
+- All files under `<USER_DATA_ROOT>/maxims/` (`*.md`)
 
 Then generate tasks based on context + maxims:
 

@@ -23,7 +23,7 @@ description: Knowledge capture workflow. Trigger when loop completes or user say
 - **分类稳定**：只使用 `maxim / decision / pipeline / knowledge`
 - **结论优先**：标题与第一句话必须能独立表达结论
 - **关系可追溯**：通过 `基于/导致/相关` 建立关联
-- **准则单文件**：每条 `maxim` 单独一个文件，`maxims/custom.md` 仅做索引与优先级
+- **准则单文件**：每条 `maxim` 必须是独立文件，不依赖索引文件
 
 ---
 
@@ -61,7 +61,7 @@ description: Knowledge capture workflow. Trigger when loop completes or user say
 3. 未获确认不得继续写入
 
 **路径规则**：
-- `maxim`：`.claude/pensieve/maxims/{one-sentence-conclusion}.md`，并更新 `.claude/pensieve/maxims/custom.md`
+- `maxim`：`.claude/pensieve/maxims/{one-sentence-conclusion}.md`
 - `decision`：`.claude/pensieve/decisions/{date}-{conclusion}.md`
 - `pipeline`：`.claude/pensieve/pipelines/{name}.md`
 - `knowledge`：`.claude/pensieve/knowledge/{name}/content.md`
@@ -103,7 +103,7 @@ description: Knowledge capture workflow. Trigger when loop completes or user say
 
 **行动**：
 1. 写入目标路径
-2. 若新增 `maxim`，同步更新 `.claude/pensieve/maxims/custom.md` 的优先级顺序
+2. 若新增 `maxim`，确保与相关 `decision/knowledge/pipeline` 建立链接
 3. 如有必要，在关联文档补反向链接
 4. 向用户确认写入位置与关联变更
 

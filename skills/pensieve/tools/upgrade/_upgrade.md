@@ -14,7 +14,7 @@ Hard rule：不要把“升级前先 doctor”当作门槛；默认流程是 upg
 
 ```
 <project>/.claude/pensieve/
-  maxims/      # 用户/团队准则（如 custom.md）
+  maxims/      # 用户/团队准则（每条准则一个文件）
   decisions/   # 决策记录（ADR）
   knowledge/   # 用户参考资料
   pipelines/   # 项目级 pipelines
@@ -47,20 +47,19 @@ Hard rule：不要把“升级前先 doctor”当作门槛；默认流程是 upg
 ### 需要迁移的内容
 
 - 用户文件（非系统文件）：
-  - `maxims/custom.md` 或其他非 `_` 前缀文件
+  - `maxims/*.md`（非 `_` 前缀文件）
   - `decisions/*.md`
   - `knowledge/*`
   - `pipelines/*.md`
   - `loop/*`
 
 > 旧版本可能在插件/项目副本里包含 `maxims/_linus.md` 与 `pipelines/review.md`。若仍在使用，请将内容合并到：
-> - `.claude/pensieve/maxims/custom.md`
+> - `.claude/pensieve/maxims/{your-maxim}.md`
 > - `.claude/pensieve/pipelines/review.md`
 > 然后删除旧副本，避免混淆。
 
 ### 模板位置（插件内）
 
-- `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/maxims.initial.md`
 - `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/maxims/*.md`
 - `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/pipeline.review.md`
 
@@ -110,9 +109,8 @@ Hard rule：不要把“升级前先 doctor”当作门槛；默认流程是 upg
 5. 创建目标目录：
    - `mkdir -p .claude/pensieve/{maxims,decisions,knowledge,pipelines,loop}`
 6. 合并 maxims：
-   - 若 `.claude/pensieve/maxims/custom.md` 不存在，从模板复制
    - 若 `.claude/pensieve/maxims/{maxim}.md` 不存在，从 `templates/maxims/*.md` 种子化
-   - 若双方都存在，加迁移标记后合并
+   - 若存在同名 maxim，比较内容后合并（必要时创建 `*.migrated.md`）
 7. 迁移预置 pipeline（必须比较内容）：
    - 若 `.claude/pensieve/pipelines/review.md` 不存在，从模板复制
    - 若存在，比较内容：

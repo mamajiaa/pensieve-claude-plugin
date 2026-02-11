@@ -42,6 +42,7 @@ PLUGIN_ROOT_RAW="${CLAUDE_PLUGIN_ROOT:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 PLUGIN_ROOT="$(to_posix_path "$PLUGIN_ROOT_RAW")"
 SYSTEM_SKILL_ROOT="$PLUGIN_ROOT/skills/pensieve"
 TOOLS_ROOT="$SYSTEM_SKILL_ROOT/tools"
+GRAPH_SCRIPT="$SYSTEM_SKILL_ROOT/tools/upgrade/scripts/generate-user-data-graph.sh"
 PROJECT_ROOT_RAW="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 PROJECT_ROOT="$(to_posix_path "$PROJECT_ROOT_RAW")"
 USER_DATA_ROOT="$PROJECT_ROOT/.claude/pensieve"
@@ -150,51 +151,30 @@ fi
 
 # Project user data overview
 if [[ -d "$USER_DATA_ROOT" ]]; then
-    CONTEXT+="## Project user data"
+    CONTEXT+="## Project user data graph"
     CONTEXT+=$'\n\n'
 
-    if [[ -d "$USER_DATA_ROOT/maxims" ]]; then
-        custom_count=$(find "$USER_DATA_ROOT/maxims" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-        CONTEXT+="- maxims: $custom_count files"
-        CONTEXT+=$'\n'
-    else
-        CONTEXT+="- maxims: (not created)"
-        CONTEXT+=$'\n'
+    if [[ -f "$GRAPH_SCRIPT" ]]; then
+        bash "$GRAPH_SCRIPT" --root "$USER_DATA_ROOT" --output "$USER_DATA_ROOT/graph.md" >/dev/null 2>&1 || true
     fi
 
-    if [[ -d "$USER_DATA_ROOT/decisions" ]]; then
-        decision_count=$(find "$USER_DATA_ROOT/decisions" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-        CONTEXT+="- decisions: $decision_count files"
-        CONTEXT+=$'\n'
-    else
-        CONTEXT+="- decisions: (not created)"
-        CONTEXT+=$'\n'
-    fi
+    GRAPH_FILE="$USER_DATA_ROOT/graph.md"
+    if [[ -f "$GRAPH_FILE" ]]; then
+        notes_count="$(sed -n 's/^- 扫描笔记数: //p' "$GRAPH_FILE" | head -n 1)"
+        links_found="$(sed -n 's/^- 发现链接数: //p' "$GRAPH_FILE" | head -n 1)"
+        links_resolved="$(sed -n 's/^- 已解析链接: //p' "$GRAPH_FILE" | head -n 1)"
+        links_unresolved="$(sed -n 's/^- 未解析链接: //p' "$GRAPH_FILE" | head -n 1)"
 
-    if [[ -d "$USER_DATA_ROOT/knowledge" ]]; then
-        knowledge_count=$(find "$USER_DATA_ROOT/knowledge" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
-        CONTEXT+="- knowledge: $knowledge_count directories"
+        CONTEXT+="- graph: \`$GRAPH_FILE\`"
         CONTEXT+=$'\n'
+        [[ -n "$notes_count" ]] && CONTEXT+="- notes: $notes_count"$'\n'
+        [[ -n "$links_found" ]] && CONTEXT+="- links found: $links_found"$'\n'
+        [[ -n "$links_resolved" ]] && CONTEXT+="- links resolved: $links_resolved"$'\n'
+        [[ -n "$links_unresolved" ]] && CONTEXT+="- links unresolved: $links_unresolved"$'\n'
     else
-        CONTEXT+="- knowledge: (not created)"
+        CONTEXT+="- graph: (not generated yet)"
         CONTEXT+=$'\n'
-    fi
-
-    if [[ -d "$USER_DATA_ROOT/pipelines" ]]; then
-        pipeline_count=$(find "$USER_DATA_ROOT/pipelines" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-        CONTEXT+="- pipelines: $pipeline_count files"
-        CONTEXT+=$'\n'
-    else
-        CONTEXT+="- pipelines: (not created)"
-        CONTEXT+=$'\n'
-    fi
-
-    if [[ -d "$USER_DATA_ROOT/loop" ]]; then
-        loop_count=$(find "$USER_DATA_ROOT/loop" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
-        CONTEXT+="- loop: $loop_count run directories"
-        CONTEXT+=$'\n'
-    else
-        CONTEXT+="- loop: (not created)"
+        CONTEXT+="- you can generate it with: \`bash $GRAPH_SCRIPT\`"
         CONTEXT+=$'\n'
     fi
 

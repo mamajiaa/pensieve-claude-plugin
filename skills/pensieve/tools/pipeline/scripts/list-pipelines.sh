@@ -29,9 +29,42 @@ echo "|----------|------|"
 
 for pipeline_file in "${pipeline_files[@]}"; do
   description="$(awk '
+    function ltrim(s) { sub(/^[[:space:]]+/, "", s); return s }
+    function rtrim(s) { sub(/[[:space:]]+$/, "", s); return s }
+    function trim(s) { return rtrim(ltrim(s)) }
     NR==1 && $0=="---" {in_yaml=1; next}
     in_yaml==1 && $0=="---" {exit}
-    in_yaml==1 && $0 ~ /^description:/ {sub(/^description:[[:space:]]*/, "", $0); print $0; exit}
+    in_yaml==1 {
+      if (capture_desc==1) {
+        if ($0 ~ /^[[:space:]][[:space:]]/) {
+          line=$0
+          sub(/^[[:space:]]+/, "", line)
+          line=trim(line)
+          if (line != "") {
+            desc=line
+            exit
+          }
+          next
+        } else if ($0 ~ /^[[:space:]]*$/) {
+          next
+        } else {
+          capture_desc=0
+        }
+      }
+
+      if ($0 ~ /^description:[[:space:]]*/) {
+        line=$0
+        sub(/^description:[[:space:]]*/, "", line)
+        line=trim(line)
+        if (line ~ /^[|>][-+]?$/ || line == "") {
+          capture_desc=1
+          next
+        }
+        desc=line
+        exit
+      }
+    }
+    END { print desc }
   ' "$pipeline_file")"
 
   if [[ -z "$description" ]]; then
