@@ -62,7 +62,7 @@ claude plugin install pensieve@kingkongshot-marketplace --scope project
 mkdir -p .claude/pensieve/{maxims,decisions,knowledge,pipelines,loop}
 ```
 
-方式 B（推荐）：运行初始化脚本（会种子化**初始 maxims + review pipeline**，不会覆盖已有文件）：
+方式 B（推荐）：运行初始化脚本（会种子化**初始 maxims + 审查 pipeline**，不会覆盖已有文件）：
 
 ```bash
 <SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-project-data.sh

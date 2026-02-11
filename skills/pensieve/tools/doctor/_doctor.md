@@ -72,6 +72,7 @@ Hard rule：
 3. 可追溯性断裂：`decision` 或 `pipeline` 缺少必需链接字段，或链接全部无效，导致上下文不可追溯。
 4. 基础结构缺失：用户数据根目录或关键分类目录缺失，导致流程无法运行。
 5. 流程失焦：`pipeline` 以大段知识堆叠替代 task 编排，且未拆分为链接引用。
+6. 命名违规：`pipeline` 文件名未采用 `run-when-*.md`（包含 legacy `review.md`）。
 
 ### SHOULD_FIX
 
@@ -118,6 +119,7 @@ bash <SYSTEM_SKILL_ROOT>/tools/doctor/scripts/check-frontmatter.sh
 约束：
 - 如果快检存在 frontmatter 语法错误（如未闭合、格式损坏），至少判为 `MUST_FIX`。
 - 如果快检存在 frontmatter 缺失、必填字段缺失或字段值非法，也必须判为 `MUST_FIX`。
+- 如果快检存在 pipeline 命名违规（`FM-301/FM-302`），也必须判为 `MUST_FIX`。
 - 未运行此快检不得输出 `最终结论`。
 
 ### Phase 2.5：先生成图谱再下结论（强制）

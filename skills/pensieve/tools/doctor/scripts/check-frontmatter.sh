@@ -1,5 +1,5 @@
 #!/bin/bash
-# Quick frontmatter validator for project-level Pensieve user data.
+# Quick frontmatter + pipeline naming validator for project-level Pensieve user data.
 # No external dependency; uses Python stdlib only.
 
 set -euo pipefail
@@ -57,6 +57,7 @@ allowed_status = {"draft", "active", "archived"}
 required_keys = ["id", "type", "title", "status", "created", "updated", "tags"]
 id_re = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 date_re = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+pipeline_name_re = re.compile(r"^run-when-[a-z0-9-]+\.md$")
 
 
 @dataclass
@@ -211,6 +212,27 @@ if not root.exists():
 
 for p in files:
     rel = str(p.relative_to(root))
+
+    if rel.startswith("pipelines/"):
+        if p.name == "review.md":
+            issues.append(
+                Issue(
+                    "MUST_FIX",
+                    "FM-301",
+                    rel,
+                    "legacy pipeline 文件名 `review.md` 已废弃，必须改为 `run-when-*.md`（推荐 `run-when-reviewing-code.md`）",
+                )
+            )
+        elif not pipeline_name_re.match(p.name):
+            issues.append(
+                Issue(
+                    "MUST_FIX",
+                    "FM-302",
+                    rel,
+                    "pipeline 文件名必须为 `run-when-*.md`，从文件名可直接判断触发场景",
+                )
+            )
+
     text = p.read_text(encoding="utf-8", errors="replace")
     fm, parse_errors, fm_state = parse_frontmatter(text)
 

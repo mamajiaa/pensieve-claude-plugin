@@ -1,3 +1,4 @@
+---
 description: 查看项目图谱摘要与 pipelines 列表
 allowed-tools: ["Bash"]
 ---

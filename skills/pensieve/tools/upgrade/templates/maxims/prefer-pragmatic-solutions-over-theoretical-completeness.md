@@ -1,3 +1,13 @@
+---
+id: prefer-pragmatic-solutions-over-theoretical-completeness
+type: maxim
+title: Prefer pragmatic solutions over theoretical completeness
+status: active
+created: 2026-02-11
+updated: 2026-02-11
+tags: [pensieve, maxim]
+---
+
 # Prefer pragmatic solutions over theoretical completeness
 
 ## One-line Conclusion

@@ -128,15 +128,19 @@ Pipeline 应直接产出可实例化任务模板。
 
 ```
 .claude/pensieve/pipelines/
-├── {name}.md
+├── run-when-*.md
 ```
 
 ### 命名约定
 
-| 前缀 | 类型 | 说明 |
+Hard rule（必须）：
+- pipeline 文件名必须使用触发意图风格：`run-when-*.md`
+- 不保留旧命名兼容（如 `review.md` 必须改名）
+
+| 命名模式 | 类型 | 说明 |
 |---|---|---|
-| `_` | 不推荐 | 插件已不内置 pipeline |
-| 无前缀 | 用户定义 | 项目/业务流程，如 `review.md` |
+| `run-when-*.md` | 用户定义 | 从文件名直接看出“何时调用” |
+| `_*.md` | 禁止 | 历史系统命名，不再使用 |
 
 ### 文件模板
 
@@ -144,6 +148,13 @@ Pipeline 应直接产出可实例化任务模板。
 # Pipeline 名称
 
 ---
+id: run-when-xxx
+type: pipeline
+title: Pipeline 名称
+status: active
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+tags: [pensieve, pipeline]
 description: 简要说明。触发词如 "trigger1", "trigger2"。
 ---
 
@@ -217,6 +228,8 @@ Role: You are [doing what]...
 
 | 要素 | 要求 |
 |---|---|
+| 文件名 | 必须为 `run-when-*.md`，从文件名即可判断触发场景 |
+| frontmatter 必填 | `id/type/title/status/created/updated/tags/description` |
 | `description` | 位于 frontmatter，包含触发词 |
 | Role 行 | 以 "You are..." 开头定义角色 |
 | 核心原则 | 1-3 条，短且可执行 |

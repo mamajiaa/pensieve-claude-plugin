@@ -64,7 +64,7 @@ description: Knowledge capture workflow. Trigger when loop completes or user say
 **路径规则**：
 - `maxim`：`.claude/pensieve/maxims/{one-sentence-conclusion}.md`
 - `decision`：`.claude/pensieve/decisions/{date}-{conclusion}.md`
-- `pipeline`：`.claude/pensieve/pipelines/{name}.md`
+- `pipeline`：`.claude/pensieve/pipelines/run-when-*.md`
 - `knowledge`：`.claude/pensieve/knowledge/{name}/content.md`
 
 ---

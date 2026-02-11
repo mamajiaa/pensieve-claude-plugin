@@ -55,13 +55,13 @@ Hard rule：不要把“升级前先 doctor”当作门槛；默认流程是 upg
 
 > 旧版本可能在插件/项目副本里包含 `maxims/_linus.md` 与 `pipelines/review.md`。若仍在使用，请将内容合并到：
 > - `.claude/pensieve/maxims/{your-maxim}.md`
-> - `.claude/pensieve/pipelines/review.md`
+> - `.claude/pensieve/pipelines/run-when-reviewing-code.md`
 > 然后删除旧副本，避免混淆。
 
 ### 模板位置（插件内）
 
 - `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/maxims/*.md`
-- `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/pipeline.review.md`
+- `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/pipeline.run-when-reviewing-code.md`
 
 ### 不应迁移的内容
 
@@ -112,17 +112,22 @@ Hard rule：不要把“升级前先 doctor”当作门槛；默认流程是 upg
    - 若 `.claude/pensieve/maxims/{maxim}.md` 不存在，从 `templates/maxims/*.md` 种子化
    - 若存在同名 maxim，比较内容后合并（必要时创建 `*.migrated.md`）
 7. 迁移预置 pipeline（必须比较内容）：
-   - 若 `.claude/pensieve/pipelines/review.md` 不存在，从模板复制
-   - 若存在，比较内容：
+   - 目标文件固定为 `.claude/pensieve/pipelines/run-when-reviewing-code.md`
+   - 若目标文件不存在，从模板复制
+   - 若目标文件存在，比较内容：
      - 相同：跳过
-     - 不同：创建 `review.migrated.md` 并记录合并说明
-8. 迁移用户文件到目标目录，尽量保持相对结构。
-9. 文件名冲突先比较内容：
+     - 不同：创建 `run-when-reviewing-code.migrated.md` 并记录合并说明
+8. 执行一次性命名改造（不兼容旧名）：
+   - `pipelines/review.md` 必须改名为 `pipelines/run-when-reviewing-code.md`
+   - 其他 pipeline 文件名也统一改为 `run-when-*.md` 风格
+   - 改名后删除旧文件，不保留同名副本
+9. 迁移用户文件到目标目录，尽量保持相对结构。
+10. 文件名冲突先比较内容：
    - 相同：跳过
    - 不同：追加迁移标记或创建 `*.migrated.md`
-10. 清理上面列出的旧系统副本。
-11. 输出迁移报告（旧路径 -> 新路径）。
-12. 升级后强制复检：
+11. 清理上面列出的旧系统副本。
+12. 输出迁移报告（旧路径 -> 新路径）。
+13. 升级后强制复检：
    - 运行一次 `/doctor`
    - 若 doctor 报告迁移/结构问题，继续修复直到 `PASS` 或 `PASS_WITH_WARNINGS`
    - 通过后再按需运行 `/selfimprove`（可选）

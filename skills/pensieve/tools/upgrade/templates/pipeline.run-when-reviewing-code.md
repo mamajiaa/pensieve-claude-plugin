@@ -1,6 +1,13 @@
 ---
-name: review
-description: 代码审查 pipeline。触发词：review / 代码审查 / 检查代码。
+id: run-when-reviewing-code
+type: pipeline
+title: 代码审查 Pipeline
+status: active
+created: 2026-02-11
+updated: 2026-02-11
+tags: [pensieve, pipeline, review]
+name: run-when-reviewing-code
+description: 在需要代码审查时调用。触发词：review / 代码审查 / 检查代码。
 
 stages: [tasks]
 gate: auto

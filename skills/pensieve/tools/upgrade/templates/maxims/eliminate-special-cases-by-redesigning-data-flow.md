@@ -1,3 +1,13 @@
+---
+id: eliminate-special-cases-by-redesigning-data-flow
+type: maxim
+title: Eliminate special cases by redesigning data flow
+status: active
+created: 2026-02-11
+updated: 2026-02-11
+tags: [pensieve, maxim]
+---
+
 # Eliminate special cases by redesigning data flow
 
 ## One-line Conclusion

@@ -61,7 +61,7 @@
 
 ### 2. 按需加载上下文
 
-不同阶段加载不同内容：执行时读 maxims，审查时读 review pipeline/knowledge，迁移时读 upgrade。
+不同阶段加载不同内容：执行时读 maxims，审查时读审查 pipeline/knowledge，迁移时读 upgrade。
 
 ### 3. 绑定 Claude Code 原生能力
 

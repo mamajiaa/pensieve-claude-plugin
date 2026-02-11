@@ -48,9 +48,9 @@ This directory is the project‑level Pensieve user data area:
 - `pipelines/`: project‑level pipelines (seeded at install)
 EOF
 fi
-REVIEW_PIPELINE="$DATA_ROOT/pipelines/review.md"
+REVIEW_PIPELINE="$DATA_ROOT/pipelines/run-when-reviewing-code.md"
 if [[ ! -f "$REVIEW_PIPELINE" ]]; then
-  cp "$TEMPLATES_ROOT/pipeline.review.md" "$REVIEW_PIPELINE"
+  cp "$TEMPLATES_ROOT/pipeline.run-when-reviewing-code.md" "$REVIEW_PIPELINE"
 fi
 
 echo "✅ Initialization complete: $DATA_ROOT"

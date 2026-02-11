@@ -1,3 +1,4 @@
+---
 description: 使用 Loop 工具（自动循环执行任务）
 argument-hint: [slug]
 allowed-tools: ["Task", "Read", "Write", "Edit", "Bash", "Grep", "Glob"]

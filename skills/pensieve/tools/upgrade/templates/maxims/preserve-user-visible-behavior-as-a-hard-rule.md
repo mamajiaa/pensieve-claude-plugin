@@ -1,3 +1,13 @@
+---
+id: preserve-user-visible-behavior-as-a-hard-rule
+type: maxim
+title: Preserve user-visible behavior as a hard rule
+status: active
+created: 2026-02-11
+updated: 2026-02-11
+tags: [pensieve, maxim]
+---
+
 # Preserve user-visible behavior as a hard rule
 
 ## One-line Conclusion

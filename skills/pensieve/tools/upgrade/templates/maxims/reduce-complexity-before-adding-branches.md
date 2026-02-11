@@ -1,3 +1,13 @@
+---
+id: reduce-complexity-before-adding-branches
+type: maxim
+title: Reduce complexity before adding branches
+status: active
+created: 2026-02-11
+updated: 2026-02-11
+tags: [pensieve, maxim]
+---
+
 # Reduce complexity before adding branches
 
 ## One-line Conclusion
