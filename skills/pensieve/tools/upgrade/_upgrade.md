@@ -60,6 +60,7 @@ May exist in:
 ### Template locations (plugin)
 
 - `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/maxims.initial.md`
+- `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/maxims/*.md`
 - `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/pipeline.review.md`
 
 ### What NOT to migrate
@@ -109,6 +110,7 @@ If multiple keys exist, do not keep compatibility keys. Leave only the new key.
    - `mkdir -p .claude/pensieve/{maxims,decisions,knowledge,pipelines,loop}`
 6. Merge maxims:
    - if `.claude/pensieve/maxims/custom.md` is missing, copy from template
+   - if `.claude/pensieve/maxims/{maxim}.md` is missing, seed from `templates/maxims/*.md`
    - if both exist, append old content with a migration marker
 7. Migrate preset pipeline (must compare content):
    - if `.claude/pensieve/pipelines/review.md` is missing, copy from template
@@ -125,6 +127,14 @@ If multiple keys exist, do not keep compatibility keys. Leave only the new key.
    - run `/selfimprove` once
    - perform one optimization pass based on the self-check result
    - treat migration as incomplete until this step is done
+
+## Optional Visualization
+
+After migration, you can generate a graph of project-level user data links:
+
+```bash
+bash <SYSTEM_SKILL_ROOT>/tools/upgrade/scripts/generate-user-data-graph.sh
+```
 
 ## Plugin Cleanup and Update Commands (In Order)
 

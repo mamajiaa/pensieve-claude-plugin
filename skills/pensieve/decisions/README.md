@@ -59,6 +59,18 @@ All "uncertain" → keep in loop directory
 | Coding taste | Reduces special cases; easier to reason | Implementation guidance |
 | Team preference | Depends on context | Team‑level; must be labeled |
 
+## Linking Rule (Required)
+
+Decisions are the backbone of project knowledge. Every decision note must include links to related context.
+
+Use these link fields:
+- `基于`：what prior context this decision depends on
+- `导致`：what this decision changes or triggers
+- `相关`：parallel topics worth checking together
+
+Hard rule:
+- At least one of the three fields must contain a valid `[[linked-note]]`.
+
 ## Writing Guide
 
 ### Directory Structure
@@ -81,6 +93,14 @@ Examples:
 ```markdown
 # {Decision Title}
 
+## One-line Conclusion
+> [State the final decision in one sentence]
+
+## 上下文链接
+- 基于：[[前置决策或知识]]
+- 导致：[[后续影响或流程]]
+- 相关：[[相关主题]]
+
 ## Context
 What situation triggered this decision?
 
@@ -97,6 +117,9 @@ What was chosen, and why?
 ## Consequence
 - What risks are reduced?
 - What better choices can future maintainers make?
+
+## Key Files
+- `path/to/file` - related implementation/document
 ```
 
 ### Example

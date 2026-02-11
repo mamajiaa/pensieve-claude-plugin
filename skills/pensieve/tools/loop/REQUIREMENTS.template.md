@@ -37,6 +37,11 @@
 
 [One sentence: what problem are we solving?]
 
+## 上下文链接（recommended）
+- 基于：[[前置决策或知识]]
+- 导致：[[后续决策或流程]]
+- 相关：[[相关主题]]
+
 ## Success Criteria
 
 - [ ] [Verifiable completion criterion 1]

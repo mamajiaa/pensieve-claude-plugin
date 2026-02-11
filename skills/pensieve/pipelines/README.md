@@ -91,6 +91,15 @@ Reach baseline → refine (tools, sequencing)
 | Pipeline → Tasks | Pipeline defines the loop; tasks are concrete actions |
 | Pipeline ↔ Decision | Decisions formed during execution can refine pipelines |
 
+## Linking Rule (Required for Pipelines)
+
+Every pipeline should include at least one explicit link in its body so readers can trace why the flow exists.
+
+Recommended fields:
+- `基于`：which decision/knowledge this pipeline depends on
+- `导致`：which outputs/follow-up workflows this pipeline triggers
+- `相关`：nearby pipelines or references
+
 ### Pipeline vs Tasks
 
 | Type | Essence | Focus |
@@ -169,6 +178,23 @@ Role: You are [doing what]...
 
 ---
 
+### Task 3: Capture Durable Conclusion (Optional)
+
+**Goal**: Preserve reusable conclusions from this run
+
+**Read Inputs**:
+1. Previous task outputs
+
+**Steps**:
+1. If the conclusion is a project choice, capture/update a `decision`
+2. If the conclusion is external/reference knowledge, capture/update `knowledge`
+3. Add links using `基于/导致/相关`
+4. If no durable conclusion exists, record \"no capture\"
+
+**Done When**: Capture result is explicit (written or skipped with reason)
+
+---
+
 ## 相关文件
 
 - `path/to/file` — description
@@ -189,6 +215,7 @@ Role: You are [doing what]...
 | **Done When** | Completion criteria must be testable |
 | **CRITICAL** / **DO NOT SKIP** | Strong markers for key steps |
 | User confirmation | Explicit "Wait for confirmation" |
+| Links | Pipeline body should include at least one meaningful link |
 
 ### Example
 

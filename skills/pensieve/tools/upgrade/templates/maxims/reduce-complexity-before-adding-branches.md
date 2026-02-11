@@ -1,0 +1,20 @@
+# Reduce complexity before adding branches
+
+## One-line Conclusion
+> When logic grows hard to read, simplify structure first and branch later only if necessary.
+
+## Quote
+"If you need more than 3 levels of indentation, you're screwed anyway; fix your program."
+
+## Guidance
+- Split large functions by responsibility.
+- Keep control flow shallow and explicit.
+- Prefer clear naming over explanatory comments.
+
+## Boundaries
+- Small, local branches are acceptable when they improve clarity.
+
+## 上下文链接（recommended）
+- 基于：[[prefer-pragmatic-solutions-over-theoretical-completeness]]
+- 导致：[[eliminate-special-cases-by-redesigning-data-flow]]
+- 相关：[[knowledge/taste-review/content]]

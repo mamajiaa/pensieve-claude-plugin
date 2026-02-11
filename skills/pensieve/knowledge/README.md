@@ -80,6 +80,11 @@ Ask yourself: **If we don't write this down, what friction will it cause?**
 
 ## When to Use
 [When to consult this knowledge]
+
+## 上下文链接（recommended）
+- 基于：[[前置知识或决策]]
+- 导致：[[会影响的决策或流程]]
+- 相关：[[相关主题]]
 ```
 
 ### Example
@@ -108,6 +113,7 @@ Designing agents, optimizing tool calls, reducing token usage
 - Prefer linking originals; avoid copying — link content to source
 - If you need a local copy, use file copy/move commands, not re‑writing
 - Periodically clean outdated knowledge
+- Linking is recommended for knowledge notes; keep links only when they add retrieval value
 
 ## System Knowledge vs Project Knowledge
 

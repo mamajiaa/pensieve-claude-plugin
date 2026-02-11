@@ -1,0 +1,20 @@
+# Preserve user-visible behavior as a hard rule
+
+## One-line Conclusion
+> Any unexpected user-visible behavior change is treated as a bug.
+
+## Quote
+"We do not break user-visible behavior."
+
+## Guidance
+- Keep outputs, contracts, and UX stable unless change is explicitly approved.
+- Treat behavior regressions as priority defects.
+- Add tests for behavior that users already rely on.
+
+## Boundaries
+- Explicitly approved behavior changes are allowed when documented and reviewed.
+
+## 上下文链接（recommended）
+- 基于：[[eliminate-special-cases-by-redesigning-data-flow]]
+- 导致：[[prefer-pragmatic-solutions-over-theoretical-completeness]]
+- 相关：[[knowledge/taste-review/content]]

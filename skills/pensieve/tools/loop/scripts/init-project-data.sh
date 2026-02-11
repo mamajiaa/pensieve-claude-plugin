@@ -24,6 +24,17 @@ if [[ ! -f "$CUSTOM_MAXIMS" ]]; then
   cp "$TEMPLATES_ROOT/maxims.initial.md" "$CUSTOM_MAXIMS"
 fi
 
+TEMPLATE_MAXIMS_DIR="$TEMPLATES_ROOT/maxims"
+if [[ -d "$TEMPLATE_MAXIMS_DIR" ]]; then
+  for template_maxim in "$TEMPLATE_MAXIMS_DIR"/*.md; do
+    [[ -f "$template_maxim" ]] || continue
+    target_maxim="$DATA_ROOT/maxims/$(basename "$template_maxim")"
+    if [[ ! -f "$target_maxim" ]]; then
+      cp "$template_maxim" "$target_maxim"
+    fi
+  done
+fi
+
 README="$DATA_ROOT/README.md"
 if [[ ! -f "$README" ]]; then
   cat > "$README" << 'EOF'

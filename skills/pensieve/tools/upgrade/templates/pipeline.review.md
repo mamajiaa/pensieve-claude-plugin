@@ -29,6 +29,11 @@ gate: auto
 
 **Knowledge 参考**：`<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md`
 
+**上下文链接（至少一条）**：
+- 基于：[[knowledge/taste-review/content]]
+- 导致：[[decisions/2026-xx-xx-review-policy]]
+- 相关：[[decisions/2026-xx-xx-review-strategy]]
+
 ---
 
 ## Task Blueprint（按顺序创建任务）
@@ -85,8 +90,25 @@ gate: auto
 
 ---
 
+### Task 4：沉淀可复用结论（可选）
+
+**目标**：把可复用结论沉淀到现有四类中
+
+**读取输入**：
+1. Task 3 的审查报告
+
+**执行步骤**：
+1. 若结论是项目选择，沉淀到 `decision`
+2. 若结论是通用外部方法，沉淀到 `knowledge`
+3. 在沉淀条目中补充 `基于/导致/相关`（至少一条，若是 decision）
+4. 若无可复用结论，明确记录“无新增沉淀”
+
+**完成标准**：沉淀结果明确（已写入或明确跳过）
+
+---
+
 ## 执行规则（给 loop 用）
 
-1. 命中此 pipeline 时，按 Task 1 → Task 2 → Task 3 的顺序创建任务。
+1. 命中此 pipeline 时，按 Task 1 → Task 2 → Task 3 → Task 4 的顺序创建任务。
 2. 默认 1:1 映射创建，不合并、不跳步。
 3. 若信息缺失，在当前 task 内补齐，不额外新建 phase。

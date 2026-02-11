@@ -48,37 +48,68 @@ Any "no" → capture as a decision, not a maxim.
 ### Directory Structure (Project Level)
 
 ```
-.claude/pensieve/maxims/custom.md
+.claude/pensieve/maxims/
+├── custom.md                     # Index + priority order
+├── {maxim-conclusion-a}.md       # One maxim per file
+└── {maxim-conclusion-b}.md
 ```
 
-### File Format
+### Index File (`custom.md`)
 
-Each maxim includes:
-- **Title line**: maxim name + core quote
-- **Expanded points**: guidance, examples, boundaries
+Use `custom.md` as an index, not as the full content container:
 
 ```markdown
-1. "Maxim Name" - Label "Core quote"
+# Maxims Index
 
-Classic example: XXX
-Guidance point
-Guidance point
-Boundary note
+## Priority Order
+1. [[eliminate-special-cases-by-redesigning-data-flow]]
+2. [[preserve-user-visible-behavior-as-a-hard-rule]]
+3. [[prefer-pragmatic-solutions-over-theoretical-completeness]]
+
+## Notes
+- Earlier items have higher priority when maxims conflict.
+```
+
+### Maxim File Format (one file per maxim)
+
+Each maxim includes:
+- **Title**: one-sentence conclusion
+- **One-line conclusion**: explicit, testable statement
+- **Guidance / boundaries**: operational rules and limits
+
+```markdown
+# {One-sentence conclusion}
+
+## One-line Conclusion
+> {One sentence that the team can apply directly}
+
+## Guidance
+- Rule 1
+- Rule 2
+
+## Boundaries
+- This does not apply when...
+
+## 上下文链接（recommended）
+- 基于：[[相关 decision 或 knowledge]]
+- 导致：[[相关 pipeline 或后续 decision]]
+- 相关：[[相关 maxim]]
 ```
 
 ### Example
 
 ```markdown
-1. "Good Taste" — Your first maxim: "Rewrite it so the special case goes away and becomes the normal case."
+# Preserve user-visible behavior as a hard rule
 
-Classic example: linked‑list deletion — reduce 10 lines with ifs to 4 lines without conditionals
-Eliminate edge cases rather than adding conditionals
-Good taste is intuition built from experience
+## One-line Conclusion
+> Any unexpected user-visible behavior change is treated as a bug.
 
-2. "Never break userspace" — Your iron rule: "We do not break user‑visible behavior!"
+## Guidance
+- Keep existing user-facing behavior stable during refactors.
+- If behavior must change, make it explicit and reviewed.
 
-Any code that unexpectedly changes user‑visible behavior is a bug
-The kernel serves users, it does not educate them
+## Boundaries
+- Expected behavior changes are allowed only with explicit user approval.
 ```
 
 ## Notes
@@ -86,9 +117,17 @@ The kernel serves users, it does not educate them
 - Maxims are **scarce** — do not add frequently
 - When adding, consider insertion position (it indicates priority)
 - Once established, maxims should rarely change — frequent edits imply weak abstraction
+- Linking is recommended (not required): when useful, show which decisions/knowledge items the maxim comes from
+
+Recommended trace format:
+
+```markdown
+Derived from: [[2026-01-22-do-not-break-user-visible-behavior]], [[knowledge/taste-review/content]]
+```
 
 ---
 
 ## Maxim Files
 
-- Project‑level custom: `.claude/pensieve/maxims/custom.md` (never overwritten)
+- Project‑level index: `.claude/pensieve/maxims/custom.md` (never overwritten)
+- Project‑level maxim notes: `.claude/pensieve/maxims/*.md` (never overwritten)
