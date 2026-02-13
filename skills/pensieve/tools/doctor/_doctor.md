@@ -11,6 +11,45 @@ description: 基于 README 规范做项目用户数据体检。触发词包括 "
 - `/upgrade`：迁移与清理
 - `/selfimprove`：沉淀与改进
 
+## Tool Contract
+
+### Use when
+
+- 用户要求体检、合规检查、迁移后复检
+- 需要明确 `MUST_FIX/SHOULD_FIX` 及证据
+- 需要判断是否仍存在旧路径并行/命名冲突
+
+### Do not use when
+
+- 用户要求直接迁移或清理数据（应转 `/upgrade`）
+- 用户要求沉淀经验、写 maxim/decision/pipeline（应转 `/selfimprove`）
+- 用户要求立即修文件（doctor 是只读体检）
+
+### Required inputs
+
+- 规范来源文件（maxims/decisions/pipelines/knowledge/upgrade）
+- 项目用户数据目录 `.claude/pensieve/`
+- 快检与图谱脚本输出：
+  - `check-frontmatter.sh`
+  - `generate-user-data-graph.sh`
+
+### Output contract
+
+- 必须按固定模板输出报告
+- 每条问题必须包含规则来源与修复建议
+- `FAIL` 且迁移相关时，下一步优先 `/upgrade`
+
+### Failure fallback
+
+- 规范文件不可读：中止判定并标注“无法判定”，不输出假结论
+- 快检脚本未执行成功：不得给最终结论，先报告阻塞点
+- 图谱读取失败：不得给最终结论，先修复图谱步骤
+
+### Negative examples
+
+- “边检查边帮我改” -> 越界，doctor 只读
+- “不跑快检直接给 PASS” -> 禁止，违背强制步骤
+
 Hard rule：
 - 不要硬编码规范。
 - 每次执行都必须先读取规范文件，再从规范推导检查项。

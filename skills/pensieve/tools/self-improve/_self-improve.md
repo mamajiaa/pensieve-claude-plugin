@@ -10,6 +10,45 @@ description: Knowledge capture workflow. Trigger when loop completes or user say
 
 **用户数据**位于项目级 `.claude/pensieve/`，永不被插件更新覆盖。
 
+## Tool Contract
+
+### Use when
+
+- loop 完成后要沉淀经验
+- 用户明确要求“沉淀/记录/复盘/规范化”
+- 目标是新增或改进 `maxim / decision / pipeline / knowledge`
+
+### Do not use when
+
+- 用户要做迁移/目录清理/历史兼容处理（应转 `/upgrade`）
+- 用户要做结构合规判定（应转 `/doctor`）
+- 用户还未确认沉淀对象与分类（先问清再继续）
+
+### Required inputs
+
+- 用户确认过的“核心结论”与目标分类
+- 目标类型对应 README：
+  - `<SYSTEM_SKILL_ROOT>/maxims/README.md`
+  - `<SYSTEM_SKILL_ROOT>/decisions/README.md`
+  - `<SYSTEM_SKILL_ROOT>/pipelines/README.md`
+  - `<SYSTEM_SKILL_ROOT>/knowledge/README.md`
+
+### Output contract
+
+- 先给分类建议与草稿，再等待用户确认
+- 写入后必须反馈：写入路径 + 回链变更
+- `decision/pipeline` 必须至少包含 1 条有效 `[[...]]` 链接
+
+### Failure fallback
+
+- 发现结构性问题（旧路径并行/目录缺失/格式大面积不符）：暂停写入，先建议 `/doctor`，必要时 `/upgrade`
+- 无法判断分类：给 2-3 个候选并请求确认，不盲写
+
+### Negative examples
+
+- “先自动把这次会话都沉淀了，不用我确认” -> 禁止自动沉淀
+- “顺便帮我把旧目录迁移掉” -> 不属于 self-improve 范围
+
 ## 职责边界（Hard Rule）
 
 - `/selfimprove` 只负责沉淀与改进，不负责全量迁移体检。

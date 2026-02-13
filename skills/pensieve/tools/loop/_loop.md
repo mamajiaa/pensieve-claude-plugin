@@ -14,6 +14,43 @@ You are orchestrating an automated task execution loop. Break complex work into 
 - **Clean handoff**: Subagents execute one task and return; Stop Hook triggers next
 - **Linkable outputs**: If a loop output becomes `decision` or `pipeline`, include at least one `[[...]]` link via `基于/导致/相关`
 
+## Tool Contract
+
+### Use when
+
+- 任务复杂，需要拆解为多个可验证子任务
+- 需要长流程自动续跑（Stop Hook 接管节奏）
+- 需要隔离上下文，避免主窗口持续膨胀
+
+### Do not use when
+
+- 任务只涉及 1-2 个文件，单步可完成
+- 目标不明确、约束未确认（先澄清，不直接开 loop）
+- 用户明确要求“主窗口直接做，不启用子代理”
+
+### Required inputs
+
+- 已确认的目标/范围/约束（Phase 2 必须确认）
+- `<SYSTEM_SKILL_ROOT>` 与 `<USER_DATA_ROOT>` 路径
+- `LOOP_DIR`（由 `init-loop.sh` 输出）
+
+### Output contract
+
+- Phase 2 必须先输出上下文摘要并获得确认
+- Phase 3 必须先展示任务列表并获得确认，再创建首个真实任务
+- 执行期每次只推进一个任务，子代理完成后立即返回
+
+### Failure fallback
+
+- `init-loop.sh` 失败：停止推进并返回错误与修复建议，不创建任务
+- `Task` 系统异常或 taskListId 丢失：停止自动续跑，提示手动 `end-loop.sh` 或重绑
+- 无法满足“单任务可执行”粒度：继续拆分或补充上下文，不强行开跑
+
+### Negative examples
+
+- “改 1 个文案文件，顺便 loop” -> 过度流程化，应直接完成
+- “还没确认需求，先建 10 个任务” -> 禁止，必须先完成 Phase 2 确认
+
 > **Path notes**: The script paths below are relative to the plugin root (parent of `skills/pensieve/`). Scripts self‑locate and can run from any working directory.
 >
 > **Important**: In real installations, the plugin lives in Claude Code's plugin cache, not inside your repo.
