@@ -44,6 +44,8 @@ claude plugin install pensieve@kingkongshot-marketplace --scope project
 
 当用户需要结构化工作流时：
 - 使用 `/pipeline` 列出项目 pipelines
+- 先用 `/upgrade` 完成版本更新前置检查（最高优先级）
+- 使用 `/init` 初始化项目级用户数据（新项目首次接入）
 - 使用 `/loop` 进行拆解 + 自动循环执行
 - 使用 `/upgrade` 迁移用户数据
 
@@ -65,7 +67,7 @@ claude plugin install pensieve@kingkongshot-marketplace --scope project
 mkdir -p .claude/pensieve/{maxims,decisions,knowledge,pipelines,loop}
 ```
 
-方式 B（推荐）：运行初始化脚本（会种子化**初始 maxims + 审查 pipeline**，不会覆盖已有文件）：
+方式 B（推荐）：运行初始化脚本（会种子化**初始 maxims + 审查 pipeline + 审查 knowledge**，不会覆盖已有文件）：
 
 ```bash
 <SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-project-data.sh
@@ -106,11 +108,12 @@ claude plugin install pensieve@kingkongshot-marketplace --scope user
 2. 初始化 `.claude/pensieve/`
 3. 重启 Claude Code（不要跳过）
 4. **告诉用户只需掌握几个基础命令**：
+   - `/upgrade`（版本更新前置检查 + 历史迁移，最高优先级）
+   - `/init`（新项目初始化）
    - `/loop`
    - `/doctor`（安装后可选体检；升级后必跑）
    - `/selfimprove`
    - `/pipeline`
-   - `/upgrade`
 
 说明保持简短，目标是降低用户认知负担。
 
@@ -133,10 +136,11 @@ claude plugin install pensieve@kingkongshot-marketplace --scope user
 
 安装后：
 
-1. 先运行初始化脚本：`<SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-project-data.sh`
+1. 先运行 `/init`（或等价脚本：`<SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-project-data.sh`）
 2. 确认种子文件存在：
    - `.claude/pensieve/maxims/*.md` 至少 1 个
    - `.claude/pensieve/pipelines/run-when-reviewing-code.md`
+   - `.claude/pensieve/knowledge/taste-review/content.md`
 3. 重启 Claude Code
 4. 输入 `loop`，应触发 Loop 工具流程
 5. 通过 `/help` 确认 `pensieve` skill 已可见

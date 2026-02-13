@@ -50,6 +50,7 @@
 
 - [安装指南](docs/installation.md)
 - [更新指南](docs/update.md)
+- [初始化工具](skills/pensieve/tools/init/_init.md)
 - [升级工具](skills/pensieve/tools/upgrade/_upgrade.md)
 - [卸载说明](docs/installation.md#卸载)
 
@@ -77,11 +78,12 @@
 
 ## 只需要学会几个简单的命令
 
+- `/init`：初始化项目级 `.claude/pensieve/`（新项目首次接入，含 review knowledge 种子）
 - `/loop`：复杂任务拆解 + 自动循环执行，直接说“使用 loop 完成“
 - `/doctor`：按 README 规范做用户数据体检，输出固定格式报告
 - `/pipeline`：查看并调用项目 pipelines
 - `/selfimprove`：沉淀经验并改进系统行为（不负责迁移体检）
-- `/upgrade`：迁移历史用户数据到当前标准（迁移后用 `/doctor` 复检）
+- `/upgrade`：版本更新前置检查 + 历史迁移（最高优先级；迁移后用 `/doctor` 复检）
 
 ## 适合什么场景
 
