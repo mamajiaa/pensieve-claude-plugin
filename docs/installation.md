@@ -44,6 +44,8 @@ Explore the project first, then decide whether to use Pensieve tools.
 
 When the user needs a structured workflow:
 - Use `/pipeline` to list project pipelines
+- Run `/upgrade` first for version update pre-check (highest priority)
+- Use `/init` to initialize project-level user data (first-time setup)
 - Use `/loop` for split + auto-loop execution
 - Use `/upgrade` to migrate user data
 
@@ -56,8 +58,8 @@ you MUST use the Self‑Improve tool:
 
 Project user data lives at `.claude/pensieve/` (never overwritten by plugin updates).
 
-> Required order: **install plugin -> initialize user data -> restart Claude Code**.  
-> If you restart before initialization, the model may not see seeded maxims and the default review pipeline.
+> Required order: **install plugin -> initialize user data -> restart Claude Code**.
+> If you restart before initialization, the model may not see seeded maxims, the default review pipeline, and review knowledge.
 
 Option A:
 
@@ -65,7 +67,7 @@ Option A:
 mkdir -p .claude/pensieve/{maxims,decisions,knowledge,pipelines,loop}
 ```
 
-Option B (recommended): run the initializer (seeds **initial maxims + `run-when-reviewing-code` pipeline**, never overwrites existing files):
+Option B (recommended): run the initializer (seeds **initial maxims + `run-when-reviewing-code` pipeline + review knowledge**, never overwrites existing files):
 
 ```bash
 <SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-project-data.sh
@@ -106,10 +108,12 @@ If you are an LLM agent:
 2. Initialize `.claude/pensieve/`
 3. Restart Claude Code (do not skip)
 4. **Tell the user they only need a few basic commands**:
+   - `/upgrade` (version update pre-check + legacy migration, highest priority)
+   - `/init` (first-time project initialization)
    - `/loop`
+   - `/doctor` (optional after install; mandatory after upgrade)
    - `/selfimprove`
    - `/pipeline`
-   - `/upgrade`
 
 Keep the explanation short; the goal is to reduce user cognitive load.
 
@@ -132,10 +136,11 @@ See **[Update Guide](update.md)**.
 
 After installation:
 
-1. Run initializer once: `<SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-project-data.sh`
+1. Run `/init` (or the equivalent script: `<SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-project-data.sh`)
 2. Confirm seeded files exist:
    - at least one file under `.claude/pensieve/maxims/*.md`
    - `.claude/pensieve/pipelines/run-when-reviewing-code.md`
+   - `.claude/pensieve/knowledge/taste-review/content.md`
 3. Restart Claude Code
 4. Say `loop` — it should trigger the Loop tool workflow
 5. Check `/help` for the `pensieve` skill

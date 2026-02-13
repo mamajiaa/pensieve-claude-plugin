@@ -11,6 +11,45 @@ Scope boundaries:
 - `/upgrade`: migrate and clean legacy layout
 - `/selfimprove`: capture learnings and improvements
 
+## Tool Contract
+
+### Use when
+
+- User requests health check, compliance check, or post-migration validation
+- Need to produce `MUST_FIX/SHOULD_FIX` findings with evidence
+- Need to determine whether old path parallels / naming conflicts still exist
+
+### Do not use when
+
+- User requests direct migration or data cleanup (route to `/upgrade`)
+- User requests capturing learnings, writing maxims/decisions/pipelines (route to `/selfimprove`)
+- User requests immediate file edits (doctor is read-only diagnosis)
+
+### Required inputs
+
+- Spec source files (maxims/decisions/pipelines/knowledge/upgrade)
+- Project user data directory `.claude/pensieve/`
+- Quick-check and graph script outputs:
+  - `check-frontmatter.sh`
+  - `generate-user-data-graph.sh`
+
+### Output contract
+
+- Must output report using the fixed template
+- Every finding must include rule source and fix suggestion
+- When `FAIL` and migration-related, next step prioritizes `/upgrade`
+
+### Failure fallback
+
+- Spec file unreadable: abort judgment and mark "unable to determine" — do not output false conclusions
+- Quick-check script failed: do not issue final conclusion — report the blocker first
+- Graph read failed: do not issue final conclusion — fix the graph step first
+
+### Negative examples
+
+- "Check and fix while you're at it" -> out of scope, doctor is read-only
+- "Skip quick-check and give me PASS" -> forbidden, violates mandatory step
+
 Hard rules:
 - Do not hardcode standards.
 - Always read spec files first, then derive checks from those specs.
@@ -63,6 +102,8 @@ Plugin activation config (for naming consistency checks):
 - `~/.claude/settings.json`
 - `<project>/.claude/settings.json`
 
+> These settings paths were added to detect plugin-key conflicts (MUST_FIX #8).
+
 ---
 
 ## Severity Rules
@@ -76,6 +117,8 @@ Mark MUST_FIX when any of these is true:
 4. Missing base structure: required root/category directories are missing.
 5. Pipeline drift: large knowledge dump replaces orchestration and no linked decomposition exists.
 6. Naming violation: pipeline filename is not `run-when-*.md` (including legacy `review.md`).
+7. Initialization gap: user-data root exists but seed files are missing (e.g., empty `maxims/*.md` or missing `pipelines/run-when-reviewing-code.md`).
+8. Plugin-key conflict: `enabledPlugins` keeps old and new Pensieve keys in parallel, or misses the new key.
 7. Initialization gap: user-data root exists but seed files are missing (e.g., empty `maxims/*.md` or missing `pipelines/run-when-reviewing-code.md`).
 8. Plugin-key conflict: `enabledPlugins` keeps old and new Pensieve keys in parallel, or misses the new key.
 
@@ -105,6 +148,7 @@ Extract:
 - Scan `.claude/pensieve/**`
 - Scan legacy candidate paths
 - Scan Pensieve-related `enabledPlugins` keys in user/project `settings.json`
+  (both `~/.claude/settings.json` and `<project>/.claude/settings.json`)
 - Produce pass/fail/unknown per rule
 
 ### Phase 2.2: Mandatory frontmatter quick check

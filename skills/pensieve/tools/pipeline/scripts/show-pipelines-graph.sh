@@ -13,7 +13,9 @@ GRAPH_SCRIPT="$PLUGIN_ROOT/skills/pensieve/tools/upgrade/scripts/generate-user-d
 GRAPH_FILE="$USER_DATA_ROOT/graph.md"
 
 if [[ -d "$USER_DATA_ROOT" && -f "$GRAPH_SCRIPT" ]]; then
-  bash "$GRAPH_SCRIPT" --root "$USER_DATA_ROOT" --output "$GRAPH_FILE" >/dev/null 2>&1 || true
+  if ! run_with_retry_timeout "pipeline.graph" 20 1 -- bash "$GRAPH_SCRIPT" --root "$USER_DATA_ROOT" --output "$GRAPH_FILE" >/dev/null 2>&1; then
+    runtime_log "warn" "GRAPH_GENERATE_FAILED" "graph generation failed; continuing with best-effort output" "script=$GRAPH_SCRIPT" "output=$GRAPH_FILE"
+  fi
 fi
 
 echo "## User Data Graph"

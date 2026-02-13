@@ -52,6 +52,12 @@ if [[ ! -d "$SYSTEM_SKILL_ROOT" ]]; then
     exit 0
 fi
 
+RUNTIME_LIB="$SYSTEM_SKILL_ROOT/tools/loop/scripts/_lib.sh"
+if [[ -f "$RUNTIME_LIB" ]]; then
+    # shellcheck source=/dev/null
+    source "$RUNTIME_LIB"
+fi
+
 # Clean stale loop markers (avoid /tmp buildup)
 get_claude_pid() {
     local pid="$$"
@@ -155,7 +161,13 @@ if [[ -d "$USER_DATA_ROOT" ]]; then
     CONTEXT+=$'\n\n'
 
     if [[ -f "$GRAPH_SCRIPT" ]]; then
-        bash "$GRAPH_SCRIPT" --root "$USER_DATA_ROOT" --output "$USER_DATA_ROOT/graph.md" >/dev/null 2>&1 || true
+        if declare -F run_with_retry_timeout >/dev/null 2>&1; then
+            if ! run_with_retry_timeout "sessionstart.graph" 20 1 -- bash "$GRAPH_SCRIPT" --root "$USER_DATA_ROOT" --output "$USER_DATA_ROOT/graph.md" >/dev/null 2>&1; then
+                declare -F runtime_log >/dev/null 2>&1 && runtime_log "warn" "GRAPH_GENERATE_FAILED" "graph generation failed in SessionStart hook" "script=$GRAPH_SCRIPT" "output=$USER_DATA_ROOT/graph.md"
+            fi
+        else
+            bash "$GRAPH_SCRIPT" --root "$USER_DATA_ROOT" --output "$USER_DATA_ROOT/graph.md" >/dev/null 2>&1 || true
+        fi
     fi
 
     GRAPH_FILE="$USER_DATA_ROOT/graph.md"

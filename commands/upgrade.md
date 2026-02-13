@@ -1,5 +1,5 @@
 ---
-description: Use Upgrade tool (guide user data migration)
+description: Use Upgrade tool (version update pre-check + user data migration)
 allowed-tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
 ---
 

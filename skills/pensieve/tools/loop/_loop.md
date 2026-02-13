@@ -12,6 +12,44 @@ You are orchestrating an automated task execution loop. Break complex work into 
 - **Atomic tasks**: Each task should be independently executable and verifiable
 - **User confirmation**: Always confirm context understanding before generating tasks
 - **Clean handoff**: Subagents execute one task and return; Stop Hook triggers next
+- **Linkable outputs**: If a loop output becomes `decision` or `pipeline`, include at least one `[[...]]` link via `Based on/Leads to/Related`
+
+## Tool Contract
+
+### Use when
+
+- Task is complex and needs splitting into multiple verifiable subtasks
+- Need long-running auto-continuation (Stop Hook drives rhythm)
+- Need context isolation to prevent main window bloat
+
+### Do not use when
+
+- Task involves only 1-2 files and can be done in a single step
+- Goal is unclear or constraints are unconfirmed (clarify first, do not jump into loop)
+- User explicitly asks to "work directly in the main window, no subagents"
+
+### Required inputs
+
+- Confirmed goal/scope/constraints (Phase 2 must confirm)
+- `<SYSTEM_SKILL_ROOT>` and `<USER_DATA_ROOT>` paths
+- `LOOP_DIR` (output by `init-loop.sh`)
+
+### Output contract
+
+- Phase 2 must output a context summary and get confirmation first
+- Phase 3 must present the task list and get confirmation before creating the first real task
+- During execution, advance only one task at a time; subagent returns immediately after completion
+
+### Failure fallback
+
+- `init-loop.sh` fails: stop and return error with fix suggestions — do not create tasks
+- `Task` system error or taskListId lost: stop auto-continuation, prompt manual `end-loop.sh` or rebind
+- Cannot achieve "single-task executable" granularity: keep splitting or add context — do not force-start
+
+### Negative examples
+
+- "Change 1 copy file, might as well loop" -> over-engineering, just do it directly
+- "Haven't confirmed requirements, create 10 tasks first" -> forbidden, must complete Phase 2 confirmation first
 
 > **Path notes**: The script paths below are relative to the plugin root (parent of `skills/pensieve/`). Scripts self‑locate and can run from any working directory.
 >

@@ -10,6 +10,45 @@ You are helping capture learnings and patterns into Pensieve's knowledge system.
 
 **User data** lives in project-level `.claude/pensieve/` and is never overwritten by the plugin.
 
+## Tool Contract
+
+### Use when
+
+- Loop completes and lessons need to be captured
+- User explicitly requests "capture/record/reflect/standardize"
+- Goal is to create or improve `maxim / decision / pipeline / knowledge`
+
+### Do not use when
+
+- User wants migration/directory cleanup/legacy compatibility (route to `/upgrade`)
+- User wants structural compliance judgment (route to `/doctor`)
+- User has not confirmed what to capture and which category (ask first, then continue)
+
+### Required inputs
+
+- User-confirmed "core conclusion" and target category
+- Target category README:
+  - `<SYSTEM_SKILL_ROOT>/maxims/README.md`
+  - `<SYSTEM_SKILL_ROOT>/decisions/README.md`
+  - `<SYSTEM_SKILL_ROOT>/pipelines/README.md`
+  - `<SYSTEM_SKILL_ROOT>/knowledge/README.md`
+
+### Output contract
+
+- Present category recommendation and draft first, then wait for user confirmation
+- After writing, report back: file path + backlink changes
+- `decision/pipeline` must include at least 1 valid `[[...]]` link
+
+### Failure fallback
+
+- Structural issues found (old path parallel / directory missing / widespread format violations): pause writing, suggest `/doctor` first, then `/upgrade` if needed
+- Cannot determine category: provide 2-3 candidates and ask for confirmation — do not write blindly
+
+### Negative examples
+
+- "Auto-capture everything from this session, no need for my confirmation" -> forbidden, no auto-capture
+- "Also migrate the old directories while you're at it" -> not self-improve scope
+
 Determine what's worth preserving, categorize it correctly, and write it in the proper format.
 
 ## Core Principles

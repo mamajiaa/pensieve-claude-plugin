@@ -66,7 +66,6 @@ else
 fi
 
 mkdir -p "$(dirname "$OUTPUT")"
-GENERATED_AT="$(date '+%Y-%m-%d %H:%M:%S')"
 
 # Build a stable file list without relying on GNU-only flags (e.g., sort -z).
 files=()
@@ -77,8 +76,7 @@ done < <(find "$ROOT" -type f -name '*.md' | LC_ALL=C sort)
 run_awk() {
 awk \
     -v root="$ROOT" \
-    -v output="$OUTPUT" \
-    -v generated_at="$GENERATED_AT" '
+    -v output="$OUTPUT" '
 function trim(s) {
     sub(/^[[:space:]]+/, "", s)
     sub(/[[:space:]]+$/, "", s)
@@ -179,7 +177,6 @@ END {
 
     print "# Pensieve User Data Graph"
     print ""
-    print "- Generated: " generated_at
     print "- Root: `" root "`"
     print "- Included categories: maxims, decisions, knowledge, pipelines"
     print ""

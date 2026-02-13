@@ -50,6 +50,7 @@ The model can execute installation, initialization, and verification steps autom
 
 - [Installation Guide](docs/installation.md)
 - [Update Guide](docs/update.md)
+- [Init Tool](skills/pensieve/tools/init/_init.md)
 - [Upgrade Tool](skills/pensieve/tools/upgrade/_upgrade.md)
 - [Uninstall Section](docs/installation.md#uninstall)
 
@@ -77,11 +78,12 @@ This design gives two direct benefits:
 
 ## Minimal Commands to Learn
 
+- `/init`: initialize project-level `.claude/pensieve/` (first-time setup for new projects, includes review knowledge seed)
 - `/loop`: split complex work and execute in auto-loop mode
 - `/doctor`: run README-driven user-data health checks
 - `/pipeline`: list and invoke project pipelines
 - `/selfimprove`: turn lessons into system-level improvements
-- `/upgrade`: migrate and validate legacy structure to current standard
+- `/upgrade`: version update pre-check + legacy migration (highest priority; run `/doctor` after migration)
 
 ## Best Fit Scenarios
 

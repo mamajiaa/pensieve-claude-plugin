@@ -16,7 +16,7 @@ gate: auto
 
 This pipeline focuses on orchestration only. Keep theory and deeper criteria in linked knowledge files.
 
-**Knowledge reference**: `<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md`
+**Knowledge reference**: `.claude/pensieve/knowledge/taste-review/content.md`
 
 **Context links (at least one)**:
 - Based on: [[knowledge/taste-review/content]]
@@ -33,7 +33,7 @@ This pipeline focuses on orchestration only. Keep theory and deeper criteria in 
 
 **Read Inputs**:
 1. User-provided files / commits / PR scope
-2. `<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md`
+2. `.claude/pensieve/knowledge/taste-review/content.md`
 
 **Steps**:
 1. Confirm review scope (files / commits / snippets)
@@ -50,7 +50,7 @@ This pipeline focuses on orchestration only. Keep theory and deeper criteria in 
 
 **Read Inputs**:
 1. Review file list from Task 1
-2. `<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md`
+2. `.claude/pensieve/knowledge/taste-review/content.md`
 
 **Steps**:
 1. Apply checklist to each file (no duplicated theory here)
