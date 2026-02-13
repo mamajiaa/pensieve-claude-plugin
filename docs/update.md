@@ -11,6 +11,13 @@ claude plugin update pensieve@kingkongshot-marketplace --scope user
 
 然后重启 Claude Code 使更新生效。
 
+如果你是在 Claude Code 会话里让模型代执行命令，`claude` 会检测嵌套会话并拦截；此时请在命令前加 `CLAUDECODE=` 清空该变量：
+
+```bash
+CLAUDECODE= claude plugin marketplace update kingkongshot/Pensieve
+CLAUDECODE= claude plugin update pensieve@kingkongshot-marketplace --scope user
+```
+
 这两条命令可重复执行；如果已经是最新版本，通常不会产生变更。
 
 > 如果你是项目级安装，请把 `--scope user` 改为 `--scope project`。

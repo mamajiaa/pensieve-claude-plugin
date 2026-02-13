@@ -208,18 +208,20 @@ bash <SYSTEM_SKILL_ROOT>/tools/upgrade/scripts/generate-user-data-graph.sh
 
 ## 插件清理与更新命令（按顺序）
 
+在 Claude Code 会话里由模型代执行 `claude` 命令时，请在命令前加 `CLAUDECODE=`（清空嵌套会话检测变量）。
+
 ```bash
 # 清理旧安装引用（未安装时忽略错误）
-claude plugin uninstall pensieve@Pensieve --scope user || true
-claude plugin uninstall pensieve@pensieve-claude-plugin --scope user || true
+CLAUDECODE= claude plugin uninstall pensieve@Pensieve --scope user || true
+CLAUDECODE= claude plugin uninstall pensieve@pensieve-claude-plugin --scope user || true
 
 # 若存在项目级安装，也清理
-claude plugin uninstall pensieve@Pensieve --scope project || true
-claude plugin uninstall pensieve@pensieve-claude-plugin --scope project || true
+CLAUDECODE= claude plugin uninstall pensieve@Pensieve --scope project || true
+CLAUDECODE= claude plugin uninstall pensieve@pensieve-claude-plugin --scope project || true
 
 # 刷新 marketplace 并更新新插件引用
-claude plugin marketplace update kingkongshot/Pensieve
-claude plugin update pensieve@kingkongshot-marketplace --scope user
+CLAUDECODE= claude plugin marketplace update kingkongshot/Pensieve
+CLAUDECODE= claude plugin update pensieve@kingkongshot-marketplace --scope user
 ```
 
 ## 约束
