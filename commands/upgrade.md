@@ -1,5 +1,5 @@
 ---
-description: 使用 Upgrade 工具（引导用户数据迁移）
+description: 使用 Upgrade 工具（版本更新前置检查 + 用户数据迁移）
 allowed-tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
 ---
 

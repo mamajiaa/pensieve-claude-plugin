@@ -1,20 +1,81 @@
 # 升级工具
 
 ---
-description: 引导将用户数据升级到项目级 `.claude/pensieve/` 结构
+description: 先拉取最新版本结构定义，再按需执行用户数据迁移（无差异则 no-op）
 ---
 
-你是 Upgrade 工具。你的职责是解释目标目录结构，并指导把旧布局迁移到新布局。你不决定用户内容，只定义路径与规则。
+你是 Upgrade 工具。你的职责是先同步最新版本，再基于最新目录结构做“是否需要迁移”的判定。只有存在结构差异时才执行迁移；否则输出 no-op 并交给 `/doctor` 判定本地数据是否还需调整。
+
+## Tool Contract
+
+### Use when
+
+- 用户要求更新插件版本或确认版本状态
+- 用户要求把历史数据迁移到 `.claude/pensieve/`
+- 用户存在旧路径并行，需要统一到单一事实源
+- 用户需要清理旧插件命名并切换到新引用
+
+### Do not use when
+
+- 新项目首次接入，只需要创建 `.claude/pensieve/`（应转 `/init`）
+- 用户只想查看合规状态与问题分级（应转 `/doctor`）
+- 用户只想沉淀经验或新增流程（应转 `/selfimprove`）
+- 用户只想查看可用 pipelines（应转 `/pipeline`）
+
+### Required inputs
+
+- 最新版本来源（优先 GitHub / Marketplace，同步后落到本地插件）
+- 版本状态（是否已按 `<PLUGIN_ROOT>/docs/update.md` 完成更新 + 重启）
+- 两级 settings 路径：
+  - `~/.claude/settings.json`
+  - `<project>/.claude/settings.json`
+- 本地现状结构（旧路径与 `.claude/pensieve/` 当前目录）
+
+### Output contract
+
+- 必须输出“结构对比结论”（是否存在结构差异）
+- 若有差异：输出迁移报告（旧路径 -> 新路径，含冲突处理）
+- 若无差异：明确输出 no-op（无需迁移）
+- 不输出 `PASS/FAIL`、`MUST_FIX/SHOULD_FIX`
+- 无论是否迁移，都必须给出下一步 `/doctor`
+
+### Failure fallback
+
+- 更新状态无法确认：先停在“确认更新 + 重启”，不进入迁移
+- 无法拉取最新版本定义：先参考 GitHub 最新文档并给重试建议，不进入迁移
+- 文件冲突无法自动合并：生成 `*.migrated.md` 并记录人工合并点
+
+### Negative examples
+
+- “先跑 doctor，再决定要不要 upgrade” -> 与 upgrade-first 规则冲突
+- “迁移时顺便给我判定 PASS/FAIL” -> 越界到 doctor
 
 Hard rule：先清理旧插件命名，再迁移用户数据。不要长期并行保留新旧命名。
+Hard rule：版本更新前置检查由 Upgrade 统一负责，且是最高优先级门槛。
+Hard rule：先从 GitHub/Marketplace 拉取最新版本结构定义，再做本地结构判定。
+Hard rule：若“无新版本 + 本地结构无差异”，直接 no-op；不要进入逐文件迁移。
 Hard rule：升级/迁移后必须执行一次 doctor 复检。
 Hard rule：不要把“升级前先 doctor”当作门槛；默认流程是 upgrade-first。
+Hard rule：进入迁移前先检查插件内文档 `<PLUGIN_ROOT>/docs/update.md`；若插件有新版本（或无法确认），先更新插件并重启 Claude Code。
+Hard rule：如果更新命令失败，必须先查阅 GitHub 最新更新文档（[docs/update.md](https://github.com/kingkongshot/Pensieve/blob/main/docs/update.md)）再继续；失败状态下不得直接进入迁移。
 
 ## 职责边界（与 Doctor 分工）
 
-- Upgrade 只负责**执行迁移动作**（创建/复制/改名/清理/合并）。
+- Upgrade 先负责**版本更新与最新结构定义同步**，再按需执行迁移动作。
+- Upgrade 只处理结构级动作（创建/复制/改名/清理/最小合并），不做逐文件语义审查。
 - Upgrade 不负责输出 `PASS/FAIL`、`MUST_FIX/SHOULD_FIX` 结论。
-- 合规判定统一由 `/doctor` 负责；Upgrade 只产出“做了什么”的迁移报告。
+- 合规判定与“还要怎么改本地数据结构”统一由 `/doctor` 负责；Upgrade 只产出“做了什么”的升级/迁移报告。
+
+## 版本检查前置（先于迁移）
+
+在执行任何迁移动作前，先同步“最新版本结构定义”：
+
+1. 先按 `<PLUGIN_ROOT>/docs/update.md` 执行插件更新命令（本质是从 GitHub/Marketplace 拉取最新版本）。
+2. 若本地文档不可用或更新失败，查阅 GitHub 最新更新文档（[docs/update.md](https://github.com/kingkongshot/Pensieve/blob/main/docs/update.md)）并重试。
+3. 如果已执行更新命令：
+   - 有新版本并完成更新：必须先重启 Claude Code，再继续 `/upgrade`。
+   - 已是最新版本（无变更）：可直接继续 `/upgrade`。
+4. 若当前环境无法确认版本状态，先询问用户是否已完成“更新 + 重启”；未确认前不进入结构判定与迁移。
 
 ## 目标结构（项目级，永不被插件覆盖）
 
@@ -27,6 +88,19 @@ Hard rule：不要把“升级前先 doctor”当作门槛；默认流程是 upg
   loop/        # loop 产物（每次 loop 一个目录）
 ```
 
+## 结构差异判定门禁（先判定再迁移）
+
+先做结构级对比，不做逐文件深读：
+
+1. 是否存在旧路径并行（如 `skills/pensieve/`、`.claude/skills/pensieve/`）。
+2. `.claude/pensieve/` 是否缺失关键目录或关键命名（如 `run-when-*.md`）。
+3. `enabledPlugins` 是否存在旧键并行或缺失新键。
+4. review pipeline 是否仍引用插件内 Knowledge 路径（`<SYSTEM_SKILL_ROOT>/knowledge/...`）。
+
+判定规则：
+- **无结构差异**：直接输出 no-op（无需迁移），然后进入 `/doctor`。
+- **有结构差异**：执行最小迁移动作，再进入 `/doctor`。
+
 ## 迁移原则
 
 - 先清理旧插件标识：迁移前删除旧安装引用和 `settings.json` 里的旧 key。
@@ -38,6 +112,8 @@ Hard rule：不要把“升级前先 doctor”当作门槛；默认流程是 upg
 - 系统能力保留在插件内：`<SYSTEM_SKILL_ROOT>/` 下内容由插件管理，不迁移不覆盖。
 - 历史系统副本应清理：迁移完成后删除项目中的旧系统拷贝（不要触碰插件内部）。
 - 用户数据必须项目级：仅迁移用户编写内容到 `.claude/pensieve/`。
+- 无差异不迁移：若结构门禁判定通过，直接 no-op，不做逐文件思考。
+- review 依赖项目内化：`.claude/pensieve/pipelines/run-when-reviewing-code.md` 应引用 `.claude/pensieve/knowledge/taste-review/content.md`，不依赖插件路径。
 - 不覆盖用户数据：目标文件存在时，采用合并或后缀策略。
 - 尽量保留结构：保留子目录层级与文件名。
 - 用模板做种子：初始 maxims 与 pipeline 模板来自插件模板。
@@ -68,13 +144,13 @@ Hard rule：不要把“升级前先 doctor”当作门槛；默认流程是 upg
 
 - `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/maxims/*.md`
 - `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/pipeline.run-when-reviewing-code.md`
+- `<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md`（作为项目知识种子源）
 
 ### 不应迁移的内容
 
 - 系统文件（通常 `_` 前缀）：
   - `pipelines/_*.md`
   - `maxims/_*.md`
-  - 插件管理的系统 knowledge
   - 历史复制目录中的系统 README / templates / scripts
 
 ## 清理旧系统副本（仅项目内）
@@ -104,39 +180,23 @@ Hard rule：不要把“升级前先 doctor”当作门槛；默认流程是 upg
 
 ## 迁移步骤（建议由 LLM 执行，偏执行）
 
-1. 读取并定位：
-   - `~/.claude/settings.json`
-   - `<project>/.claude/settings.json`
-2. 清理旧 `enabledPlugins` 键，仅保留/添加新键。
-3. 清理旧安装引用：
-   - 卸载 `pensieve@Pensieve`（若存在）
-   - 卸载 `pensieve@pensieve-claude-plugin`（若存在）
-4. 按规则定位旧位置中的用户内容并执行迁移。
-5. 创建目标目录：
-   - `mkdir -p .claude/pensieve/{maxims,decisions,knowledge,pipelines,loop}`
-6. 合并 maxims：
-   - 若 `.claude/pensieve/maxims/{maxim}.md` 不存在，从 `templates/maxims/*.md` 种子化
-   - 若存在同名 maxim，比较内容后合并（必要时创建 `*.migrated.md`）
-7. 迁移预置 pipeline（必须比较内容）：
-   - 目标文件固定为 `.claude/pensieve/pipelines/run-when-reviewing-code.md`
-   - 若目标文件不存在，从模板复制
-   - 若目标文件存在，比较内容：
-     - 相同：跳过
-     - 不同：创建 `run-when-reviewing-code.migrated.md` 并记录合并说明
-8. 执行一次性命名改造（不兼容旧名）：
-   - `pipelines/review.md` 必须改名为 `pipelines/run-when-reviewing-code.md`
-   - 其他 pipeline 文件名也统一改为 `run-when-*.md` 风格
-   - 改名后删除旧文件，不保留同名副本
-9. 迁移用户文件到目标目录，尽量保持相对结构。
-10. 文件名冲突先比较内容：
-   - 相同：跳过
-   - 不同：追加迁移标记或创建 `*.migrated.md`
-11. 清理上面列出的旧系统副本。
-12. 输出迁移报告（旧路径 -> 新路径）。
-13. 升级后强制复检（由 Doctor 判定）：
-   - 运行一次 `/doctor`
-   - 若 doctor 报告迁移/结构问题，继续修复直到 `PASS` 或 `PASS_WITH_WARNINGS`
-   - 通过后再按需运行 `/selfimprove`（可选）
+1. 执行“版本检查前置（先于迁移）”，确保已同步到最新版本结构定义。
+2. 做“结构差异判定门禁”（旧路径并行 / 目录缺失 / 命名不一致 / 插件键不一致）。
+3. 若无结构差异：
+   - 输出 no-op：`无需迁移`
+   - 直接运行 `/doctor`，由 doctor 判定是否还需本地数据结构调整
+   - 结束 upgrade
+4. 若有结构差异，才进入迁移：
+   - 修正 `enabledPlugins`（移除旧键，保留新键）
+   - 清理旧安装引用（若存在）
+   - 执行最小结构迁移（目录创建、命名改造、旧副本清理）
+   - 若缺失 `.claude/pensieve/knowledge/taste-review/content.md`，从插件知识种子化一份
+   - 将 review pipeline 中的 `<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md` 重写为 `.claude/pensieve/knowledge/taste-review/content.md`
+   - 仅在冲突时做最小合并（必要时产出 `*.migrated.md`）
+5. 输出迁移报告（结构差异 -> 执行动作 -> 结果）。
+6. 迁移后强制运行 `/doctor`：
+   - 由 doctor 给出 `PASS/FAIL` 与“还要怎么改本地结构”的具体清单
+   - upgrade 不在此阶段做额外逐文件语义修复
 
 ## 可选可视化
 
