@@ -157,7 +157,8 @@ legacy_user_paths = [
 ]
 legacy_graph_patterns = ["_pensieve-graph*.md", "pensieve-graph*.md", "graph*.md"]
 legacy_readme_re = re.compile(r"(?i)^readme(?:.*\.md)?$")
-plugin_path_markers = ["<SYSTEM_SKILL_ROOT>/knowledge/", "skills/pensieve/knowledge/"]
+# Match plugin-internal knowledge path, but ignore project-scoped ".claude/skills/..." references.
+plugin_path_re = re.compile(r"(?<!\.claude/)skills/pensieve/knowledge/")
 plugin_skill_root = plugin_root / "skills" / "pensieve"
 
 
@@ -195,6 +196,12 @@ def same_path(a: Path, b: Path) -> bool:
 
 def read_text_normalized(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="replace").replace("\r\n", "\n")
+
+
+def has_plugin_knowledge_path_reference(text: str) -> bool:
+    if "<SYSTEM_SKILL_ROOT>/knowledge/" in text:
+        return True
+    return bool(plugin_path_re.search(text))
 
 
 def load_json(path: Path) -> tuple[dict | None, str | None]:
@@ -311,7 +318,7 @@ for target, template in critical_files:
 review_pipeline = root / "pipelines" / "run-when-reviewing-code.md"
 if review_pipeline.is_file():
     txt = read_text_normalized(review_pipeline)
-    if any(m in txt for m in plugin_path_markers):
+    if has_plugin_knowledge_path_reference(txt):
         add_finding(
             "STR-301",
             "MUST_FIX",
