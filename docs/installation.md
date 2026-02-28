@@ -44,7 +44,7 @@ claude plugin install pensieve@kingkongshot-marketplace --scope project
 
 当用户需要结构化工作流时：
 - 先用 Upgrade 工具完成版本更新前置检查（最高优先级）
-- 使用 Init 工具初始化项目级用户数据（新项目首次接入）
+- 使用 Init 工具初始化项目级用户数据，并生成首轮探索与品味基线（新项目首次接入）
 - 使用 Loop 工具进行拆解 + 自动循环执行
 - 使用 Upgrade 工具处理迁移用户数据
 - 查看图谱时直接读取项目级 `SKILL.md` 的 `## Graph`
@@ -75,6 +75,7 @@ mkdir -p .claude/skills/pensieve/{maxims,decisions,knowledge,pipelines,loop}
 
 > `<SYSTEM_SKILL_ROOT>` 可由 `CLAUDE_PLUGIN_ROOT` 推导：`$CLAUDE_PLUGIN_ROOT/skills/pensieve`。
 > 初始化脚本会自动维护项目级 `SKILL.md`：写入固定路由 + 最新 graph（自动生成，请勿手改）。
+> 说明：脚本只负责"目录 + 种子 + SKILL 同步"。新增的"提交记录/代码探索 + review pipeline 品味分析"由 Init 工具执行，不在脚本内自动运行。
 
 ### 4. 重启 Claude Code
 
@@ -107,8 +108,9 @@ claude plugin install pensieve@kingkongshot-marketplace --scope user
 如果你是 LLM agent：
 1. 安装插件
 2. 初始化 `.claude/skills/pensieve/`
-3. 重启 Claude Code（不要跳过）
-4. **告诉用户只需表达几个基础意图**：
+3. 基于提交记录与代码做一次探索，并用 review pipeline 产出首轮品味分析
+4. 重启 Claude Code（不要跳过）
+5. **告诉用户只需表达几个基础意图**：
    - 升级/迁移（Upgrade）
    - 初始化（Init）
    - 拆解执行（Loop）
@@ -145,9 +147,13 @@ claude plugin install pensieve@kingkongshot-marketplace --scope user
    - `.claude/skills/pensieve/knowledge/taste-review/content.md`
    - `.claude/skills/pensieve/SKILL.md` 已存在
    - `SKILL.md` 包含自动生成标记与 graph 段落
-3. 重启 Claude Code
-4. 直接说“用 loop 完成一个小任务”，应触发 Loop 工具流程
-5. 通过 `/help` 确认 `pensieve` skill 已可见
+3. 若走 Init 工具完整流程，确认输出包含：
+   - 提交记录与代码热点探索摘要
+   - 可沉淀候选清单（仅候选，不自动写入）
+   - 基于 review pipeline 的品味分析摘要
+4. 重启 Claude Code
+5. 直接说“用 loop 完成一个小任务”，应触发 Loop 工具流程
+6. 通过 `/help` 确认 `pensieve` skill 已可见
 
 > 说明：`init-loop.sh` 只会创建 loop 目录与 `_agent-prompt.md`。  
 > `_context.md` 在 Phase 2 由主窗口创建并填充。

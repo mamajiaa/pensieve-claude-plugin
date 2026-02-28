@@ -78,7 +78,7 @@
 
 ## 只需要表达几个简单意图
 
-- init：初始化项目级 `.claude/skills/pensieve/`（新项目首次接入，含 review knowledge 种子）
+- init：初始化项目级 `.claude/skills/pensieve/`，并做首轮提交/代码探索 + review 品味基线分析
 - loop：复杂任务拆解 + 自动循环执行
 - doctor：按 README 规范做用户数据体检，输出固定格式报告
 - self-improve：沉淀经验并改进系统行为（不负责迁移体检）
