@@ -33,7 +33,7 @@ description: 基于 README 规范做项目用户数据体检。触发词包括 "
 - 快检与图谱脚本输出：
   - `check-frontmatter.sh`
   - `generate-user-data-graph.sh`
-- 项目级 SKILL 维护脚本：`<SYSTEM_SKILL_ROOT>/tools/memory/scripts/maintain-auto-memory.sh`
+- 项目级 SKILL 维护脚本：`<SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh`
 
 ### Output contract
 
@@ -272,9 +272,31 @@ bash <SYSTEM_SKILL_ROOT>/tools/upgrade/scripts/generate-user-data-graph.sh
 输出报告后，必须执行：
 
 ```bash
-bash <SYSTEM_SKILL_ROOT>/tools/memory/scripts/maintain-auto-memory.sh --event doctor --note "doctor summary: status={PASS|PASS_WITH_WARNINGS|FAIL}, must_fix={n}, should_fix={n}"
+bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event doctor --note "doctor summary: status={PASS|PASS_WITH_WARNINGS|FAIL}, must_fix={n}, should_fix={n}"
 ```
 
 约束：
 - 只允许写入项目级 `.claude/skills/pensieve/SKILL.md`（自动维护文件）。
 - 不得在 doctor 阶段修改 `.claude/skills/pensieve/**` 中的用户数据文件；仅允许更新 `SKILL.md` 自动维护块。
+
+### Phase 4：Auto Memory 补齐检查
+
+检查 Claude Code 的 auto memory（`MEMORY.md`）是否包含 Pensieve 的使用说明。若缺失则补一条，确保新会话能记住本项目使用了 Pensieve。
+
+**检查方法**：
+1. 读取你的 auto memory 入口文件 `MEMORY.md`（路径已在系统提示中给出）
+2. 检查是否已存在 `@pensieve.md` 条目
+
+**若已存在**：跳过，无需重复写入。
+
+**若缺失**：在 `MEMORY.md` 中追加以下内容：
+
+```markdown
+## Pensieve
+- @pensieve.md
+```
+
+约束：
+- 仅追加，不修改已有内容
+- 写入前确认 `MEMORY.md` 未超 200 行上限；若接近则跳过并在报告中标注 INFO
+- 若无法定位 auto memory 目录，在报告 `## 3) 建议处理` 中标注为 SHOULD_FIX，不阻断 doctor 流程
