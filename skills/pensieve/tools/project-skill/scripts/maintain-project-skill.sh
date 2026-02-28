@@ -60,21 +60,40 @@ esac
 PROJECT_ROOT="$(to_posix_path "$(project_root)")"
 USER_DATA_ROOT="$(user_data_root)"
 SKILL_FILE="$(project_skill_file)"
-GRAPH_FILE="$(pensieve_graph_file)"
 PLUGIN_ROOT="$(plugin_root_from_script "$SCRIPT_DIR")"
 GRAPH_SCRIPT="$PLUGIN_ROOT/skills/pensieve/tools/upgrade/scripts/generate-user-data-graph.sh"
+TMP_GRAPH_FILE="$(mktemp "${TMPDIR:-/tmp}/pensieve-graph.XXXXXX")"
+
+cleanup_tmp_graph() {
+  rm -f "$TMP_GRAPH_FILE"
+}
+trap cleanup_tmp_graph EXIT
 
 mkdir -p "$USER_DATA_ROOT"/{maxims,decisions,knowledge,pipelines,loop}
 
 if [[ -x "$GRAPH_SCRIPT" ]]; then
-  bash "$GRAPH_SCRIPT" --root "$USER_DATA_ROOT" --output "$GRAPH_FILE" >/dev/null
+  bash "$GRAPH_SCRIPT" --root "$USER_DATA_ROOT" --output "$TMP_GRAPH_FILE" >/dev/null
+else
+  printf '%s\n' "_(graph not generated yet)_" > "$TMP_GRAPH_FILE"
 fi
+
+# Graph is embedded in SKILL.md only. Remove legacy standalone graph files.
+for legacy_graph in \
+  "$USER_DATA_ROOT"/_pensieve-graph.md \
+  "$USER_DATA_ROOT"/_pensieve-graph.*.md \
+  "$USER_DATA_ROOT"/pensieve-graph.md \
+  "$USER_DATA_ROOT"/pensieve-graph.*.md \
+  "$USER_DATA_ROOT"/graph.md \
+  "$USER_DATA_ROOT"/graph.*.md; do
+  [[ -e "$legacy_graph" ]] || continue
+  rm -f "$legacy_graph"
+done
 
 PYTHON_BIN="$(python_bin || true)"
 [[ -n "$PYTHON_BIN" ]] || { echo "Python not found" >&2; exit 1; }
 TIMESTAMP="$(runtime_now_utc)"
 
-"$PYTHON_BIN" - "$SKILL_FILE" "$GRAPH_FILE" "$EVENT" "$TIMESTAMP" "$PROJECT_ROOT" "$USER_DATA_ROOT" "$NOTE" <<'PY'
+"$PYTHON_BIN" - "$SKILL_FILE" "$TMP_GRAPH_FILE" "$EVENT" "$TIMESTAMP" "$PROJECT_ROOT" "$USER_DATA_ROOT" "$NOTE" <<'PY'
 from __future__ import annotations
 
 import re
@@ -177,4 +196,3 @@ PY
 
 echo "✅ Pensieve project SKILL updated"
 echo "  - skill: $SKILL_FILE"
-echo "  - graph: $GRAPH_FILE"

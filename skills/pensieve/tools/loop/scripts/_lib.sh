@@ -75,12 +75,6 @@ project_skill_file() {
     echo "$dr/SKILL.md"
 }
 
-pensieve_graph_file() {
-    local dr
-    dr="$(user_data_root)"
-    echo "$dr/_pensieve-graph.md"
-}
-
 ensure_user_data_root() {
     local dr
     dr="$(user_data_root)"

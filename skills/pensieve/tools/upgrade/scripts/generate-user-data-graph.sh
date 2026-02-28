@@ -1,5 +1,5 @@
 #!/bin/bash
-# Generate a Mermaid graph for project-level Pensieve user data.
+# Generate Mermaid graph markdown for project-level Pensieve user data.
 
 set -euo pipefail
 
@@ -13,13 +13,13 @@ Usage:
 
 Options:
   --root <path>      Scan root. Default: <project>/.claude/skills/pensieve
-  --output <path>    Output markdown file. Default: <project>/.claude/skills/pensieve/_pensieve-graph.md
+  --output <path>    Output markdown file. Default: stdout
   -h, --help         Show this help
 USAGE
 }
 
 ROOT=""
-OUTPUT=""
+OUTPUT="-"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -56,16 +56,13 @@ if [[ ! -d "$ROOT" ]]; then
     exit 1
 fi
 
-if [[ -z "$OUTPUT" ]]; then
-    OUTPUT="$(pensieve_graph_file)"
-else
+if [[ "$OUTPUT" != "-" ]]; then
     OUTPUT="$(to_posix_path "$OUTPUT")"
     if [[ "$OUTPUT" != /* ]]; then
         OUTPUT="$PROJECT_ROOT/$OUTPUT"
     fi
+    mkdir -p "$(dirname "$OUTPUT")"
 fi
-
-mkdir -p "$(dirname "$OUTPUT")"
 
 # Build a stable file list without relying on GNU-only flags (e.g., sort -z).
 files=()
@@ -292,10 +289,17 @@ END {
 ' "$@"
 }
 
-if [[ ${#files[@]} -eq 0 ]]; then
-    run_awk < /dev/null > "$OUTPUT"
+if [[ "$OUTPUT" == "-" ]]; then
+    if [[ ${#files[@]} -eq 0 ]]; then
+        run_awk < /dev/null
+    else
+        run_awk "${files[@]}"
+    fi
 else
-    run_awk "${files[@]}" > "$OUTPUT"
+    if [[ ${#files[@]} -eq 0 ]]; then
+        run_awk < /dev/null > "$OUTPUT"
+    else
+        run_awk "${files[@]}" > "$OUTPUT"
+    fi
+    echo "✅ Graph generated: $OUTPUT"
 fi
-
-echo "✅ Graph generated: $OUTPUT"
