@@ -8,11 +8,11 @@ description: 仅在任务复杂且必须拆成多个可验证子任务时使用�
 
 将复杂工作拆成可执行原子任务，在 Task 系统中按顺序推进。主窗口只做编排，每次仅分派一个子任务给子代理执行。
 
-## Core Principles
+## 核心原则
 
-- **Context isolation**: Each task runs in a subagent to prevent main window context explosion
-- **Atomic tasks**: Each task should be independently executable and verifiable
-- **Clean handoff**: Subagents execute one task and return; main window continues to the next task
+- **上下文隔离**：每个任务在子代理中运行，避免主窗口上下文爆炸
+- **原子任务**：每个任务可独立执行、可独立验证
+- **干净交接**：子代理执行一个任务后返回；主窗口继续分派下一个
 
 ## Tool Contract
 
@@ -24,207 +24,205 @@ description: 仅在任务复杂且必须拆成多个可验证子任务时使用�
 
 ### Required inputs
 
-- 已确认的目标/范围/约束（Phase 2 必须确认）
+- 已确认的目标/范围/约束（Phase 2 确认后再进入 Phase 3，因为目标不清晰时生成的任务大概率需要返工）
 - `<SYSTEM_SKILL_ROOT>` 与 `<USER_DATA_ROOT>` 路径
 - `LOOP_DIR`（由 `init-loop.sh` 输出）
 
 ### Output contract
 
-- Phase 2 必须先输出上下文摘要并获得确认
-- Phase 3 必须在 Claude Task 系统中直接创建真实任务（不可只输出 markdown/list）
+- Phase 2 先输出上下文摘要并获得确认——确认步骤确保任务拆解基于共识，而非假设
+- Phase 3 在 Claude Task 系统中直接创建真实任务（不是只输出 markdown/list）——Task 系统提供状态追踪和子代理分派
 - 执行期每次只推进一个任务，子代理完成后立即返回
 
 ### Failure fallback
 
-- `init-loop.sh` 失败：停止推进并返回错误与修复建议，不创建任务
+- `init-loop.sh` 失败：停止推进并返回错误与修复建议——没有 LOOP_DIR 的任务无法正确隔离上下文
 - `Task` 系统异常：停止推进并输出恢复建议（重试/缩小任务/手动收尾）
-- 无法满足"单任务可执行"粒度：继续拆分或补充上下文，不强行开跑
+- 无法满足"单任务可执行"粒度：继续拆分或补充上下文——强行开跑粒度过粗的任务会导致子代理频繁提问，失去上下文隔离的意义
 
 ### Negative examples
 
-- "改 1 个文案文件，顺便 loop" → 过度流程化，应直接完成
-- "还没确认需求，先建 10 个任务" → 禁止，必须先完成 Phase 2 确认
+- "改 1 个文案文件，顺便 loop" → 1-2 个文件的修改直接完成更快，loop 的初始化和编排开销反而拖慢进度
+- "还没确认需求，先建 10 个任务" → 需求未确认时生成的任务大概率与最终目标不匹配，返工成本高于先花一分钟确认
 
 ---
 
-## Phase 0: Simple Task Check
+## Phase 0: 简单任务检查
 
 评估任务复杂度。满足以下全部条件时，**建议直接完成**：
-- Only 1–2 files involved
-- Scope is clear, no exploration needed
-- Likely 1 task to finish
+- 只涉及 1-2 个文件
+- 范围清晰，无需探索
+- 一个任务即可完成
 
-> This looks simple; finishing directly will be faster. Do you want to do it now or run a loop?
+> 这个任务看起来比较简单，直接完成会更快。要现在做还是用 loop？
 
 用户选直接完成 → 不开 loop。用户坚持 → 继续 Phase 1。
 
 ---
 
-## Phase 1: Initialize
+## Phase 1: 初始化
 
-**Goal**: Prepare the loop directory before task splitting
+**目标**：在拆分任务前准备好 loop 目录
 
 ```
 bash <SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-loop.sh <slug>
 ```
 
-**slug**: short English identifier (e.g., `snake-game`, `auth-module`).
+**slug**：简短英文标识（如 `snake-game`、`auth-module`）。
 
-**IMPORTANT**: Do **not** run with `run_in_background: true`. You need `LOOP_DIR` immediately.
+不要用 `run_in_background: true` 运行——后续步骤立刻需要 `LOOP_DIR` 路径。
 
-Script output (remember `LOOP_DIR`):
+脚本输出（记住 `LOOP_DIR`）：
 ```
 LOOP_DIR=.claude/skills/pensieve/loop/2026-01-27-login
 ```
 
 ---
 
-## Phase 2: Capture Context
+## Phase 2: 捕获上下文
 
-**Goal**: Document conversation context before task generation
+**目标**：在生成任务前记录会话上下文
 
-1. Create `LOOP_DIR/_context.md`:
+1. 创建 `LOOP_DIR/_context.md`：
 
 ```markdown
-# Conversation Context
+# 会话上下文
 
-## Pre-Context
+## 前置上下文
 
-### Interaction History
-| Turn | Model Attempt | User Feedback |
-|------|----------------|---------------|
+### 交互历史
+| 轮次 | 模型尝试 | 用户反馈 |
+|------|----------|----------|
 | 1 | ... | ... |
 
-### Final Consensus
-- Goal: XXX
-- Scope: YYY
-- Constraints: ZZZ
+### 最终共识
+- 目标: XXX
+- 范围: YYY
+- 约束: ZZZ
 
-### Understanding & Assumptions
-- Expected modules involved
-- Expected implementation approach
-- Expected difficulties
+### 理解与假设
+- 预期涉及的模块
+- 预期实现方式
+- 预期难点
 
-### Document References
-| Type | Path |
+### 文档引用
+| 类型 | 路径 |
 |------|------|
-| requirements | none / path |
-| design | none / path |
-| plan | none / path |
+| 需求文档 | 无 / 路径 |
+| 设计文档 | 无 / 路径 |
+| 计划文档 | 无 / 路径 |
 
-### Context Links (optional)
+### 上下文链接（可选）
 - 基于：[[前置决策或知识]]
 - 导致：[[后续决策、流程或文档]]
 - 相关：[[相关主题]]
 ```
 
-2. **Present context summary to user and confirm before proceeding**
+2. **向用户展示上下文摘要并确认后再继续**
 
-3. **Create requirements/design docs as needed**:
+3. **按需创建需求/设计文档**：
 
-   | Condition | Needed | Template |
-   |----------|--------|----------|
-   | Requirements unclear (goal/scope/constraints not confirmed) | requirements | `loop/REQUIREMENTS.template.md` |
-   | Implementation not obvious | design | `loop/DESIGN.template.md` |
+   | 条件 | 需要 | 模板 |
+   |------|------|------|
+   | 需求不清晰（目标/范围/约束未确认） | 需求文档 | `loop/REQUIREMENTS.template.md` |
+   | 实现方式不明显 | 设计文档 | `loop/DESIGN.template.md` |
 
-   Hard rule: only the two conditions above trigger document creation.
+   仅上述两个条件触发文档创建——不必要的文档只会增加噪音，不会帮助任务生成。
 
-4. If loop likely produces `decision` or `pipeline`, prefill Context Links.
+4. 如果 loop 可能产出 `decision` 或 `pipeline`，预填上下文链接。
 
 > 链接规则见 `<SYSTEM_SKILL_ROOT>/references/shared-rules.md` § 语义链接规则
 
 ---
 
-## Phase 3: Generate Tasks
+## Phase 3: 生成任务
 
-**Goal**: Break down work into atomic, executable tasks
+**目标**：将工作拆解为原子化、可执行的任务
 
-**CRITICAL**: Do not proceed without user confirmation from Phase 2.
+Phase 2 的用户确认是前置条件——基于未确认上下文生成的任务大概率与最终目标不匹配。
 
-### Load maxims first (mandatory)
+### 先加载准则
 
-Read all project maxims from `<USER_DATA_ROOT>/maxims/*.md`. Use maxims to shape task boundaries and acceptance criteria.
+读取所有项目准则 `<USER_DATA_ROOT>/maxims/*.md`，用准则约束任务边界和验收标准。在生成任务前加载准则，确保约束从一开始就嵌入验收标准，而不是事后补丁。
 
-**Hard rule**: Do not generate task lists before maxims are loaded.
+### 获取可用流程
 
-### Get available pipelines
+读取 `<USER_DATA_ROOT>/pipelines/` 下所有 `*.md` 文件。如果存在相关 pipeline，读取并检查是否包含任务蓝图。
 
-Read all `*.md` files from `<USER_DATA_ROOT>/pipelines/`. If a relevant pipeline exists, read it and check for explicit task blueprint.
+**蓝图检测**：包含 `## Task Blueprint` 或有序的 `### Task 1/2/3...` 标题。
 
-**Task blueprint detection**: Contains `## Task Blueprint` or ordered `### Task 1/2/3...` headings.
+蓝图处理：
+- 有蓝图 → 1:1 按序映射为运行时任务。合并/拆分/重排蓝图步骤会破坏预定义序列的意义。
+- 无蓝图 → 正常拆分任务。
 
-**Hard rule**:
-- Blueprint exists → 1:1 ordered runtime tasks. Do not merge/split/reorder.
-- No blueprint → normal task splitting.
+### 任务粒度标准
 
-### Task granularity standard
+**核心检验：子代理能否不提问就执行完？**
 
-**Core test: Can an agent execute without asking questions?**
+每个任务需要：
+- 指定要创建或修改的文件/组件
+- 包含具体的构建/修改/测试操作
 
-Each task must:
-- Specify files/components to create or modify
-- Include concrete build/change/test actions
+### 操作步骤
 
-### Actions
-
-1. Read project maxims, extract constraints
-2. Check relevant pipeline for blueprint
-3. Blueprint → 1:1 mapping; else split with granularity standard
-4. Ensure acceptance criteria aligned with maxims
-5. Create tasks in Claude Task system (after Phase 2 confirmation)
-6. Do not treat markdown checklist as task creation
-7. Show concise snapshot (task id + subject), then create/run first task
+1. 读取项目准则，提取约束
+2. 检查相关 pipeline 是否有蓝图
+3. 有蓝图 → 1:1 映射；否则按粒度标准拆分
+4. 确保验收标准与准则对齐
+5. 在 Claude Task 系统中创建任务（Phase 2 确认后）
+6. markdown checklist 不等于任务创建——只有在 Task 系统中创建的才算数
+7. 展示简要快照（task id + 主题），然后创建/运行第一个任务
 
 ---
 
-## Phase 4: Main-Window Continuation
+## Phase 4: 主窗口续跑
 
-After first task creation, main window fetches next pending task and dispatches one subagent at a time until all tasks complete.
+第一个任务创建后，主窗口获取下一个待处理任务，每次分派一个子代理，直到所有任务完成。
 
-**Important**: Do not rely on hooks or background bind processes.
+不依赖 hooks 或后台绑定进程——主窗口主动轮询任务状态更可靠。
 
 ---
 
-## Phase 5: Execute Tasks
+## Phase 5: 执行任务
 
-**Goal**: Run each task via isolated subagents
+**目标**：通过隔离的子代理逐个执行任务
 
-1. Launch a general-purpose agent for the first pending task:
+1. 为第一个待处理任务启动通用子代理：
 
 ```
 Task(
   subagent_type: "general-purpose",
-  prompt: "Read .claude/skills/pensieve/loop/{date}-{slug}/_agent-prompt.md and execute task_id={id}"
+  prompt: "读取 .claude/skills/pensieve/loop/{date}-{slug}/_agent-prompt.md 并执行 task_id={id}"
 )
 ```
 
-The `_agent-prompt.md` (generated by init-loop.sh) includes:
-- Role definition, loop context path, maxims paths, execution constraints
+`_agent-prompt.md`（由 init-loop.sh 生成）包含：
+- 角色定义、loop 上下文路径、准则路径、执行约束
 
-2. Subagent: TaskGet → execute → return
-3. Main window checks task status, dispatches next pending task
-
----
-
-## Phase 6: Wrap Up
-
-1. All tasks complete → ask whether to run self-improve (`tools/self-improve/_self-improve.md`).
-2. If loop produced `decision` or `pipeline`, ensure output includes linking per `<SYSTEM_SKILL_ROOT>/references/shared-rules.md`.
+2. 子代理：TaskGet → 执行 → 返回
+3. 主窗口检查任务状态，分派下一个待处理任务
 
 ---
 
-## Phase Selection Guide
+## Phase 6: 收尾
 
-| Task characteristics | Phase combination |
-|---------------------|-------------------|
-| Clear, small scope | tasks |
-| Need code understanding | plan → tasks |
-| Need technical design | plan → design → tasks |
-| Unclear requirements | plan → requirements → design → tasks |
+1. 所有任务完成 → 询问是否运行 self-improve（`tools/self-improve/_self-improve.md`）。
+2. 如果 loop 产出了 `decision` 或 `pipeline`，确保输出包含链接（见 `<SYSTEM_SKILL_ROOT>/references/shared-rules.md`）。
 
 ---
 
-## Related Files
+## Phase 选择指南
 
-- `tools/loop/README.md` — Detailed documentation
-- `<SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-loop.sh` — Initialize loop directory
+| 任务特征 | Phase 组合 |
+|----------|------------|
+| 范围清晰、规模小 | 直接生成任务 |
+| 需要理解代码 | 计划 → 任务 |
+| 需要技术设计 | 计划 → 设计 → 任务 |
+| 需求不清晰 | 计划 → 需求 → 设计 → 任务 |
+
+---
+
+## 相关文件
+
+- `tools/loop/README.md` — 详细文档
+- `<SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-loop.sh` — 初始化 loop 目录

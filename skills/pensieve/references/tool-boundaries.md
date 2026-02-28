@@ -22,6 +22,7 @@
 |----------|----------|-----------|
 | 更新插件版本 / 迁移旧数据 / 清理旧路径 | `/upgrade` | `/init`, `/doctor` |
 | 新项目首次接入 / 补齐种子文件 / 生成首轮品味基线 | `/init` | `/upgrade`（除非有旧数据） |
+| 初始化完成后的合规复检 | `/doctor`（必跑） | 跳过 doctor 直接开发 |
 | 合规检查 / PASS-FAIL 分级报告 | `/doctor` | `/upgrade`, `/self-improve` |
 | 沉淀经验 / 写 maxim / decision / pipeline | `/self-improve` | `/doctor`, `/upgrade` |
 | 复杂任务拆解自动执行 | `/loop` | 直接执行（小任务） |

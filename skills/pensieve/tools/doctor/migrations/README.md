@@ -36,7 +36,6 @@
 自动维护文件（允许工具更新）：
 
 - `SKILL.md`
-- `_pensieve-graph.md`
 
 ## 历史结构与处理规则
 
@@ -44,6 +43,9 @@
 |---|---|---|
 | `<project>/skills/pensieve/` | deprecated | 迁移用户数据到目标根目录后删除旧系统副本 |
 | `<project>/.claude/pensieve/` | deprecated | 迁移用户数据到目标根目录后删除旧目录 |
+| `<user-home>/.claude/skills/pensieve/` | deprecated | 删除（仅保留项目级用户数据根） |
+| `<user-home>/.claude/pensieve/` | deprecated | 删除（仅保留项目级用户数据根） |
+| `<project>/.claude/skills/pensieve/{_pensieve-graph.md,pensieve-graph.md,graph.md}` | deprecated | 删除（图谱仅保留在 `SKILL.md#Graph`） |
 | `<project>/.claude/skills/pensieve/` | active | 作为唯一读写根目录 |
 
 ## 迁移判定（给 Doctor/Upgrade）
@@ -54,12 +56,14 @@
 2. active 路径缺失最小目录结构。
 3. active 路径缺失关键种子文件。
 4. 关键文件内容与模板不一致。
+5. 发现独立 graph 文件（`_pensieve-graph*.md` / `pensieve-graph*.md` / `graph*.md`）。
 
 判为“结构层 no-op”的条件：
 
 1. 仅存在 active 路径。
 2. 最小目录结构齐全。
 3. 关键种子文件齐全且内容与模板一致。
+4. 不存在 deprecated 路径与独立 graph 文件。
 
 ## 关键文件内容对齐策略
 

@@ -10,6 +10,7 @@
 
 - 涉及"更新版本/插件异常/版本不确定/兼容问题"时，优先路由 `/upgrade`。
 - 执行 `/init` 或 `/doctor` 前，若版本状态不明，先完成 `/upgrade`。
+- `/init` 完成后，必须执行一次 `/doctor`。
 - 默认流程：`/upgrade` → `/doctor` → `/self-improve`。
 - `/doctor` 不是 `/upgrade` 的前置门槛。
 

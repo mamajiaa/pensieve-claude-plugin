@@ -29,7 +29,6 @@
 ## 自动维护文件
 
 - `SKILL.md` — 项目级路由 + 图谱（工具自动更新）
-- `_pensieve-graph.md` — 链接图谱
 
 ## 历史路径（deprecated）
 
@@ -37,3 +36,6 @@
 
 - `<project>/skills/pensieve/` — 旧系统+用户数据混合目录
 - `<project>/.claude/pensieve/` — 早期用户数据目录
+- `<user-home>/.claude/skills/pensieve/` — 旧用户级数据目录（应删除）
+- `<user-home>/.claude/pensieve/` — 更早期用户级数据目录（应删除）
+- `<project>/.claude/skills/pensieve/{_pensieve-graph.md,pensieve-graph.md,graph.md}` — 旧独立图谱文件（应删除）
