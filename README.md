@@ -64,6 +64,7 @@ claude plugin install pensieve@kingkongshot-marketplace --scope user
 ### `init` — 初始化项目
 
 扫描你的 git 历史，识别热点模块，跑一轮代码品味基线分析。创建项目级知识目录（maxims / decisions / knowledge / pipelines），种子化默认的审查和提交 pipeline。**只分析不写入**，你决定哪些发现值得保留。
+完成后必须跑一次 `doctor` 做结构与格式复检。
 
 > "帮我初始化 pensieve"
 

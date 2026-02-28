@@ -115,7 +115,7 @@ claude plugin install pensieve@kingkongshot-marketplace --scope user
    - 升级/迁移（Upgrade）
    - 初始化（Init）
    - 拆解执行（Loop）
-   - 体检（Doctor，安装后可选；升级后必跑）
+   - 体检（Doctor，初始化后必跑；升级后必跑）
    - 沉淀（Self-Improve）
    - 看图谱（直接读项目级 `SKILL.md` 的 `## Graph`）
 
