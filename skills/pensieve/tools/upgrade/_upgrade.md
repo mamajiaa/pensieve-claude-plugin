@@ -26,6 +26,7 @@ description: 先拉取最新版本结构定义，再按需执行用户数据迁�
 
 - 最新版本来源（优先 GitHub / Marketplace，同步后落到本地插件）
 - 版本状态（是否已按 `<PLUGIN_ROOT>/docs/update.md` 完成更新 + 重启）
+- 用户数据结构迁移规范：`<SYSTEM_SKILL_ROOT>/tools/doctor/migrations/README.md`（结构历史与最新状态单一事实源）
 - 两级 settings 路径：
   - `~/.claude/settings.json`
   - `<project>/.claude/settings.json`
@@ -56,6 +57,7 @@ description: 先拉取最新版本结构定义，再按需执行用户数据迁�
 Hard rule：先清理旧插件命名，再迁移用户数据。不要长期并行保留新旧命名。
 Hard rule：版本更新前置检查由 Upgrade 统一负责，且是最高优先级门槛。
 Hard rule：先从 GitHub/Marketplace 拉取最新版本结构定义，再做本地结构判定。
+Hard rule：目录历史与最新目标结构以 `<SYSTEM_SKILL_ROOT>/tools/doctor/migrations/README.md` 为准；若与其他文档冲突，以该文件为准。
 Hard rule：若“无新版本 + 本地结构无差异”，直接 no-op；不要进入逐文件迁移。
 Hard rule：升级/迁移后必须执行一次 doctor 复检。
 Hard rule：不要把“升级前先 doctor”当作门槛；默认流程是 upgrade-first。

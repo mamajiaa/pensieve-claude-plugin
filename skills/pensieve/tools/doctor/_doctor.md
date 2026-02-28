@@ -28,6 +28,7 @@ description: 基于 README 规范做项目用户数据体检。触发词包括 "
 ### Required inputs
 
 - 规范来源文件（maxims/decisions/pipelines/knowledge/upgrade）
+- 用户数据结构迁移规范：`<SYSTEM_SKILL_ROOT>/tools/doctor/migrations/README.md`
 - 项目用户数据目录 `.claude/skills/pensieve/`
 - 快检与图谱脚本输出：
   - `check-frontmatter.sh`
@@ -74,7 +75,8 @@ Hard rule：
 2. `<SYSTEM_SKILL_ROOT>/decisions/README.md`
 3. `<SYSTEM_SKILL_ROOT>/pipelines/README.md`
 4. `<SYSTEM_SKILL_ROOT>/knowledge/README.md`
-5. `<SYSTEM_SKILL_ROOT>/tools/upgrade/_upgrade.md`（仅用于迁移/旧路径判定）
+5. `<SYSTEM_SKILL_ROOT>/tools/doctor/migrations/README.md`（结构历史与最新状态的单一事实源）
+6. `<SYSTEM_SKILL_ROOT>/tools/upgrade/_upgrade.md`（仅用于升级执行流程，不作为结构历史主源）
 
 约束：
 - 如果规范没有明确写“必须/required/hard rule/at least one”，不要判为 MUST_FIX。
@@ -84,7 +86,7 @@ Hard rule：
 
 ## 检查范围
 
-项目级用户数据：
+项目级用户数据（以 `<SYSTEM_SKILL_ROOT>/tools/doctor/migrations/README.md` 的 Latest 定义为准）：
 
 ```
 .claude/skills/pensieve/
@@ -95,10 +97,9 @@ Hard rule：
   loop/
 ```
 
-以及旧路径候选（由 upgrade 规范定义）：
-- `<project>/skills/pensieve/`
-- `<project>/.claude/pensieve/`
-- 其他历史用户数据目录（若 upgrade 规则提到）
+以及旧路径候选（以 `<SYSTEM_SKILL_ROOT>/tools/doctor/migrations/README.md` 的 deprecated 列表为准）：
+- 例如：`<project>/skills/pensieve/`、`<project>/.claude/pensieve/`
+- 若规范文件新增/调整历史路径，Doctor 必须按该文件同步检查
 
 以及插件启用配置（用于命名一致性检查）：
 - `~/.claude/settings.json`
@@ -143,7 +144,7 @@ Hard rule：
 - 命名规则
 - 必填 section/字段
 - 链接规则（尤其 `decision` / `pipeline`）
-- 迁移与旧路径规则
+- 迁移与旧路径规则（从 `tools/doctor/migrations/README.md` 提取 latest/deprecated 列表）
 
 输出内部检查矩阵（无需先展示给用户）。
 
