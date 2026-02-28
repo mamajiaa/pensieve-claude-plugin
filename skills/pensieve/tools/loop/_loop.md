@@ -149,11 +149,7 @@ Read all project maxims from `<USER_DATA_ROOT>/maxims/*.md`. Use maxims to shape
 
 ### Get available pipelines
 
-```bash
-bash <SYSTEM_SKILL_ROOT>/tools/pipeline/scripts/list-pipelines.sh
-```
-
-If a relevant pipeline exists, read it and check for explicit task blueprint.
+Read all `*.md` files from `<USER_DATA_ROOT>/pipelines/`. If a relevant pipeline exists, read it and check for explicit task blueprint.
 
 **Task blueprint detection**: Contains `## Task Blueprint` or ordered `### Task 1/2/3...` headings.
 

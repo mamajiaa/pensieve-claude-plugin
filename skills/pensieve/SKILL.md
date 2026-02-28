@@ -43,11 +43,6 @@ Route: tools/loop/_loop.md
 </example>
 
 <example>
-User: "看看现在有哪些 pipeline"
-Route: tools/pipeline/_pipeline.md
-</example>
-
-<example>
 User: "执行 run-when-reviewing-code pipeline"
 Route: tools/loop/_loop.md
 </example>
@@ -80,9 +75,7 @@ Route: tools/loop/_loop.md
 | 版本升级 | `tools/upgrade/_upgrade.md` | upgrade, 迁移, 版本 |
 | 体检 | `tools/doctor/_doctor.md` | doctor, 体检, 检查格式 |
 | 沉淀经验 | `tools/self-improve/_self-improve.md` | self-improve, 沉淀, 复盘 |
-| 循环执行 | `tools/loop/_loop.md` | loop, 循环执行 |
-| 查看 pipeline | `tools/pipeline/_pipeline.md` | 查看 pipeline, 图谱, 列表 |
-| 执行 pipeline | `tools/loop/_loop.md` | 执行 pipeline, run-when-* |
+| 循环执行 | `tools/loop/_loop.md` | loop, 循环执行, 执行 pipeline |
 
 ## 路由失败回退
 

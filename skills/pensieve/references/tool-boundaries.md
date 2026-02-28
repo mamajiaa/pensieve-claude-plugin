@@ -13,7 +13,6 @@
 | `/self-improve` | 沉淀经验到四类用户数据 | 不做迁移/体检 |
 | `/init` | 初始化项目目录 + 种子化 + 基线探索与品味分析（只读） | 不做迁移清理，不直接写入沉淀 |
 | `/loop` | 拆解复杂任务 + 子代理循环执行 | 小任务直接完成，不开 loop |
-| `/pipeline` | 只读查看图谱与 pipeline 列表 | 不改写/执行 pipeline |
 
 ---
 
@@ -26,8 +25,7 @@
 | 合规检查 / PASS-FAIL 分级报告 | `/doctor` | `/upgrade`, `/self-improve` |
 | 沉淀经验 / 写 maxim / decision / pipeline | `/self-improve` | `/doctor`, `/upgrade` |
 | 复杂任务拆解自动执行 | `/loop` | 直接执行（小任务） |
-| 查看可用 pipelines 或图谱 | `/pipeline` | `/self-improve`（只读不改） |
-| 执行某个具体 pipeline | `/loop`（加载 pipeline） | `/pipeline`（只列不执行） |
+| 执行某个具体 pipeline | `/loop`（加载 pipeline） | 直接执行（应走 loop） |
 
 ---
 
