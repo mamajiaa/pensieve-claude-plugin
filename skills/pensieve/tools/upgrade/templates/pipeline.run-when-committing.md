@@ -7,7 +7,7 @@ created: 2026-02-28
 updated: 2026-02-28
 tags: [pensieve, pipeline, commit, self-improve]
 name: run-when-committing
-description: 提交阶段强制流程：先判断是否有可沉淀洞察，命中则先自改进沉淀，再做原子化提交。触发词：commit / 提交 / git commit。
+description: 提交阶段强制流程：先判断是否有可沉淀洞察，命中则先自改进沉淀，再做原子化提交。触发词：commit、提交、git commit。
 
 stages: [tasks]
 gate: auto

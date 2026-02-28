@@ -14,7 +14,7 @@ description: 用于提交或复盘时自动沉淀可复用结论（knowledge/dec
 
 - 提交 pipeline（`run-when-committing.md`）调用（自动触发）
 - loop 完成后的收尾沉淀
-- 用户明确要求"沉淀/记录/复盘/规范化"
+- 用户明确要求"沉淀、记录、复盘、规范化"
 
 ### Required inputs
 

@@ -7,7 +7,7 @@ created: 2026-02-11
 updated: 2026-02-28
 tags: [pensieve, pipeline, review]
 name: run-when-reviewing-code
-description: 代码审查阶段流程：先探索提交记录与代码热点，提取可沉淀候选，再按固定 Task Blueprint 产出高信号品味审查结论。触发词：review / 代码审查 / 检查代码。
+description: 代码审查阶段流程：先探索提交记录与代码热点，提取可沉淀候选，再按固定 Task Blueprint 产出高信号品味审查结论。触发词：review、代码审查、检查代码。
 
 stages: [tasks]
 gate: auto

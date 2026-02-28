@@ -112,7 +112,7 @@ claude plugin install pensieve@kingkongshot-marketplace --scope user
 3. 基于提交记录与代码做一次探索，并用 review pipeline 产出首轮品味分析
 4. 重启 Claude Code（不要跳过）
 5. **告诉用户只需表达几个基础意图**：
-   - 升级/迁移（Upgrade）
+   - 升级或迁移（Upgrade）
    - 初始化（Init）
    - 拆解执行（Loop）
    - 体检（Doctor，初始化后必跑；升级后必跑）

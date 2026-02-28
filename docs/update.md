@@ -59,7 +59,7 @@ CLAUDECODE= claude plugin update pensieve@kingkongshot-marketplace --scope user
 
 然后：
 - 即使存在历史脏数据，也优先先执行 Upgrade（不要把 Doctor 当成升级前门槛）
-- 每次升级/迁移后必须运行一次 Doctor 做基于 README 的体检
+- 每次升级或迁移后必须运行一次 Doctor 做基于 README 的体检
 - 如果 doctor 报告迁移/结构问题，运行 Upgrade 后再次执行 Doctor
 - 如果 doctor 通过，按需再执行 Self-Improve 沉淀经验
 - Upgrade、Doctor、Self-Improve 执行后都应维护项目级 `.claude/skills/pensieve/SKILL.md`（固定路由 + graph）

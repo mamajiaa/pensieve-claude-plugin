@@ -177,7 +177,7 @@ status: active
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 tags: [pensieve, pipeline]
-description: [强约束场景 + 跳过代价 + 触发词]。示例：在 X 场景必须执行此 pipeline；跳过会导致 Y 风险。触发词：a / b / c。
+description: [强约束场景 + 跳过代价 + 触发词]。示例：在 X 场景必须执行此 pipeline；跳过会导致 Y 风险。触发词：a、b、c。
 ---
 
 ## 信号门禁（必须）

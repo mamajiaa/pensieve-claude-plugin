@@ -1,5 +1,5 @@
 ---
-description: 只读体检工具：基于 README 规范输出 PASS/FAIL 与 MUST_FIX/SHOULD_FIX 证据清单，不直接改文件。若跳过体检继续开发，结构问题会被持续放大。触发词：doctor / health check / 体检 / 检查格式 / 检查迁移。
+description: 只读体检工具：基于 README 规范输出 PASS/FAIL 与 MUST_FIX/SHOULD_FIX 证据清单，不直接改文件。若跳过体检继续开发，结构问题会被持续放大。触发词：doctor、health check、体检、检查格式、检查迁移。
 ---
 
 # Doctor 流程
