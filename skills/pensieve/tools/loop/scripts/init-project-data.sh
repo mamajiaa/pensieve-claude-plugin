@@ -11,6 +11,17 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/_lib.sh"
 
+is_readme_file() {
+  case "$(basename "$1")" in
+    [Rr][Ee][Aa][Dd][Mm][Ee]|[Rr][Ee][Aa][Dd][Mm][Ee].md)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
 PROJECT_ROOT="$(project_root)"
 DATA_ROOT="$(user_data_root)"
 
@@ -25,6 +36,7 @@ TEMPLATE_MAXIMS_DIR="$TEMPLATES_ROOT/maxims"
 if [[ -d "$TEMPLATE_MAXIMS_DIR" ]]; then
   for template_maxim in "$TEMPLATE_MAXIMS_DIR"/*.md; do
     [[ -f "$template_maxim" ]] || continue
+    is_readme_file "$template_maxim" && continue
     target_maxim="$DATA_ROOT/maxims/$(basename "$template_maxim")"
     if [[ ! -f "$target_maxim" ]]; then
       cp "$template_maxim" "$target_maxim"
@@ -36,6 +48,7 @@ KNOWLEDGE_SEEDED_COUNT=0
 if [[ -d "$SYSTEM_KNOWLEDGE_ROOT" ]]; then
   while IFS= read -r source_file; do
     [[ -f "$source_file" ]] || continue
+    is_readme_file "$source_file" && continue
     rel_path="${source_file#$SYSTEM_KNOWLEDGE_ROOT/}"
     target_file="$DATA_ROOT/knowledge/$rel_path"
     mkdir -p "$(dirname "$target_file")"
@@ -68,6 +81,7 @@ fi
 PIPELINE_SEEDED_COUNT=0
 for template_pipeline in "$TEMPLATES_ROOT"/pipeline.run-when-*.md; do
   [[ -f "$template_pipeline" ]] || continue
+  is_readme_file "$template_pipeline" && continue
   pipeline_name="$(basename "$template_pipeline" | sed 's/^pipeline\.//')"
   target_pipeline="$DATA_ROOT/pipelines/$pipeline_name"
   if [[ ! -f "$target_pipeline" ]]; then

@@ -6,6 +6,7 @@
 
 - 提供单一事实源：历史目录怎么处理、当前目录长什么样。
 - 让 Doctor/Upgrade 使用同一份结构规则，避免口径漂移。
+- 结构检查实现统一由脚本 `<SYSTEM_SKILL_ROOT>/tools/doctor/scripts/scan-structure.sh` 承载，避免两套判定逻辑分叉。
 
 ## 当前目标结构（Latest, Active）
 
@@ -46,6 +47,7 @@
 | `<user-home>/.claude/skills/pensieve/` | deprecated | 删除（仅保留项目级用户数据根） |
 | `<user-home>/.claude/pensieve/` | deprecated | 删除（仅保留项目级用户数据根） |
 | `<project>/.claude/skills/pensieve/{_pensieve-graph.md,pensieve-graph.md,graph.md}` | deprecated | 删除（图谱仅保留在 `SKILL.md#Graph`） |
+| `<project>/.claude/skills/pensieve/{maxims,decisions,knowledge,pipelines,loop}/{README*.md,readme*.md}` | deprecated | 删除（规范单一事实源在插件侧 `<SYSTEM_SKILL_ROOT>/*/README.md`） |
 | `<project>/.claude/skills/pensieve/` | active | 作为唯一读写根目录 |
 
 ## 迁移判定（给 Doctor/Upgrade）
@@ -57,6 +59,7 @@
 3. active 路径缺失关键种子文件。
 4. 关键文件内容与模板不一致。
 5. 发现独立 graph 文件（`_pensieve-graph*.md` / `pensieve-graph*.md` / `graph*.md`）。
+6. 发现项目级子目录历史规范 README 副本（`{maxims,decisions,knowledge,pipelines,loop}/{README*.md,readme*.md}`）。
 
 判为“结构层 no-op”的条件：
 
@@ -64,6 +67,7 @@
 2. 最小目录结构齐全。
 3. 关键种子文件齐全且内容与模板一致。
 4. 不存在 deprecated 路径与独立 graph 文件。
+5. 不存在项目级子目录历史规范 README 副本。
 
 ## 关键文件内容对齐策略
 
@@ -87,6 +91,7 @@
 
 - 插件内系统文件（`<SYSTEM_SKILL_ROOT>/` 下内容）
 - 历史系统副本中的模板/脚本/说明文档（除明确属于用户数据的条目外）
+- 项目级子目录历史规范 README 副本（`{maxims,decisions,knowledge,pipelines,loop}/{README*.md,readme*.md}`）
 
 ## 维护规则
 

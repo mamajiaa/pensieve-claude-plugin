@@ -22,6 +22,7 @@ description: 只读体检工具：基于 README 规范输出 PASS/FAIL 与 MUST_
 - 规范来源文件（见下方"规范来源"）
 - 用户数据结构迁移规范：`<SYSTEM_SKILL_ROOT>/tools/doctor/migrations/README.md`
 - 项目用户数据目录 `.claude/skills/pensieve/`
+- 共享结构扫描脚本输出：`scan-structure.sh`（Doctor/Upgrade 共用）
 - 快检与图谱脚本输出：`check-frontmatter.sh`、`generate-user-data-graph.sh`
 - 项目级 SKILL 维护脚本：`<SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh`
 
@@ -30,6 +31,7 @@ description: 只读体检工具：基于 README 规范输出 PASS/FAIL 与 MUST_
 - 按固定模板输出报告
 - 每条问题包含规则来源与修复建议
 - `FAIL` 且迁移相关时，下一步优先 `upgrade`
+- 若发现历史规范 README 副本，标记为 `MUST_FIX` 并建议执行 `upgrade` 清理
 - 报告后同步项目级 `SKILL.md`（记录 doctor 检查时间与结论摘要）
 
 ### Failure fallback
@@ -88,6 +90,7 @@ description: 只读体检工具：基于 README 规范输出 PASS/FAIL 与 MUST_
 8. **插件命名冲突**：`enabledPlugins` 同时保留旧键与新键，或缺失新键。
 9. **范围违规**：发现插件级/用户级 pensieve skill 副本，未收敛到项目级单根目录。
 10. **遗留文件**：发现独立 graph 文件（`_pensieve-graph*.md`/`pensieve-graph*.md`/`graph*.md`）。
+11. **规范副本遗留**：发现项目级子目录中的历史规范 README 副本（`.claude/skills/pensieve/{maxims,decisions,knowledge,pipelines,loop}/{README*.md,readme*.md}`）。
 
 ### SHOULD_FIX
 
@@ -112,17 +115,27 @@ description: 只读体检工具：基于 README 规范输出 PASS/FAIL 与 MUST_
 - 必填 section/字段
 - 链接规则（尤其 `decision` / `pipeline`）
 - 迁移与旧路径规则（从 `tools/doctor/migrations/README.md` 提取 latest/deprecated 列表）
+- 结构判定统一由共享脚本 `scan-structure.sh` 实现，避免 Doctor/Upgrade 维护两套检查逻辑
 
 输出内部检查矩阵（无需先展示给用户）。
 
 ### Phase 2：扫描文件并验证
 
-- 扫描 `.claude/skills/pensieve/**`
-- 扫描旧路径候选中的用户数据痕迹
-- 扫描用户级目录 `~/.claude/skills/pensieve/`、`~/.claude/pensieve/` 是否残留
-- 扫描项目级根目录是否存在独立 graph 文件（`_pensieve-graph*.md`/`pensieve-graph*.md`/`graph*.md`）
-- 扫描用户级/项目级 `settings.json` 中 Pensieve 相关 `enabledPlugins` 键
-- 对每条规则产出：通过 / 失败 / 无法判断
+先运行共享结构扫描（Doctor/Upgrade 共用）：
+
+```bash
+bash <SYSTEM_SKILL_ROOT>/tools/doctor/scripts/scan-structure.sh --output .state/pensieve-structure-scan.json
+```
+
+读取扫描结果并纳入判定：
+- `status`（`aligned` / `drift`）
+- `summary.must_fix_count` / `summary.should_fix_count`
+- `flags.*`（旧路径、graph、README 副本、关键文件漂移、settings 键冲突等）
+- `findings[]`（作为报告 `MUST_FIX/SHOULD_FIX` 证据来源）
+
+约束：
+- Doctor 不改用户数据文件；结构扫描只读。
+- 若 `summary.must_fix_count > 0`，结构结论至少为 `FAIL`，建议动作优先 `upgrade`。
 
 ### Phase 2.2：运行 Frontmatter 快检工具
 

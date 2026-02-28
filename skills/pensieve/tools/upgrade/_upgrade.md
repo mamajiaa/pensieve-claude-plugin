@@ -1,5 +1,5 @@
 ---
-description: 版本与迁移入口：先同步最新版本定义，再执行完整迁移校准（结构、关键文件内容、旧路径清理、插件键统一）。仅在结构与关键内容都一致时 no-op；完成后交由 `doctor` 复检。数据侧只保留项目级 `.claude/skills/pensieve/`，发现插件级/用户级副本或独立 graph 文件会清理。
+description: 版本与迁移入口：先同步最新版本定义，再执行完整迁移校准（结构、关键文件内容、旧路径清理、插件键统一）。仅在结构与关键内容都一致时 no-op；完成后交由 `doctor` 复检。数据侧只保留项目级 `.claude/skills/pensieve/`，发现插件级/用户级副本、独立 graph 文件或历史规范 README 副本会清理。
 ---
 
 # 升级工具
@@ -18,12 +18,14 @@ description: 版本与迁移入口：先同步最新版本定义，再执行完�
 - 用户需要清理旧插件命名并切换到新引用
 - 用户存在插件级/用户级 pensieve skill 副本，需清理为仅项目级
 - 用户目录中存在独立 graph 文件（`_pensieve-graph*.md`/`pensieve-graph*.md`/`graph*.md`），需删除
+- 用户目录中存在历史规范 README 副本（`.claude/skills/pensieve/{maxims,decisions,knowledge,pipelines,loop}/{README*.md,readme*.md}`），需删除
 
 ### Required inputs
 
 - 最新版本来源（优先 GitHub / Marketplace，同步后落到本地插件）
 - 版本状态（是否已按 `<PLUGIN_ROOT>/docs/update.md` 完成更新 + 重启）
 - 用户数据结构迁移规范：`<SYSTEM_SKILL_ROOT>/tools/doctor/migrations/README.md`（单一事实源）
+- 共享结构扫描脚本：`<SYSTEM_SKILL_ROOT>/tools/doctor/scripts/scan-structure.sh`（与 Doctor 共用）
 - 两级 settings 路径：`~/.claude/settings.json`、`<project>/.claude/settings.json`
 - 本地现状结构（旧路径与 `.claude/skills/pensieve/` 当前目录）
 - 项目级 SKILL 维护脚本：`<SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh`
@@ -59,7 +61,7 @@ description: 版本与迁移入口：先同步最新版本定义，再执行完�
 - **目录历史与最新目标结构以 `migrations/README.md` 为准**：单一事实源避免多处定义不一致。
 - **主窗口默认推动"完整迁移校准"**：提供多套迁移模式给用户选择会增加出错概率，大多数用户只需要"对齐到最新"。
 - **"无新版本 + 无结构差异 + 关键文件内容一致" → 才允许 no-op**：宽松的 no-op 条件会跳过内容漂移修复。
-- **发现旧路径/插件级副本/独立 graph 文件要清理**：多源并行是结构问题的主要来源。
+- **发现旧路径/插件级副本/独立 graph 文件/历史规范 README 副本要清理**：多源并行与规范副本漂移是结构问题的主要来源。
 - **升级/迁移后执行一次 `doctor`**：迁移操作可能引入新的格式问题，立即体检能尽早发现。
 - **进入迁移前先检查 `<PLUGIN_ROOT>/docs/update.md`**：有新版本先更新插件并重启。
 - 更新命令失败时，先查阅 [GitHub docs/update.md](https://github.com/kingkongshot/Pensieve/blob/main/docs/update.md) 再继续。
@@ -77,22 +79,20 @@ description: 版本与迁移入口：先同步最新版本定义，再执行完�
 
 ## 完整迁移校准门禁
 
-先做结构 + 关键文件内容对比：
+先执行与 Doctor 共用的结构扫描：
 
-1. 是否存在旧路径并行（如 `skills/pensieve/`、`.claude/pensieve/`）。
-2. 是否存在用户级 pensieve skill 目录（`~/.claude/skills/pensieve/`、`~/.claude/pensieve/`）。
-3. `.claude/skills/pensieve/` 是否缺失关键目录或命名。
-4. `enabledPlugins` 是否存在旧键并行或缺失新键。
-5. review pipeline 是否仍引用插件内 Knowledge 路径。
-6. 是否存在独立 graph 文件（`_pensieve-graph*.md`/`pensieve-graph*.md`/`graph*.md`）。
-7. 关键文件内容是否与模板一致：
-   - `pipelines/run-when-reviewing-code.md`
-   - `pipelines/run-when-committing.md`
-   - `knowledge/taste-review/content.md`
+```bash
+bash <SYSTEM_SKILL_ROOT>/tools/doctor/scripts/scan-structure.sh --output .state/pensieve-structure-scan.pre.json
+```
+
+基于扫描输出判定：
+- 读取 `summary.must_fix_count`、`flags.*`、`findings[]`
+- 结构、旧路径、README 副本、关键文件漂移、settings 键冲突统一以此扫描结果为准
+- 迁移动作只消费这份结果，不再在 Upgrade 文档内维护第二套检查逻辑
 
 判定：
-- **全部一致** → no-op → `doctor`
-- **任一不一致** → 完整迁移校准 → `doctor`
+- **`summary.must_fix_count = 0`** → no-op → `doctor`
+- **`summary.must_fix_count > 0`** → 完整迁移校准 → `doctor`
 
 ## 迁移原则
 
@@ -102,6 +102,7 @@ description: 版本与迁移入口：先同步最新版本定义，再执行完�
 - review 依赖项目内化：引用 `.claude/skills/pensieve/knowledge/taste-review/content.md`。
 - 用户文件冲突时做最小合并（必要时产出 `*.migrated.md`）。
 - 迁移完成后删除旧路径（包含插件级/用户级副本与独立 graph 文件），避免双源。
+- 迁移完成后删除项目级子目录历史规范 README 副本（只保留插件侧规范 README）。
 - 用模板做种子：初始 maxims 与 pipeline 模板来自插件。
 
 > 数据边界（系统 vs 用户）见 `<SYSTEM_SKILL_ROOT>/references/shared-rules.md`
@@ -139,6 +140,7 @@ description: 版本与迁移入口：先同步最新版本定义，再执行完�
 
 - 系统文件（`_` 前缀）：`pipelines/_*.md`、`maxims/_*.md`
 - 历史复制目录中的系统 README / templates / scripts
+- 项目级子目录中的历史规范 README 副本（`{maxims,decisions,knowledge,pipelines,loop}/{README*.md,readme*.md}`）
 
 ## 清理旧系统副本（仅项目内）
 
@@ -150,6 +152,7 @@ description: 版本与迁移入口：先同步最新版本定义，再执行完�
 - `<project>/.claude/skills/pensieve/_pensieve-graph.md`
 - `<project>/.claude/skills/pensieve/pensieve-graph.md`
 - `<project>/.claude/skills/pensieve/graph.md`
+- `<project>/.claude/skills/pensieve/{maxims,decisions,knowledge,pipelines,loop}/{README*.md,readme*.md}`
 - 历史系统 `README.md` 与 `_*.md`
 
 不确定时先备份再删除。
@@ -164,21 +167,30 @@ description: 版本与迁移入口：先同步最新版本定义，再执行完�
 ## 迁移步骤
 
 1. 版本检查前置。
-2. 完整迁移校准门禁。
-3. 若无差异：
+2. 执行共享结构扫描（pre）并读取 `.state/pensieve-structure-scan.pre.json`。
+3. 若无差异（`summary.must_fix_count = 0`）：
    - 输出 no-op
    - 维护项目级 SKILL：`bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event upgrade --note "upgrade no-op (structure + critical content aligned)"`
    - 运行 `doctor`
-4. 若有差异（任一项不一致）：
+4. 若有差异（`summary.must_fix_count > 0`）：
    - 修正 `enabledPlugins`
    - 清理旧安装引用与旧目录
+   - 删除项目级子目录历史规范 README 副本
+     ```bash
+     for d in maxims decisions knowledge pipelines loop; do
+       find ".claude/skills/pensieve/$d" -maxdepth 1 -type f \( -iname 'readme*.md' -o -iname 'readme' \) -delete 2>/dev/null || true
+     done
+     ```
    - 迁移用户编写内容到 active 根目录
    - 对齐关键文件（缺失补齐；不一致替换）
    - 重写 review pipeline 路径引用
    - 用户文件冲突时最小合并
-5. 输出迁移报告。
-6. 维护项目级 SKILL：`bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event upgrade --note "upgrade migration completed"`
-7. 运行 `doctor`。
+5. 再次执行共享结构扫描（post）：
+   - `bash <SYSTEM_SKILL_ROOT>/tools/doctor/scripts/scan-structure.sh --output .state/pensieve-structure-scan.post.json --fail-on-drift`
+   - 若 post 扫描仍有 MUST_FIX，升级判定为未收敛，停止并返回差异清单
+6. 输出迁移报告。
+7. 维护项目级 SKILL：`bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event upgrade --note "upgrade migration completed"`
+8. 运行 `doctor`。
 
 ## 插件清理与更新命令
 
@@ -198,3 +210,4 @@ CLAUDECODE= claude plugin update pensieve@kingkongshot-marketplace --scope user
 - 只允许为 Pensieve 相关 `enabledPlugins` 键修改 `settings.json`。
 - 不在 upgrade 阶段输出体检级别结论——upgrade 关注"对齐"，体检关注"合规"，混合会模糊职责边界。
 - 不保留独立 graph 文件——图谱统一维护在项目级 `SKILL.md#Graph`，多处维护会导致不一致。
+- 不保留项目级子目录规范 README 副本——规范单一事实源在插件侧 `<SYSTEM_SKILL_ROOT>/*/README.md`。
