@@ -88,8 +88,9 @@ mkdir -p .claude/skills/pensieve/{maxims,decisions,knowledge,pipelines,loop}
 如果你之前把系统内容复制到了项目里（例如 `skills/pensieve/`），请使用 Upgrade 工具做迁移和清理：
 
 - 合并项目级 maxims
-- 迁移预置 pipeline
-- 移除历史系统副本（README 与 `_*.md`）
+- 对齐关键模块与文件位置（含 `run-when-*.md`、`knowledge/taste-review/content.md`）
+- 关键文件内容不一致时执行替换（先备份）
+- 移除历史系统副本与旧目录（README 与 `_*.md` 以及 deprecated 路径）
 
 ---
 

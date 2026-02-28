@@ -50,10 +50,10 @@ CLAUDECODE= claude plugin update pensieve@kingkongshot-marketplace --scope user
 
 **Upgrade 核心逻辑（版本优先）**：
 - Upgrade 先同步最新版本结构定义（来自 GitHub/Marketplace）
-- 再做结构差异门禁（旧路径并行/目录与命名差异/插件键差异）
-- 若无差异：Upgrade 应 no-op，不做逐文件迁移
-- 若有差异：执行最小结构迁移
-- 无论是否迁移：都应补齐缺失的 `run-when-*.md` pipeline 种子（只补缺不覆盖）
+- 再做完整迁移校准门禁（旧路径并行/目录与命名差异/插件键差异/关键文件内容差异）
+- 若结构与关键内容都一致：Upgrade 才允许 no-op
+- 若任一项不一致：执行完整迁移校准（迁移 + 关键文件内容对齐 + 旧路径清理）
+- 关键文件（`run-when-*.md`、`knowledge/taste-review/content.md`）内容不一致时默认替换（先备份）
 - review 依赖应项目内化：pipeline 引用 `.claude/skills/pensieve/knowledge/...`，不依赖 `<SYSTEM_SKILL_ROOT>/knowledge/...`
 - 最终统一交给 Doctor 判定“还需如何调整本地数据结构”
 
@@ -66,7 +66,7 @@ CLAUDECODE= claude plugin update pensieve@kingkongshot-marketplace --scope user
 
 推荐顺序：
 1. 检查并更新插件（或确认已是最新版本），然后重启 Claude Code
-2. 运行 Upgrade（先结构判定；若无差异则 no-op）
+2. 运行 Upgrade（完整迁移校准；仅在结构与关键内容都一致时 no-op）
 3. 运行一次 Doctor（必须）
 4. 若 doctor 报错，继续 Upgrade 后再跑 Doctor
 5. 需要沉淀经验时再运行 Self-Improve
