@@ -1,6 +1,6 @@
 ---
 name: pensieve
-description: 当用户表达任何意图时**立即加载**此 skill。系统能力（tools/knowledge/scripts）位于插件内，随插件更新维护。用户数据必须位于项目级 `.claude/skills/pensieve/`，插件不会覆盖。用户要改进 Pensieve 系统（插件内容）时，**必须**使用 Self‑Improve 工具（`tools/self-improve/_self-improve.md`）。
+description: 当用户表达任何意图时**立即加载**此 skill。系统能力（tools/knowledge/scripts）位于插件内，随插件更新维护。用户数据必须位于项目级 `.claude/skills/pensieve/`，插件不会覆盖。插件内容由插件维护，不提供用户修改路径。
 ---
 
 # Pensieve
@@ -47,6 +47,11 @@ User: "看看现在有哪些 pipeline"
 Route: tools/pipeline/_pipeline.md
 </example>
 
+<example>
+User: "执行 run-when-reviewing-code pipeline"
+Route: tools/loop/_loop.md
+</example>
+
 ## 全局硬规则（摘要）
 
 1. **Upgrade 优先级最高**：版本/兼容/迁移问题先走 `/upgrade`。
@@ -76,7 +81,8 @@ Route: tools/pipeline/_pipeline.md
 | 体检 | `tools/doctor/_doctor.md` | doctor, 体检, 检查格式 |
 | 沉淀经验 | `tools/self-improve/_self-improve.md` | self-improve, 沉淀, 复盘 |
 | 循环执行 | `tools/loop/_loop.md` | loop, 循环执行 |
-| 查看 pipeline | `tools/pipeline/_pipeline.md` | pipeline, 图谱 |
+| 查看 pipeline | `tools/pipeline/_pipeline.md` | 查看 pipeline, 图谱, 列表 |
+| 执行 pipeline | `tools/loop/_loop.md` | 执行 pipeline, run-when-* |
 
 ## 路由失败回退
 

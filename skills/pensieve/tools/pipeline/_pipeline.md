@@ -50,7 +50,7 @@ description: 只读查看工具：先给出项目图谱摘要，再列出 projec
 
 ## Execution (Mechanical)
 
-!`${CLAUDE_PLUGIN_ROOT}/skills/pensieve/tools/pipeline/scripts/show-pipelines-graph.sh`
+bash <SYSTEM_SKILL_ROOT>/tools/pipeline/scripts/show-pipelines-graph.sh
 
 ## Constraints
 
