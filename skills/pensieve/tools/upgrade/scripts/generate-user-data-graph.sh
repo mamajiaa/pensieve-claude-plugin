@@ -236,9 +236,10 @@ END {
             edge_key = src SUBSEP lbl SUBSEP tgt
             if (!(edge_key in edge_seen)) {
                 edge_seen[edge_key] = 1
-                if (lbl == "link") print "  " ids[src] " --> " ids[tgt]
-                else print "  " ids[src] " -->|" lbl "| " ids[tgt]
-                resolved++
+                edge_unique_count++
+                edge_unique_src[edge_unique_count] = src
+                edge_unique_tgt[edge_unique_count] = tgt
+                edge_unique_lbl[edge_unique_count] = lbl
             }
         } else {
             unresolved_key = src SUBSEP tok
@@ -249,6 +250,25 @@ END {
                 unresolved_tok[unresolved] = tok
             }
         }
+    }
+
+    # Simplify inverse semantic duplicates:
+    #   A --基于--> B and B --导致--> A keep only "基于".
+    for (i = 1; i <= edge_unique_count; i++) {
+        keep_edge[i] = 1
+        if (edge_unique_lbl[i] == "导致") {
+            reverse_based_key = edge_unique_tgt[i] SUBSEP "基于" SUBSEP edge_unique_src[i]
+            if (reverse_based_key in edge_seen) keep_edge[i] = 0
+        }
+    }
+    for (i = 1; i <= edge_unique_count; i++) {
+        if (!keep_edge[i]) continue
+        src = edge_unique_src[i]
+        tgt = edge_unique_tgt[i]
+        lbl = edge_unique_lbl[i]
+        if (lbl == "link") print "  " ids[src] " --> " ids[tgt]
+        else print "  " ids[src] " -->|" lbl "| " ids[tgt]
+        resolved++
     }
 
     print "```"
