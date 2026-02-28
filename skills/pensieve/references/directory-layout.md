@@ -19,7 +19,7 @@
 
 ## 关键种子文件
 
-初始化时由 `/init` 种子化（幂等，不覆盖已有）：
+初始化时由 `init` 种子化（幂等，不覆盖已有）：
 
 - `pipelines/run-when-reviewing-code.md` — 代码审查流程
 - `pipelines/run-when-committing.md` — 提交流程

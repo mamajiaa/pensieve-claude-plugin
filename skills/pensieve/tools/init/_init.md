@@ -1,5 +1,5 @@
 ---
-description: 初始化项目级 `.claude/skills/pensieve/` 并补齐种子文件；随后执行一次基线探索（提交记录+实际代码），产出可沉淀候选，并基于该结果调用 review pipeline 做品味分析。幂等且不覆盖已有用户数据；涉及迁移/清理应先走 `/upgrade`；完成后交由 `/doctor` 复检。
+description: 初始化项目级 `.claude/skills/pensieve/` 并补齐种子文件；随后执行一次基线探索（提交记录+实际代码），产出可沉淀候选，并基于该结果调用 review pipeline 做品味分析。幂等且不覆盖已有用户数据；涉及迁移/清理应先走 `upgrade`；完成后交由 `doctor` 复检。
 ---
 
 # Init 工具
@@ -32,24 +32,24 @@ description: 初始化项目级 `.claude/skills/pensieve/` 并补齐种子文件
 - 输出基线探索摘要（提交窗口、热点文件/模块、可沉淀候选清单）
 - 输出 review pipeline 品味分析摘要（高风险点 + 证据 + 兼容性风险）
 - 说明不会覆盖已有用户文件
-- 若发现历史旧路径，提示运行 `/upgrade`
+- 若发现历史旧路径，提示运行 `upgrade`
 - 回报项目级 `SKILL.md` 更新结果
 - 说明候选仅分析，不自动写入沉淀文件
-- 给出下一步：运行 `/doctor`
+- 给出下一步：运行 `doctor`
 
 ### Failure fallback
 
 - 脚本执行失败：输出失败原因与重试命令——隐式兜底会掩盖根因，让用户误以为初始化成功
 - 缺少 `<SYSTEM_SKILL_ROOT>`：提示重启/检查插件注入，停止执行
-- 版本状态未知：提示先运行 `/upgrade`
+- 版本状态未知：提示先运行 `upgrade`
 - 仓库无提交记录或 Git 不可用：跳过探索与品味分析，标记 `SKIPPED`
-- review pipeline 缺失：返回缺失路径并建议先重新运行 `/init` 或 `/upgrade`
+- review pipeline 缺失：返回缺失路径并建议先重新运行 `init` 或 `upgrade`
 
 ### Negative examples
 
-- "项目里有旧版 skills/pensieve/，顺手帮我迁移" → 迁移涉及路径清理和数据合并，init 不具备这些能力，转 `/upgrade`
-- "先给我 PASS/FAIL 体检结论" → init 只做初始化不做合规判定，转 `/doctor`
-- "把探索候选直接写入 knowledge/decision" → 写入需要遵循语义分层规范，转 `/self-improve`
+- "项目里有旧版 skills/pensieve/，顺手帮我迁移" → 迁移涉及路径清理和数据合并，init 不具备这些能力，转 `upgrade`
+- "先给我 PASS/FAIL 体检结论" → init 只做初始化不做合规判定，转 `doctor`
+- "把探索候选直接写入 knowledge/decision" → 写入需要遵循语义分层规范，转 `self-improve`
 
 ## 执行步骤
 
@@ -68,7 +68,7 @@ bash <SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-project-data.sh
 4. 核验项目级 SKILL：
    - `.claude/skills/pensieve/SKILL.md` 已创建/更新
    - 文件内包含自动生成标记与 graph 段落
-5. 若扫描到历史目录（`skills/pensieve/` 或 `.claude/pensieve/`），追加提醒：运行 `/upgrade` 处理迁移与清理。
+5. 若扫描到历史目录（`skills/pensieve/` 或 `.claude/pensieve/`），追加提醒：运行 `upgrade` 处理迁移与清理。
 6. 执行基线探索（只读）：
    - 读取最近提交记录（默认最近 30 条，或用户指定窗口）
    - 汇总高频变更文件/模块与风险热点
@@ -82,12 +82,12 @@ bash <SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-project-data.sh
    - 初始化结果
    - 可沉淀候选摘要
    - 品味分析摘要
-   - 下一步：运行 `/doctor`（初始化后立即体检能尽早发现种子文件的格式问题）
-   - 若需落库：运行 `/self-improve`
+   - 下一步：运行 `doctor`（初始化后立即体检能尽早发现种子文件的格式问题）
+   - 若需落库：运行 `self-improve`
 
 ## 约束
 
-- 初始化可附带只读探索与品味分析，但不直接落库沉淀内容——落库需要遵循语义分层规范，由 `/self-improve` 负责。
-- 不做迁移清理——迁移涉及路径合并和旧数据处理，由 `/upgrade` 负责。
+- 初始化可附带只读探索与品味分析，但不直接落库沉淀内容——落库需要遵循语义分层规范，由 `self-improve` 负责。
+- 不做迁移清理——迁移涉及路径合并和旧数据处理，由 `upgrade` 负责。
 - 不覆盖已有用户文件——用户可能已经手动编辑过，覆盖会丢失修改。
-- 不输出 `/doctor` 风格的合规分级结论——init 的职责是"建好"，不是"判好坏"。
+- 不输出 `doctor` 风格的合规分级结论——init 的职责是"建好"，不是"判好坏"。

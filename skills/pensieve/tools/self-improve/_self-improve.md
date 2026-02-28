@@ -34,13 +34,13 @@ description: 用于提交或复盘时自动沉淀可复用结论（knowledge/dec
 
 ### Failure fallback
 
-- 发现结构性问题（旧路径并行/目录缺失/格式大面积不符）：跳过沉淀，建议后续运行 `/doctor`——在结构不稳定时写入的数据位置可能不对
+- 发现结构性问题（旧路径并行/目录缺失/格式大面积不符）：跳过沉淀，建议后续运行 `doctor`——在结构不稳定时写入的数据位置可能不对
 - 无法一次判断分类：按三层拆分（IS → `knowledge`，WANT → `decision`，MUST → `maxim`）
 
 ### Negative examples
 
-- "顺手把旧目录也迁了" → 迁移涉及路径清理和数据合并，self-improve 没有这些能力，转 `/upgrade`
-- "先给我 PASS/FAIL 体检结论" → 合规判定需要读取完整规范并运行快检，转 `/doctor`
+- "顺手把旧目录也迁了" → 迁移涉及路径清理和数据合并，self-improve 没有这些能力，转 `upgrade`
+- "先给我 PASS/FAIL 体检结论" → 合规判定需要读取完整规范并运行快检，转 `doctor`
 
 ---
 

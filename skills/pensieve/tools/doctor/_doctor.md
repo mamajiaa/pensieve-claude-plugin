@@ -29,7 +29,7 @@ description: 只读体检工具：基于 README 规范输出 PASS/FAIL 与 MUST_
 
 - 按固定模板输出报告
 - 每条问题包含规则来源与修复建议
-- `FAIL` 且迁移相关时，下一步优先 `/upgrade`
+- `FAIL` 且迁移相关时，下一步优先 `upgrade`
 - 报告后同步项目级 `SKILL.md`（记录 doctor 检查时间与结论摘要）
 
 ### Failure fallback
@@ -174,7 +174,7 @@ bash <SYSTEM_SKILL_ROOT>/tools/upgrade/scripts/generate-user-data-graph.sh
 - MUST_FIX: {n}
 - SHOULD_FIX: {n}
 - INFO: {n}
-- 建议下一步: {`/upgrade` | `self-improve` | `none`}
+- 建议下一步: {`upgrade` | `self-improve` | `none`}
 
 ## 1.5) 图谱摘要（结论前置依据）
 - 图谱文件: `{<project>/.claude/skills/pensieve/SKILL.md#Graph}`
@@ -199,7 +199,7 @@ bash <SYSTEM_SKILL_ROOT>/tools/upgrade/scripts/generate-user-data-graph.sh
 - 发现非项目级 skill 根: {yes/no}
 - 发现独立 graph 文件: {yes/no}
 - 缺失关键目录: {yes/no}
-- 建议动作: {`/upgrade` or `none`}
+- 建议动作: {`upgrade` or `none`}
 
 ## 5) 三步行动计划
 1. {第一步（可执行的具体操作）}
@@ -221,7 +221,7 @@ bash <SYSTEM_SKILL_ROOT>/tools/upgrade/scripts/generate-user-data-graph.sh
 
 注意事项：
 - 每条问题包含 `规则来源`（具体到 README/章节），让用户能追溯判定依据。
-- `状态=FAIL` 且迁移相关时，`下一步` 优先给 `/upgrade`。
+- `状态=FAIL` 且迁移相关时，`下一步` 优先给 `upgrade`。
 - doctor 阶段不改项目用户数据文件，仅 `SKILL.md` 自动维护块可更新——同时修改和检查会混淆状态。
 - `decision` 或 `pipeline` 的断链至少判为 `MUST_FIX`。
 

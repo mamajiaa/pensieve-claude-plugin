@@ -1,12 +1,12 @@
 ---
-description: 版本与迁移入口：先同步最新版本定义，再执行完整迁移校准（结构、关键文件内容、旧路径清理、插件键统一）。仅在结构与关键内容都一致时 no-op；完成后交由 `/doctor` 复检。数据侧只保留项目级 `.claude/skills/pensieve/`，发现插件级/用户级副本或独立 graph 文件会清理。
+description: 版本与迁移入口：先同步最新版本定义，再执行完整迁移校准（结构、关键文件内容、旧路径清理、插件键统一）。仅在结构与关键内容都一致时 no-op；完成后交由 `doctor` 复检。数据侧只保留项目级 `.claude/skills/pensieve/`，发现插件级/用户级副本或独立 graph 文件会清理。
 ---
 
 # 升级工具
 
 > 工具边界见 `<SYSTEM_SKILL_ROOT>/references/tool-boundaries.md` | 共享规则见 `<SYSTEM_SKILL_ROOT>/references/shared-rules.md` | 目录约定见 `<SYSTEM_SKILL_ROOT>/references/directory-layout.md`
 
-先同步最新版本，再执行"完整迁移校准"判定（结构 + 关键文件内容）。任一项不一致即迁移；仅全部一致时 no-op，然后交给 `/doctor`。
+先同步最新版本，再执行"完整迁移校准"判定（结构 + 关键文件内容）。任一项不一致即迁移；仅全部一致时 no-op，然后交给 `doctor`。
 
 ## Tool Contract
 
@@ -34,8 +34,8 @@ description: 版本与迁移入口：先同步最新版本定义，再执行完�
 - 有差异：输出迁移报告（旧路径 → 新路径、已替换关键文件、已清理旧路径）
 - 无差异：输出 no-op（结构与关键内容均一致）
 - 关键文件都要对齐模板；内容不一致时先备份再替换
-- 不输出 `PASS/FAIL`、`MUST_FIX/SHOULD_FIX`——合规判定由 `/doctor` 负责
-- 给出下一步 `/doctor`
+- 不输出 `PASS/FAIL`、`MUST_FIX/SHOULD_FIX`——合规判定由 `doctor` 负责
+- 给出下一步 `doctor`
 - 输出项目级 `SKILL.md` 更新结果
 
 ### Failure fallback
@@ -60,7 +60,7 @@ description: 版本与迁移入口：先同步最新版本定义，再执行完�
 - **主窗口默认推动"完整迁移校准"**：提供多套迁移模式给用户选择会增加出错概率，大多数用户只需要"对齐到最新"。
 - **"无新版本 + 无结构差异 + 关键文件内容一致" → 才允许 no-op**：宽松的 no-op 条件会跳过内容漂移修复。
 - **发现旧路径/插件级副本/独立 graph 文件要清理**：多源并行是结构问题的主要来源。
-- **升级/迁移后执行一次 `/doctor`**：迁移操作可能引入新的格式问题，立即体检能尽早发现。
+- **升级/迁移后执行一次 `doctor`**：迁移操作可能引入新的格式问题，立即体检能尽早发现。
 - **进入迁移前先检查 `<PLUGIN_ROOT>/docs/update.md`**：有新版本先更新插件并重启。
 - 更新命令失败时，先查阅 [GitHub docs/update.md](https://github.com/kingkongshot/Pensieve/blob/main/docs/update.md) 再继续。
 
@@ -91,8 +91,8 @@ description: 版本与迁移入口：先同步最新版本定义，再执行完�
    - `knowledge/taste-review/content.md`
 
 判定：
-- **全部一致** → no-op → `/doctor`
-- **任一不一致** → 完整迁移校准 → `/doctor`
+- **全部一致** → no-op → `doctor`
+- **任一不一致** → 完整迁移校准 → `doctor`
 
 ## 迁移原则
 
@@ -168,7 +168,7 @@ description: 版本与迁移入口：先同步最新版本定义，再执行完�
 3. 若无差异：
    - 输出 no-op
    - 维护项目级 SKILL：`bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event upgrade --note "upgrade no-op (structure + critical content aligned)"`
-   - 运行 `/doctor`
+   - 运行 `doctor`
 4. 若有差异（任一项不一致）：
    - 修正 `enabledPlugins`
    - 清理旧安装引用与旧目录
@@ -178,7 +178,7 @@ description: 版本与迁移入口：先同步最新版本定义，再执行完�
    - 用户文件冲突时最小合并
 5. 输出迁移报告。
 6. 维护项目级 SKILL：`bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event upgrade --note "upgrade migration completed"`
-7. 运行 `/doctor`。
+7. 运行 `doctor`。
 
 ## 插件清理与更新命令
 
