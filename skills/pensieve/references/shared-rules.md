@@ -44,7 +44,8 @@ Loop 输出若成为 `decision` 或 `pipeline`，必须在 wrap-up 前补齐链�
 - **系统能力**（随插件更新）：`<SYSTEM_SKILL_ROOT>/`（`skills/pensieve/` 内，插件管理）
   - 包含 tools / scripts / system knowledge / 格式 README
   - 不内置 pipelines / maxims 内容
-- **用户数据**（项目级，永不覆盖）：`<USER_DATA_ROOT>/`（`<project>/.claude/skills/pensieve/`）
+- **用户数据**（项目级，默认不覆盖）：`<USER_DATA_ROOT>/`（`<project>/.claude/skills/pensieve/`）
+  - 唯一例外：`/upgrade` 对关键文件（`run-when-*.md`、`knowledge/taste-review/content.md`）做内容对齐时，可先备份再覆盖。
   - 完整目录结构见 `<SYSTEM_SKILL_ROOT>/references/directory-layout.md`
 
 路径约定（由 SessionStart hook 注入）：

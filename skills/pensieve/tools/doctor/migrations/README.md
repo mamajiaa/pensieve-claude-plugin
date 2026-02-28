@@ -21,11 +21,17 @@
 - `pipelines/`
 - `loop/`
 
-关键文件（初始化后应存在）：
+关键文件（初始化后应存在，且 Upgrade 需对齐内容）：
 
 - `pipelines/run-when-reviewing-code.md`
 - `pipelines/run-when-committing.md`
 - `knowledge/taste-review/content.md`
+
+关键文件内容来源（单一事实源）：
+
+- `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/pipeline.run-when-reviewing-code.md`
+- `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/pipeline.run-when-committing.md`
+- `<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md`
 
 自动维护文件（允许工具更新）：
 
@@ -47,12 +53,21 @@
 1. 发现 deprecated 路径与 active 路径并行存在（双源）。
 2. active 路径缺失最小目录结构。
 3. active 路径缺失关键种子文件。
+4. 关键文件内容与模板不一致。
 
 判为“结构层 no-op”的条件：
 
 1. 仅存在 active 路径。
 2. 最小目录结构齐全。
-3. 关键种子文件齐全（或仅缺失可由 Upgrade 补齐的种子）。
+3. 关键种子文件齐全且内容与模板一致。
+
+## 关键文件内容对齐策略
+
+当关键文件缺失或内容不一致时，Upgrade 必须执行完整对齐：
+
+1. 若目标文件存在，先备份为 `*.bak.<timestamp>`。
+2. 使用模板文件覆盖目标文件。
+3. 在迁移报告中列出被替换文件与备份路径。
 
 ## 迁移内容边界
 

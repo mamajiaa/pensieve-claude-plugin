@@ -152,7 +152,7 @@ description: Project-level Pensieve skill file. Auto-maintained route + graph. D
 
 ## Routing
 - Init：初始化项目级 skill 数据目录并补齐种子；随后执行首轮提交/代码探索与 review 品味基线分析（只读）。
-- Upgrade：对齐目录结构与命名，必要时做最小迁移。
+- Upgrade：执行完整迁移校准（结构、关键文件内容、旧路径清理）。
 - Doctor：做结构/frontmatter/链接体检并给出修复建议。
 - Self-Improve：沉淀 knowledge/decision/maxim/pipeline。
 - Loop：进入任务分解与执行闭环。
