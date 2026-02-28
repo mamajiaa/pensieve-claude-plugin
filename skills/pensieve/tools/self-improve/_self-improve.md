@@ -1,7 +1,7 @@
 # 自改进（Auto Self-Improve）
 
 ---
-description: 自动沉淀经验。由提交 pipeline 在 git commit 时调用，或用户手动触发。从会话上下文 + diff 中提取洞察并写入用户数据。
+description: 用于提交或复盘时自动沉淀可复用结论（knowledge/decision/maxim/pipeline），默认直接写入用户数据。跳过会丢失团队经验并重复踩坑；迁移与合规判定不在本工具职责内。
 ---
 
 你在帮助把经验与模式沉淀到 Pensieve 的四类用户数据中：`maxim / decision / pipeline / knowledge`。
@@ -47,6 +47,11 @@ description: 自动沉淀经验。由提交 pipeline 在 git commit 时调用，
 
 - 发现结构性问题（旧路径并行/目录缺失/格式大面积不符）：跳过沉淀，建议后续运行 `/doctor`
 - 无法一次判断分类：按三层拆分（事实 -> `knowledge`，偏好 -> `decision`，强约束 -> `maxim`）
+
+### Negative examples
+
+- “顺手把旧目录也迁了” -> 越界，应转 `/upgrade`
+- “先给我 PASS/FAIL 体检结论” -> 越界，应转 `/doctor`
 
 ## 职责边界（Hard Rule）
 

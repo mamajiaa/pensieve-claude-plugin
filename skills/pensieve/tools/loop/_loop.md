@@ -1,10 +1,10 @@
 ---
-description: Auto-loop task execution. Trigger when user says "use loop", "loop mode", or similar.
+description: 仅在任务复杂且必须拆成多个可验证子任务时使用；主窗口负责编排、子代理逐任务执行。若目标未确认或任务很小仍开 loop，会引入不必要流程成本并放大上下文噪音。触发词：loop / use loop / loop mode / 循环执行。
 ---
 
-# Loop Pipeline
+# Loop 工具
 
-You are orchestrating an automated task execution loop. Break complex work into discrete tasks, then execute them via subagents while the main window advances to the next pending task.
+你负责把复杂工作拆成可执行原子任务，并在 Task 系统中按顺序推进。主窗口只做编排，每次仅分派一个子任务给子代理执行。
 
 ## Core Principles
 
