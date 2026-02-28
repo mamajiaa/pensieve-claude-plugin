@@ -9,7 +9,7 @@ description: 基于 README 规范做项目用户数据体检。触发词包括 "
 核心定位：
 - `/doctor`：检查与报告
 - `/upgrade`：迁移与清理
-- `/selfimprove`：沉淀与改进
+- `self-improve`：沉淀与改进
 
 ## Tool Contract
 
@@ -22,22 +22,24 @@ description: 基于 README 规范做项目用户数据体检。触发词包括 "
 ### Do not use when
 
 - 用户要求直接迁移或清理数据（应转 `/upgrade`）
-- 用户要求沉淀经验、写 maxim/decision/pipeline（应转 `/selfimprove`）
+- 用户要求沉淀经验、写 maxim/decision/pipeline（应转 `self-improve`）
 - 用户要求立即修文件（doctor 是只读体检）
 
 ### Required inputs
 
 - 规范来源文件（maxims/decisions/pipelines/knowledge/upgrade）
-- 项目用户数据目录 `.claude/pensieve/`
+- 项目用户数据目录 `.claude/skills/pensieve/`
 - 快检与图谱脚本输出：
   - `check-frontmatter.sh`
   - `generate-user-data-graph.sh`
+- 项目级 SKILL 维护脚本：`<SYSTEM_SKILL_ROOT>/tools/memory/scripts/maintain-auto-memory.sh`
 
 ### Output contract
 
 - 必须按固定模板输出报告
 - 每条问题必须包含规则来源与修复建议
 - `FAIL` 且迁移相关时，下一步优先 `/upgrade`
+- 报告后必须同步项目级 `SKILL.md`（记录 doctor 检查时间与结论摘要，并更新 graph）
 
 ### Failure fallback
 
@@ -60,7 +62,7 @@ Hard rule：
 1. 先运行 `/upgrade`（即使存在脏数据，也优先迁移）
 2. 再运行 `/doctor` 输出合规报告
 3. 若仍有 MUST_FIX，继续 `/upgrade` 或人工修复后复检
-4. 通过后，再按需运行 `/selfimprove`
+4. 通过后，再按需运行 `self-improve`
 
 ---
 
@@ -85,7 +87,7 @@ Hard rule：
 项目级用户数据：
 
 ```
-.claude/pensieve/
+.claude/skills/pensieve/
   maxims/
   decisions/
   knowledge/
@@ -95,7 +97,7 @@ Hard rule：
 
 以及旧路径候选（由 upgrade 规范定义）：
 - `<project>/skills/pensieve/`
-- `<project>/.claude/skills/pensieve/`
+- `<project>/.claude/pensieve/`
 - 其他历史用户数据目录（若 upgrade 规则提到）
 
 以及插件启用配置（用于命名一致性检查）：
@@ -116,12 +118,15 @@ Hard rule：
 4. 基础结构缺失：用户数据根目录或关键分类目录缺失，导致流程无法运行。
 5. 流程失焦：`pipeline` 以大段知识堆叠替代 task 编排，且未拆分为链接引用。
 6. 命名违规：`pipeline` 文件名未采用 `run-when-*.md`（包含 legacy `review.md`）。
-7. 初始化断裂：项目用户数据目录存在，但缺少初始种子（如 `maxims/*.md` 为空或缺失 `pipelines/run-when-reviewing-code.md`）。
+7. 初始化断裂：项目用户数据目录存在，但缺少初始种子（如 `maxims/*.md` 为空，或缺失 `pipelines/run-when-reviewing-code.md` / `pipelines/run-when-committing.md`）。
 8. 插件命名冲突：`enabledPlugins` 同时保留旧键与新键，或缺失新键，导致升级路径不确定。
 
 ### SHOULD_FIX
 
 来自 README 的“recommended / 建议 / prefer”规则未满足，或明显降低可维护性，但不阻断主流程。
+
+包括但不限于：
+- `decision` 缺少“探索减负”段，或缺少“下次少问 / 下次少查 / 失效条件”条目。
 
 ### INFO
 
@@ -144,7 +149,7 @@ Hard rule：
 
 ### Phase 2：扫描文件并验证
 
-- 扫描 `.claude/pensieve/**`
+- 扫描 `.claude/skills/pensieve/**`
 - 扫描旧路径候选中的用户数据痕迹
 - 扫描用户级/项目级 `settings.json` 中 Pensieve 相关 `enabledPlugins` 键
 - 对每条规则产出：通过 / 失败 / 无法判断
@@ -166,6 +171,7 @@ bash <SYSTEM_SKILL_ROOT>/tools/doctor/scripts/check-frontmatter.sh
 - 如果快检存在 frontmatter 语法错误（如未闭合、格式损坏），至少判为 `MUST_FIX`。
 - 如果快检存在 frontmatter 缺失、必填字段缺失或字段值非法，也必须判为 `MUST_FIX`。
 - 如果快检存在 pipeline 命名违规（`FM-301/FM-302`），也必须判为 `MUST_FIX`。
+- 如果快检存在 `decision` 探索减负缺失（`FM-401~FM-404`），至少判为 `SHOULD_FIX`。
 - 未运行此快检不得输出 `最终结论`。
 
 ### Phase 2.5：先生成图谱再下结论（强制）
@@ -197,17 +203,17 @@ bash <SYSTEM_SKILL_ROOT>/tools/upgrade/scripts/generate-user-data-graph.sh
 ## 0) 头信息
 - 检查时间: {YYYY-MM-DD HH:mm:ss}
 - 项目根目录: `{absolute-path}`
-- 数据目录: `{absolute-path}/.claude/pensieve`
+- 数据目录: `{absolute-path}/.claude/skills/pensieve`
 
 ## 1) 执行摘要（先看这里）
 - 总体状态: {PASS | PASS_WITH_WARNINGS | FAIL}
 - MUST_FIX: {n}
 - SHOULD_FIX: {n}
 - INFO: {n}
-- 建议下一步: {`/upgrade` | `/selfimprove` | `none`}
+- 建议下一步: {`/upgrade` | `self-improve` | `none`}
 
 ## 1.5) 图谱摘要（结论前置依据）
-- 图谱文件: `{.claude/pensieve/graph.md}`
+- 图谱文件: `{<project>/.claude/skills/pensieve/SKILL.md#Graph}`
 - 扫描笔记数: {n}
 - 发现链接数: {n}
 - 已解析链接: {n}
@@ -257,5 +263,17 @@ bash <SYSTEM_SKILL_ROOT>/tools/upgrade/scripts/generate-user-data-graph.sh
 约束：
 - 每条问题必须包含 `规则来源`（具体到 README/章节）。
 - 当 `状态=FAIL` 且与迁移相关时，`下一步命令` 必须优先给 `/upgrade`。
-- doctor 阶段禁止自动改文件。
+- doctor 阶段禁止自动改项目用户数据文件（`.claude/skills/pensieve/**`）；仅 `SKILL.md` 自动维护块可更新。
 - 若 `decision` 或 `pipeline` 的必填链接在图谱中表现为断链，至少判为 `MUST_FIX`。
+
+### Phase 3.5：维护项目级 SKILL（强制）
+
+输出报告后，必须执行：
+
+```bash
+bash <SYSTEM_SKILL_ROOT>/tools/memory/scripts/maintain-auto-memory.sh --event doctor --note "doctor summary: status={PASS|PASS_WITH_WARNINGS|FAIL}, must_fix={n}, should_fix={n}"
+```
+
+约束：
+- 只允许写入项目级 `.claude/skills/pensieve/SKILL.md`（自动维护文件）。
+- 不得在 doctor 阶段修改 `.claude/skills/pensieve/**` 中的用户数据文件；仅允许更新 `SKILL.md` 自动维护块。

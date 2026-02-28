@@ -1,3 +1,13 @@
+---
+id: taste-review-content
+type: knowledge
+title: 代码品味审查知识库
+status: active
+created: 2026-02-28
+updated: 2026-02-28
+tags: [pensieve, knowledge, review, taste]
+---
+
 # 代码品味审查知识库
 
 用于代码审查的核心哲学、预警信号与经典案例。

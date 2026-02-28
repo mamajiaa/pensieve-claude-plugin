@@ -1,5 +1,5 @@
 #!/bin/bash
-# Quick frontmatter + pipeline naming validator for project-level Pensieve user data.
+# Quick frontmatter + structural validator for project-level Pensieve user data.
 # No external dependency; uses Python stdlib only.
 
 set -euo pipefail
@@ -21,7 +21,7 @@ Usage:
   check-frontmatter.sh [--root <path>]
 
 Options:
-  --root <path>   Scan root. Default: <project>/.claude/pensieve
+  --root <path>   Scan root. Default: <project>/.claude/skills/pensieve
   -h, --help      Show help
 USAGE
       exit 0
@@ -194,6 +194,16 @@ def parse_frontmatter(text: str) -> tuple[dict[str, object] | None, list[str], s
     return data, errors, None
 
 
+def body_without_frontmatter(text: str) -> str:
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return text
+    for i in range(1, len(lines)):
+        if lines[i].strip() == "---":
+            return "\n".join(lines[i + 1 :])
+    return text
+
+
 def valid_date(s: str) -> bool:
     if not date_re.match(s):
         return False
@@ -270,6 +280,46 @@ for p in files:
     v_tags = fm.get("tags")
     if v_tags is not None and not isinstance(v_tags, list):
         issues.append(Issue("MUST_FIX", "FM-205", rel, "tags 非法（应为数组，如 [pensieve, maxim]）"))
+
+    if rel.startswith("decisions/"):
+        body = body_without_frontmatter(text)
+        if not re.search(r"^\s*##\s*探索减负\s*$", body, flags=re.MULTILINE):
+            issues.append(
+                Issue(
+                    "SHOULD_FIX",
+                    "FM-401",
+                    rel,
+                    "decision 建议包含 `## 探索减负` 段，明确下次如何减少询问与探索成本",
+                )
+            )
+        else:
+            if "下次可以少问什么" not in body:
+                issues.append(
+                    Issue(
+                        "SHOULD_FIX",
+                        "FM-402",
+                        rel,
+                        "decision 的 `探索减负` 段缺少“下次可以少问什么”条目",
+                    )
+                )
+            if "下次可以少查什么" not in body:
+                issues.append(
+                    Issue(
+                        "SHOULD_FIX",
+                        "FM-403",
+                        rel,
+                        "decision 的 `探索减负` 段缺少“下次可以少查什么”条目",
+                    )
+                )
+            if "失效条件" not in body:
+                issues.append(
+                    Issue(
+                        "SHOULD_FIX",
+                        "FM-404",
+                        rel,
+                        "decision 的 `探索减负` 段缺少“失效条件（何时必须重新评估）”条目",
+                    )
+                )
 
 must_fix = [x for x in issues if x.level == "MUST_FIX"]
 should_fix = [x for x in issues if x.level == "SHOULD_FIX"]

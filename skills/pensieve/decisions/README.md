@@ -5,11 +5,31 @@
 ## 目的
 
 Decision 的核心价值是减少重复犯错。
+Decision 的第二核心价值是减少重复询问与重复探索。
 
 当类似问题再次出现时，团队应能快速回答：
 - 当时做了什么选择
 - 为什么这么选
 - 为什么没选其他方案
+- 下次可以直接跳过哪些询问/探索步骤
+
+## 决策减负原则（跨项目）
+
+一条好的 decision 不只是“记录历史”，而是“压缩未来探索路径”。
+
+最小要求：
+1. 明确“触发条件”（什么时候直接套用这条决策）
+2. 明确“跳过项”（哪些问题不用再问，哪些路径不用再查）
+3. 明确“边界条件”（什么情况下这条决策失效）
+
+## 语义定位（WANT 层）
+
+`decision` 承载 WANT（偏好层）：项目想要的方向、取舍与策略，即“我想这样”。
+
+判定要点：
+- 不是“世界客观事实”（那是 `knowledge`）
+- 不是“不可违反底线”（那是 `maxim`）
+- 是在当前项目上下文中主动选择的做法
 
 ## 捕获标准
 
@@ -47,8 +67,8 @@ Decision 的核心价值是减少重复犯错。
 
 | 阶段 | 位置 | 说明 |
 |---|---|---|
-| loop 期间 | `.claude/pensieve/loop/{name}/_decisions/` | 临时，随 loop 生命周期 |
-| loop 结束后 | `.claude/pensieve/decisions/` | 项目级用户数据（永不覆盖） |
+| loop 期间 | `.claude/skills/pensieve/loop/{name}/_decisions/` | 临时，随 loop 生命周期 |
+| loop 结束后 | `.claude/skills/pensieve/decisions/` | 项目级用户数据（永不覆盖） |
 
 ### 决策层级
 
@@ -75,7 +95,7 @@ Hard rule：
 ### 目录结构
 
 ```
-.claude/pensieve/decisions/{date}-{statement}.md
+.claude/skills/pensieve/decisions/{date}-{statement}.md
 ```
 
 命名规则：
@@ -117,6 +137,11 @@ Hard rule：
 - 降低了哪些风险？
 - 让后续维护者可以做出哪些更好选择？
 
+## 探索减负
+- 下次可以少问什么：
+- 下次可以少查什么：
+- 失效条件（出现时必须重新评估）：
+
 ## Key Files
 - `path/to/file` - 相关实现或文档
 ```
@@ -151,3 +176,4 @@ Hard rule：
 - Decision 强依赖上下文，必须写清 Context
 - 没有 Alternatives Considered 的决策通常不完整
 - 团队偏好型决策必须明确标注，避免被误当成普适规则
+- 若不能明确“下次少问/少查什么”，这条内容更可能是讨论记录，不应升级到 `decisions/`

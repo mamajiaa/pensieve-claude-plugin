@@ -12,7 +12,16 @@ Maxim 不是技术细节，而是团队“默认行为”的抽象：
 
 Maxim 的价值是降低决策成本，避免每次从零推导。
 
-> 说明：插件不内置固定 maxim 文件。安装/迁移时会在 `.claude/pensieve/maxims/` 种子化初始准则，用户可自由编辑。
+> 说明：插件不内置固定 maxim 文件。安装/迁移时会在 `.claude/skills/pensieve/maxims/` 种子化初始准则，用户可自由编辑。
+
+## 语义定位（MUST 层）
+
+`maxim` 承载 MUST（约束层）：必须遵守的底线与行为约束，即“必须这样”。
+
+判定要点：
+- 违反会显著提升回归风险或破坏协作基线
+- 不是一次性项目偏好（那是 `decision`）
+- 不是客观机制描述（那是 `knowledge`）
 
 ## 捕获标准
 
@@ -40,7 +49,7 @@ Maxim 的价值是降低决策成本，避免每次从零推导。
 ### 目录结构（项目级）
 
 ```
-.claude/pensieve/maxims/
+.claude/skills/pensieve/maxims/
 ├── {maxim-conclusion-a}.md
 └── {maxim-conclusion-b}.md
 ```
@@ -115,4 +124,4 @@ Derived from: [[2026-01-22-do-not-break-user-visible-behavior]], [[knowledge/tas
 
 ## Maxim 文件位置
 
-- 项目级条目：`.claude/pensieve/maxims/*.md`（永不覆盖）
+- 项目级条目：`.claude/skills/pensieve/maxims/*.md`（永不覆盖）

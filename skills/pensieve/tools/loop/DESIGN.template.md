@@ -2,18 +2,16 @@
 
 **Owner**: Main Window
 
-**Purpose**: When multiple options exist, record the choice and rationale.
+**Purpose**: Record design choice and rationale when implementation is not obvious.
 
 **When to write**:
 - Implementation is not obvious
-- Multiple viable options require trade‑offs
-- The decision will impact later work
 
 ---
 
 ## Writing Rules
 
-- Create at `.claude/pensieve/loop/{date}-{slug}/design.md`
+- Create at `.claude/skills/pensieve/loop/{date}-{slug}/design.md`
 - Do necessary code exploration during design
 - After user confirmation, record the path in `_context.md`
 
@@ -36,7 +34,7 @@
 
 | Type | Path | Key Excerpt |
 |------|------|----------|
-| requirement | `.claude/pensieve/loop/{date}-{slug}/requirements.md` | Core problem: ... |
+| requirement | `.claude/skills/pensieve/loop/{date}-{slug}/requirements.md` | Core problem: ... |
 | decision | `decisions/2026-01-20-xxx.md` | "Quoted text" |
 | maxim | `maxims/linus.md` | "Good taste" |
 | conversation | _context.md#requirements-clarification | User said: "..." |

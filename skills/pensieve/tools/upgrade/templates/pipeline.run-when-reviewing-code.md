@@ -17,7 +17,7 @@ gate: auto
 
 这个 pipeline 只负责任务编排。审查标准与深层依据统一放在 Knowledge 中，避免在本文件重复展开。
 
-**Knowledge 参考**：`.claude/pensieve/knowledge/taste-review/content.md`
+**Knowledge 参考**：`.claude/skills/pensieve/knowledge/taste-review/content.md`
 
 **上下文链接（至少一条）**：
 - 基于：[[knowledge/taste-review/content]]
@@ -34,7 +34,7 @@ gate: auto
 
 **读取输入**：
 1. 用户指定的文件 / 提交 / PR 范围
-2. `.claude/pensieve/knowledge/taste-review/content.md`
+2. `.claude/skills/pensieve/knowledge/taste-review/content.md`
 
 **执行步骤**：
 1. 确认审查范围（文件 / 提交 / 代码片段）
@@ -51,7 +51,7 @@ gate: auto
 
 **读取输入**：
 1. Task 1 产出的待审文件清单
-2. `.claude/pensieve/knowledge/taste-review/content.md`
+2. `.claude/skills/pensieve/knowledge/taste-review/content.md`
 
 **执行步骤**：
 1. 对每个文件执行审查清单（理论与依据见 Knowledge，不在此文件复制）

@@ -2,18 +2,16 @@
 
 **Owner**: Main Window
 
-**Purpose**: An anchor for long projects so you don't forget the original intent.
+**Purpose**: Clarify ambiguous requirements into a stable goal/scope/constraints baseline.
 
 **When to write**:
-- Estimated 6+ tasks
-- Multi‑day execution
-- Multiple modules involved
+- Requirements are unclear (goal/scope/constraints not confirmed)
 
 ---
 
 ## Writing Rules
 
-- Create at `.claude/pensieve/loop/{date}-{slug}/requirements.md`
+- Create at `.claude/skills/pensieve/loop/{date}-{slug}/requirements.md`
 - Write a first draft before asking questions
 - After user confirmation, record the path in `_context.md`
 

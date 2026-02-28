@@ -1,3 +1,13 @@
+---
+id: knowledge-readme
+type: knowledge
+title: Knowledge 规范
+status: active
+created: 2026-02-28
+updated: 2026-02-28
+tags: [pensieve, knowledge, spec]
+---
+
 # Knowledge（知识）
 
 外部参考材料：技术文档、API 说明、最佳实践等。
@@ -35,6 +45,20 @@ Knowledge 的核心价值是降低执行摩擦。
 | 每次都要从代码猜约定 | 隐性知识未显式化 |
 | pipeline 依赖外部标准 | 应沉淀为可复用参考 |
 
+## 语义定位（IS 层）
+
+`knowledge` 只承载 IS（事实层）：系统现状、机制边界、可验证行为，即“是这样”。
+
+当一次任务主要成本在探索与定位时，若内容属于 IS，建议沉淀：
+
+1. 状态转换：动作触发后，数据/行为如何变化
+2. 症状 -> 根因 -> 定位：看到什么现象，去哪里查，为什么
+3. 边界与所有权：谁可以改、谁只能调用、跨模块如何流转
+4. 不存在/已移除：哪些能力不在当前系统，避免重复探索
+5. 反模式：看起来可行但会失败的路径
+
+> 原则：先判定语义层，再落地类型。`knowledge`=IS，`decision`=WANT，`maxim`=MUST，`pipeline`=HOW。
+
 ## 关系与演化
 
 | 方向 | 说明 |
@@ -59,7 +83,7 @@ Knowledge 的核心价值是降低执行摩擦。
 ### 目录结构
 
 ```
-.claude/pensieve/knowledge/{name}/
+.claude/skills/pensieve/knowledge/{name}/
 ├── content.md      # 知识正文
 └── source/         # 来源文件（可选）
 ```
@@ -85,6 +109,37 @@ Knowledge 的核心价值是降低执行摩擦。
 - 基于：[[前置知识或决策]]
 - 导致：[[会影响的决策或流程]]
 - 相关：[[相关主题]]
+```
+
+### 探索型知识模板（推荐）
+
+```markdown
+# {主题}
+
+## Source
+[来源：代码库/文档/会话]
+
+## Summary
+[一句话说明这条知识能节省什么探索成本]
+
+## 状态转换
+[动作 -> 状态变化 -> 可观察结果]
+
+## 症状 -> 根因 -> 定位
+- **[症状]**: [根因] -> [文件/模块/入口]
+
+## 边界与所有权
+- [模块 A 负责什么]
+- [模块 B 只读/只调，不直接写]
+
+## 反模式（Do Not）
+- [不要这样做 + 原因]
+
+## 验证信号
+- [日志/测试/运行行为]
+
+## When to Use
+[下一次遇到什么情况先读这条]
 ```
 
 ### 示例
@@ -118,4 +173,4 @@ Anthropic 官方的 agent 工具设计指南。
 ## 系统知识 vs 项目知识
 
 - 系统知识：`skills/pensieve/knowledge/`（随插件更新）
-- 项目知识：`.claude/pensieve/knowledge/`（永不覆盖）
+- 项目知识：`.claude/skills/pensieve/knowledge/`（永不覆盖）

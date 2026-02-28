@@ -588,7 +588,7 @@ generate_reinforcement() {
     local project_root_raw project_root user_data_root
     project_root_raw="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
     project_root="$(to_posix_path "$project_root_raw")"
-    user_data_root="$project_root/.claude/pensieve"
+    user_data_root="$project_root/.claude/skills/pensieve"
 
     cat << EOF
 Only call Task — do not execute yourself:
@@ -614,7 +614,7 @@ should_skip_subagent() {
     local subject description
     subject=$(json_get_value "$task_file" "subject" "")
     description=$(json_get_value "$task_file" "description" "")
-    [[ "$subject" == "Self‑Improve" ]] && return 0
+    [[ "$subject" == "Self-Improve" || "$subject" == "Self‑Improve" ]] && return 0
     echo "$description" | grep -q "do not call agent" && return 0
     return 1
 }
@@ -646,7 +646,7 @@ main() {
 
                 rm -f "$MARKER_FILE"
                 local reason
-                reason=$'All tasks are complete (task data was cleaned by the system). Run self‑improve?\n\nPipeline path:\n- '"$self_improve_path"$'\n\nIf yes, follow that pipeline; if no, that’s fine. Loop has stopped.'
+                reason=$'All tasks are complete (task data was cleaned by the system). Run self-improve?\n\nPipeline path:\n- '"$self_improve_path"$'\n\nIf yes, follow that pipeline; if no, that’s fine. Loop has stopped.'
                 emit_block_response "$reason" "✅ Loop done | Self‑improve?"
                 exit 0
             fi
@@ -672,7 +672,7 @@ main() {
             # Remove marker so Stop Hook won't continue
             rm -f "$MARKER_FILE"
             local reason
-            reason=$'All tasks are complete. Run self‑improve?\n\nPipeline path:\n- '"$self_improve_path"$'\n\nIf yes, follow that pipeline; if no, that’s fine. Loop has stopped.'
+            reason=$'All tasks are complete. Run self-improve?\n\nPipeline path:\n- '"$self_improve_path"$'\n\nIf yes, follow that pipeline; if no, that’s fine. Loop has stopped.'
             emit_block_response "$reason" "✅ Loop done | Self‑improve?"
             exit 0
         fi

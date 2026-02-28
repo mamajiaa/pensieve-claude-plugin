@@ -11,16 +11,16 @@ description: 先拉取最新版本结构定义，再按需执行用户数据迁�
 ### Use when
 
 - 用户要求更新插件版本或确认版本状态
-- 用户要求把历史数据迁移到 `.claude/pensieve/`
+- 用户要求把历史数据迁移到 `.claude/skills/pensieve/`
 - 用户存在旧路径并行，需要统一到单一事实源
 - 用户需要清理旧插件命名并切换到新引用
 
 ### Do not use when
 
-- 新项目首次接入，只需要创建 `.claude/pensieve/`（应转 `/init`）
+- 新项目首次接入，只需要创建 `.claude/skills/pensieve/`（应转 `/init`）
 - 用户只想查看合规状态与问题分级（应转 `/doctor`）
-- 用户只想沉淀经验或新增流程（应转 `/selfimprove`）
-- 用户只想查看可用 pipelines（应转 `/pipeline`）
+- 用户只想沉淀经验或新增流程（应转 `self-improve`）
+- 用户只想查看图谱与可用 pipelines（应直接读取项目级 `SKILL.md` 的 `## Graph`）
 
 ### Required inputs
 
@@ -29,15 +29,18 @@ description: 先拉取最新版本结构定义，再按需执行用户数据迁�
 - 两级 settings 路径：
   - `~/.claude/settings.json`
   - `<project>/.claude/settings.json`
-- 本地现状结构（旧路径与 `.claude/pensieve/` 当前目录）
+- 本地现状结构（旧路径与 `.claude/skills/pensieve/` 当前目录）
+- 项目级 SKILL 维护脚本：`<SYSTEM_SKILL_ROOT>/tools/memory/scripts/maintain-auto-memory.sh`
 
 ### Output contract
 
 - 必须输出“结构对比结论”（是否存在结构差异）
 - 若有差异：输出迁移报告（旧路径 -> 新路径，含冲突处理）
 - 若无差异：明确输出 no-op（无需迁移）
+- 无论是否迁移，都必须补齐缺失的项目 pipeline 种子（`run-when-*.md`，只补缺不覆盖）
 - 不输出 `PASS/FAIL`、`MUST_FIX/SHOULD_FIX`
 - 无论是否迁移，都必须给出下一步 `/doctor`
+- 必须输出项目级 `SKILL.md` 更新结果（固定路由 + graph）
 
 ### Failure fallback
 
@@ -80,7 +83,7 @@ Hard rule：如果更新命令失败，必须先查阅 GitHub 最新更新文档
 ## 目标结构（项目级，永不被插件覆盖）
 
 ```
-<project>/.claude/pensieve/
+<project>/.claude/skills/pensieve/
   maxims/      # 用户/团队准则（每条准则一个文件）
   decisions/   # 决策记录（ADR）
   knowledge/   # 用户参考资料
@@ -92,8 +95,8 @@ Hard rule：如果更新命令失败，必须先查阅 GitHub 最新更新文档
 
 先做结构级对比，不做逐文件深读：
 
-1. 是否存在旧路径并行（如 `skills/pensieve/`、`.claude/skills/pensieve/`）。
-2. `.claude/pensieve/` 是否缺失关键目录或关键命名（如 `run-when-*.md`）。
+1. 是否存在旧路径并行（如 `skills/pensieve/`、`.claude/pensieve/`）。
+2. `.claude/skills/pensieve/` 是否缺失关键目录或关键命名（如 `run-when-*.md`）。
 3. `enabledPlugins` 是否存在旧键并行或缺失新键。
 4. review pipeline 是否仍引用插件内 Knowledge 路径（`<SYSTEM_SKILL_ROOT>/knowledge/...`）。
 
@@ -111,9 +114,10 @@ Hard rule：如果更新命令失败，必须先查阅 GitHub 最新更新文档
   - `pensieve@kingkongshot-marketplace`
 - 系统能力保留在插件内：`<SYSTEM_SKILL_ROOT>/` 下内容由插件管理，不迁移不覆盖。
 - 历史系统副本应清理：迁移完成后删除项目中的旧系统拷贝（不要触碰插件内部）。
-- 用户数据必须项目级：仅迁移用户编写内容到 `.claude/pensieve/`。
+- 用户数据必须项目级：仅迁移用户编写内容到 `.claude/skills/pensieve/`。
 - 无差异不迁移：若结构门禁判定通过，直接 no-op，不做逐文件思考。
-- review 依赖项目内化：`.claude/pensieve/pipelines/run-when-reviewing-code.md` 应引用 `.claude/pensieve/knowledge/taste-review/content.md`，不依赖插件路径。
+- 缺失 pipeline 必补齐：将模板中的 `pipeline.run-when-*.md` 补齐到项目 `pipelines/`（仅补不存在文件，不覆盖用户修改）。
+- review 依赖项目内化：`.claude/skills/pensieve/pipelines/run-when-reviewing-code.md` 应引用 `.claude/skills/pensieve/knowledge/taste-review/content.md`，不依赖插件路径。
 - 不覆盖用户数据：目标文件存在时，采用合并或后缀策略。
 - 尽量保留结构：保留子目录层级与文件名。
 - 用模板做种子：初始 maxims 与 pipeline 模板来自插件模板。
@@ -124,6 +128,7 @@ Hard rule：如果更新命令失败，必须先查阅 GitHub 最新更新文档
 用户数据可能存在于：
 
 - 项目内 `skills/pensieve/` 或其子目录
+- 项目内 `.claude/pensieve/`（历史目录）
 - 用户自建 `maxims/`、`decisions/`、`knowledge/`、`pipelines/`、`loop/`
 
 ### 需要迁移的内容
@@ -136,14 +141,15 @@ Hard rule：如果更新命令失败，必须先查阅 GitHub 最新更新文档
   - `loop/*`
 
 > 旧版本可能在插件/项目副本里包含 `maxims/_linus.md` 与 `pipelines/review.md`。若仍在使用，请将内容合并到：
-> - `.claude/pensieve/maxims/{your-maxim}.md`
-> - `.claude/pensieve/pipelines/run-when-reviewing-code.md`
+> - `.claude/skills/pensieve/maxims/{your-maxim}.md`
+> - `.claude/skills/pensieve/pipelines/run-when-reviewing-code.md`
 > 然后删除旧副本，避免混淆。
 
 ### 模板位置（插件内）
 
 - `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/maxims/*.md`
 - `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/pipeline.run-when-reviewing-code.md`
+- `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/pipeline.run-when-committing.md`
 - `<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md`（作为项目知识种子源）
 
 ### 不应迁移的内容
@@ -158,7 +164,7 @@ Hard rule：如果更新命令失败，必须先查阅 GitHub 最新更新文档
 迁移后，删除项目中的旧系统副本：
 
 - `<project>/skills/pensieve/`
-- `<project>/.claude/skills/pensieve/`
+- `<project>/.claude/pensieve/`
 - 历史系统 `README.md` 与 `_*.md` 提示词文件
 
 如果不确定某文件是否系统副本，先备份再删除。
@@ -183,18 +189,30 @@ Hard rule：如果更新命令失败，必须先查阅 GitHub 最新更新文档
 1. 执行“版本检查前置（先于迁移）”，确保已同步到最新版本结构定义。
 2. 做“结构差异判定门禁”（旧路径并行 / 目录缺失 / 命名不一致 / 插件键不一致）。
 3. 若无结构差异：
+   - 先补齐缺失的 pipeline 种子（不覆盖已有文件）：
+     ```bash
+     for t in <SYSTEM_SKILL_ROOT>/tools/upgrade/templates/pipeline.run-when-*.md; do
+       name="$(basename "$t" | sed 's/^pipeline\.//')"
+       target=".claude/skills/pensieve/pipelines/$name"
+       [ -f "$target" ] || cp "$t" "$target"
+     done
+     ```
    - 输出 no-op：`无需迁移`
+   - 运行项目级 SKILL 维护：`bash <SYSTEM_SKILL_ROOT>/tools/memory/scripts/maintain-auto-memory.sh --event upgrade --note \"upgrade no-op\"`
    - 直接运行 `/doctor`，由 doctor 判定是否还需本地数据结构调整
    - 结束 upgrade
 4. 若有结构差异，才进入迁移：
    - 修正 `enabledPlugins`（移除旧键，保留新键）
    - 清理旧安装引用（若存在）
    - 执行最小结构迁移（目录创建、命名改造、旧副本清理）
-   - 若缺失 `.claude/pensieve/knowledge/taste-review/content.md`，从插件知识种子化一份
-   - 将 review pipeline 中的 `<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md` 重写为 `.claude/pensieve/knowledge/taste-review/content.md`
+   - 若缺失 `.claude/skills/pensieve/knowledge/taste-review/content.md`，从插件知识种子化一份
+   - 补齐缺失的 pipeline 种子（`run-when-*.md`，不覆盖已有文件）
+   - 将 review pipeline 中的 `<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md` 重写为 `.claude/skills/pensieve/knowledge/taste-review/content.md`
    - 仅在冲突时做最小合并（必要时产出 `*.migrated.md`）
 5. 输出迁移报告（结构差异 -> 执行动作 -> 结果）。
-6. 迁移后强制运行 `/doctor`：
+6. 运行项目级 SKILL 维护：
+   - `bash <SYSTEM_SKILL_ROOT>/tools/memory/scripts/maintain-auto-memory.sh --event upgrade --note \"upgrade migration completed\"`
+7. 迁移后强制运行 `/doctor`：
    - 由 doctor 给出 `PASS/FAIL` 与“还要怎么改本地结构”的具体清单
    - upgrade 不在此阶段做额外逐文件语义修复
 

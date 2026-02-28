@@ -1,6 +1,6 @@
 #!/bin/bash
 # 初始化项目级 pensieve 用户数据目录：
-#   <project>/.claude/pensieve/
+#   <project>/.claude/skills/pensieve/
 #
 # 该目录由用户拥有，插件更新永不覆盖。
 #
@@ -12,11 +12,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/_lib.sh"
 
 PROJECT_ROOT="$(project_root)"
-DATA_ROOT="$PROJECT_ROOT/.claude/pensieve"
+DATA_ROOT="$(user_data_root)"
 
 PLUGIN_ROOT="$(plugin_root_from_script "$SCRIPT_DIR")"
 TEMPLATES_ROOT="$PLUGIN_ROOT/skills/pensieve/tools/upgrade/templates"
 SYSTEM_KNOWLEDGE_ROOT="$PLUGIN_ROOT/skills/pensieve/knowledge"
+PROJECT_SKILL_SCRIPT="$PLUGIN_ROOT/skills/pensieve/tools/memory/scripts/maintain-auto-memory.sh"
 
 mkdir -p "$DATA_ROOT"/{maxims,decisions,knowledge,loop,pipelines}
 
@@ -48,7 +49,7 @@ fi
 README="$DATA_ROOT/README.md"
 if [[ ! -f "$README" ]]; then
   cat > "$README" << 'EOF'
-# .claude/pensieve (User Data)
+# .claude/skills/pensieve (Project Skill Data)
 
 This directory is the project‑level Pensieve user data area:
 - **NEVER** overwritten by plugin updates
@@ -61,12 +62,19 @@ This directory is the project‑level Pensieve user data area:
 - `knowledge/`: external knowledge (format: `<SYSTEM_SKILL_ROOT>/knowledge/README.md`)
 - `loop/`: loop runs (one folder per loop)
 - `pipelines/`: project‑level pipelines (seeded at install)
+- `SKILL.md`: project-level skill route + graph (auto-generated, do not edit manually)
 EOF
 fi
-REVIEW_PIPELINE="$DATA_ROOT/pipelines/run-when-reviewing-code.md"
-if [[ ! -f "$REVIEW_PIPELINE" ]]; then
-  cp "$TEMPLATES_ROOT/pipeline.run-when-reviewing-code.md" "$REVIEW_PIPELINE"
-fi
+PIPELINE_SEEDED_COUNT=0
+for template_pipeline in "$TEMPLATES_ROOT"/pipeline.run-when-*.md; do
+  [[ -f "$template_pipeline" ]] || continue
+  pipeline_name="$(basename "$template_pipeline" | sed 's/^pipeline\.//')"
+  target_pipeline="$DATA_ROOT/pipelines/$pipeline_name"
+  if [[ ! -f "$target_pipeline" ]]; then
+    cp "$template_pipeline" "$target_pipeline"
+    ((PIPELINE_SEEDED_COUNT++)) || true
+  fi
+done
 
 echo "✅ Initialization complete: $DATA_ROOT"
 MAXIM_COUNT=0
@@ -75,3 +83,10 @@ if [[ -d "$DATA_ROOT/maxims" ]]; then
 fi
 echo "  - maxims/*.md: $MAXIM_COUNT files present"
 echo "  - knowledge/*: seeded $KNOWLEDGE_SEEDED_COUNT new file(s)"
+echo "  - pipelines/*: seeded $PIPELINE_SEEDED_COUNT new file(s)"
+
+if [[ -x "$PROJECT_SKILL_SCRIPT" ]]; then
+  if ! bash "$PROJECT_SKILL_SCRIPT" --event install --note "seeded project skill data via init-project-data.sh"; then
+    echo "⚠️  Project skill update skipped: failed to run maintain-auto-memory.sh" >&2
+  fi
+fi

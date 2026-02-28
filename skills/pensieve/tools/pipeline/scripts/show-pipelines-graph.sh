@@ -6,11 +6,10 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../loop/scripts/_lib.sh"
 
-PROJECT_ROOT="$(project_root)"
-USER_DATA_ROOT="$PROJECT_ROOT/.claude/pensieve"
+USER_DATA_ROOT="$(user_data_root)"
 PLUGIN_ROOT="$(plugin_root_from_script "$SCRIPT_DIR")"
 GRAPH_SCRIPT="$PLUGIN_ROOT/skills/pensieve/tools/upgrade/scripts/generate-user-data-graph.sh"
-GRAPH_FILE="$USER_DATA_ROOT/graph.md"
+GRAPH_FILE="$(pensieve_graph_file)"
 
 if [[ -d "$USER_DATA_ROOT" && -f "$GRAPH_SCRIPT" ]]; then
   if ! run_with_retry_timeout "pipeline.graph" 20 1 -- bash "$GRAPH_SCRIPT" --root "$USER_DATA_ROOT" --output "$GRAPH_FILE" >/dev/null 2>&1; then

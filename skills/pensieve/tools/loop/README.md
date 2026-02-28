@@ -24,12 +24,12 @@ Combines the Claude Code Task system with a local tracking directory to auto‑l
 
 ### Step 2: Fill context (Main Window)
 
-In the loop directory (`.claude/pensieve/loop/{date}-{slug}/`):
+In the loop directory (`.claude/skills/pensieve/loop/{date}-{slug}/`):
 
 1. **Create and fill `_context.md`** (see format below; to avoid "Read before Write" friction, init-loop.sh no longer creates a template file)
 2. **Create documents as needed**
-   - `requirements.md` — requirements (estimate 6+ tasks)
-   - `design.md` — design choices (multiple options to weigh)
+   - `requirements.md` — only when requirements are unclear (goal/scope/constraints not confirmed)
+   - `design.md` — only when implementation is not obvious
    - `plan.md` — code exploration notes (need code understanding)
 
 ### _context.md format
@@ -106,6 +106,10 @@ Each task includes:
 - description (source + action + completion criteria)
 - activeForm (progressive, e.g., "Implementing user login")
 
+After Phase 2 confirmation, create tasks directly in Claude Task system.
+Do not use a standalone markdown/bullet list as a substitute for real task creation.
+If you need to present tasks to the user, show a snapshot from created tasks (task id + subject).
+
 Hard rule: do not generate task lists before maxims are loaded.
 
 ### Step 4: Auto-bind Stop Hook to the real taskListId
@@ -121,9 +125,9 @@ Call an agent for each task:
 ```
 Task agent=task-executor prompt="
 task_id: 1
-context: .claude/pensieve/loop/{date}-{slug}/_context.md
+context: .claude/skills/pensieve/loop/{date}-{slug}/_context.md
 system_skill_root: <SYSTEM_SKILL_ROOT>
-user_data_root: .claude/pensieve
+user_data_root: .claude/skills/pensieve
 "
 ```
 
@@ -134,7 +138,7 @@ The agent returns after one task. Stop Hook detects pending tasks, injects reinf
 | Storage | Content | Purpose |
 |---------|---------|---------|
 | `~/.claude/tasks/<uuid>/` | Task state (JSON) | Claude Code native |
-| `.claude/pensieve/loop/{date}-{slug}/` | Metadata + docs | Project‑level tracking and learnings (never overwritten) |
+| `.claude/skills/pensieve/loop/{date}-{slug}/` | Metadata + docs | Project‑level tracking and learnings (never overwritten) |
 
 ## Directory Structure
 
@@ -144,7 +148,7 @@ The agent returns after one task. Stop Hook detects pending tasks, injects reinf
     ├── 2.json
     └── ...
 
-.claude/pensieve/loop/           # Project tracking (metadata + learnings)
+.claude/skills/pensieve/loop/           # Project tracking (metadata + learnings)
     └── 2026-01-23-login/        # One directory per loop
         ├── _meta.md             # Metadata (goal, pipeline)
         ├── _context.md          # Conversation context, interventions
@@ -202,7 +206,7 @@ Injected on each continuation:
 
 ## Closed-Loop Learning (Main Window)
 
-After the agent returns, run self‑improve:
+After the agent returns, run self-improve:
 
 ```
 Pre‑assumptions → execution → post‑deviations → capture learnings

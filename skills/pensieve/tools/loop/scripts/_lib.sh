@@ -3,7 +3,7 @@
 #
 # Conventions:
 # - System capability lives inside the plugin: <plugin>/skills/pensieve
-# - User data lives at project level: <project>/.claude/pensieve
+# - User data lives at project level: <project>/.claude/skills/pensieve
 
 plugin_root_from_script() {
     local script_dir="$1"
@@ -61,7 +61,24 @@ project_root() {
 user_data_root() {
     local pr
     pr="$(project_root)"
-    echo "$pr/.claude/pensieve"
+    echo "$pr/.claude/skills/pensieve"
+}
+
+# Backward-compatible alias. "memory dir" is now the project skill dir.
+auto_memory_dir() {
+    user_data_root
+}
+
+project_skill_file() {
+    local dr
+    dr="$(user_data_root)"
+    echo "$dr/SKILL.md"
+}
+
+pensieve_graph_file() {
+    local dr
+    dr="$(user_data_root)"
+    echo "$dr/_pensieve-graph.md"
 }
 
 ensure_user_data_root() {

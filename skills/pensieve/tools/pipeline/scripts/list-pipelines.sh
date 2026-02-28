@@ -6,12 +6,11 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../loop/scripts/_lib.sh"
 
-project_root_path="$(project_root)"
-pipeline_dir="$project_root_path/.claude/pensieve/pipelines"
+pipeline_dir="$(user_data_root)/pipelines"
 
 if [[ ! -d "$pipeline_dir" ]]; then
   echo "No project pipelines found"
-  echo "Create the directory: mkdir -p .claude/pensieve/pipelines"
+  echo "Create the directory: mkdir -p .claude/skills/pensieve/pipelines"
   exit 0
 fi
 
@@ -20,7 +19,7 @@ pipeline_files=("$pipeline_dir"/*.md)
 
 if [[ "${#pipeline_files[@]}" -eq 0 ]]; then
   echo "No project pipelines found"
-  echo "Create the directory: mkdir -p .claude/pensieve/pipelines"
+  echo "Create the directory: mkdir -p .claude/skills/pensieve/pipelines"
   exit 0
 fi
 

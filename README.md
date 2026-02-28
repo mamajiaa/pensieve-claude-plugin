@@ -31,14 +31,14 @@
 - **更高代码品味**：输出更简洁、可维护、可验证
 - **更硬的代码审查**：`review` pipeline 执行 linus 一致的标准
 - **更稳的长会话表现**：按需加载减少上下文噪音，提示词不在塞爆上下文
-- **更少人工盯流程**：`/loop` 自动拆解并续跑任务，让每一次对话都改进 pipeline
+- **更少人工盯流程**：loop 自动拆解并续跑任务，让每一次对话都改进 pipeline
 
 ## 30 秒开始
 
 1. 安装插件
-2. 初始化 `.claude/pensieve/`
+2. 初始化 `.claude/skills/pensieve/`
 3. 重启 Claude Code
-4. 输入 `loop`
+4. 直接说“用 loop 完成开发”
 
 快速入口（推荐自动化）：
 
@@ -67,7 +67,7 @@
 ### 3. 绑定 Claude Code 原生能力
 
 - **Skills**：路由意图到工具
-- **Hooks**：SessionStart 注入路由，Stop 负责自动续跑
+- **Hooks**：Stop 负责自动续跑
 - **Task**：任务状态驱动流程节奏
 - **Agent**：主窗口拆解，子代理执行
 
@@ -76,14 +76,14 @@
 - **更轻量**：复用 Claude Code 原生执行链，减少额外封装和维护负担
 - **升级红利**：Claude Code 原生能力升级时，Pensieve 可同步获得改进
 
-## 只需要学会几个简单的命令
+## 只需要表达几个简单意图
 
-- `/init`：初始化项目级 `.claude/pensieve/`（新项目首次接入，含 review knowledge 种子）
-- `/loop`：复杂任务拆解 + 自动循环执行，直接说“使用 loop 完成“
-- `/doctor`：按 README 规范做用户数据体检，输出固定格式报告
-- `/pipeline`：查看并调用项目 pipelines
-- `/selfimprove`：沉淀经验并改进系统行为（不负责迁移体检）
-- `/upgrade`：版本更新前置检查 + 历史迁移（最高优先级；迁移后用 `/doctor` 复检）
+- init：初始化项目级 `.claude/skills/pensieve/`（新项目首次接入，含 review knowledge 种子）
+- loop：复杂任务拆解 + 自动循环执行
+- doctor：按 README 规范做用户数据体检，输出固定格式报告
+- self-improve：沉淀经验并改进系统行为（不负责迁移体检）
+- upgrade：版本更新前置检查 + 历史迁移（最高优先级；迁移后用 doctor 复检）
+- 看图谱：直接读取项目级 `SKILL.md` 的 `## Graph`
 
 ## 适合什么场景
 

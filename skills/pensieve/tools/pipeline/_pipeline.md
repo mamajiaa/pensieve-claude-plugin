@@ -19,12 +19,12 @@ You are the Pipeline tool. Your task is to **only read** project-level data and 
 ### Do not use when
 
 - 用户要求执行某个 pipeline（应转具体执行流程）
-- 用户要求创建/修改 pipeline（应转 `/selfimprove` 或明确写入流程）
+- 用户要求创建/修改 pipeline（应转 `self-improve` 或明确写入流程）
 - 用户要求迁移/合规体检（应转 `/upgrade` 或 `/doctor`）
 
 ### Required inputs
 
-- `<project>/.claude/pensieve/` 目录路径
+- `<project>/.claude/skills/pensieve/` 目录路径
 - `<SYSTEM_SKILL_ROOT>/tools/pipeline/scripts/show-pipelines-graph.sh`
 
 ### Output contract
@@ -50,7 +50,7 @@ You are the Pipeline tool. Your task is to **only read** project-level data and 
 Project pipelines live at:
 
 ```
-<project>/.claude/pensieve/pipelines/
+<project>/.claude/skills/pensieve/pipelines/
 ```
 
 > If the directory doesn't exist or is empty, say "No project pipelines found" and show how to create it.

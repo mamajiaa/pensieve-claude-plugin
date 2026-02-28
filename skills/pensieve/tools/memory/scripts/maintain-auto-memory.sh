@@ -1,0 +1,178 @@
+#!/bin/bash
+# Maintain project-level Pensieve SKILL.md as the single auto-maintained memory surface.
+#
+# Usage:
+#   maintain-auto-memory.sh --event <install|upgrade|doctor|self-improve> [--note "..."]
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../../loop/scripts/_lib.sh"
+
+EVENT=""
+NOTE=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --event)
+      [[ $# -ge 2 ]] || { echo "Missing value for --event" >&2; exit 1; }
+      EVENT="$2"
+      shift 2
+      ;;
+    --note)
+      [[ $# -ge 2 ]] || { echo "Missing value for --note" >&2; exit 1; }
+      NOTE="$2"
+      shift 2
+      ;;
+    -h|--help)
+      cat <<'USAGE'
+Usage:
+  maintain-auto-memory.sh --event <install|upgrade|doctor|self-improve> [--note "..."]
+
+Options:
+  --event <name>   Lifecycle event to record
+  --note <text>    Optional one-line note
+  -h, --help       Show help
+USAGE
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [[ -z "$EVENT" ]]; then
+  echo "--event is required" >&2
+  exit 1
+fi
+
+case "$EVENT" in
+  install|init|upgrade|doctor|self-improve|selfimprove)
+    ;;
+  *)
+    echo "Unsupported --event: $EVENT" >&2
+    exit 1
+    ;;
+esac
+
+PROJECT_ROOT="$(to_posix_path "$(project_root)")"
+USER_DATA_ROOT="$(user_data_root)"
+SKILL_FILE="$(project_skill_file)"
+GRAPH_FILE="$(pensieve_graph_file)"
+PLUGIN_ROOT="$(plugin_root_from_script "$SCRIPT_DIR")"
+GRAPH_SCRIPT="$PLUGIN_ROOT/skills/pensieve/tools/upgrade/scripts/generate-user-data-graph.sh"
+
+mkdir -p "$USER_DATA_ROOT"/{maxims,decisions,knowledge,pipelines,loop}
+
+if [[ -x "$GRAPH_SCRIPT" ]]; then
+  bash "$GRAPH_SCRIPT" --root "$USER_DATA_ROOT" --output "$GRAPH_FILE" >/dev/null
+fi
+
+PYTHON_BIN="$(python_bin || true)"
+[[ -n "$PYTHON_BIN" ]] || { echo "Python not found" >&2; exit 1; }
+TIMESTAMP="$(runtime_now_utc)"
+
+"$PYTHON_BIN" - "$SKILL_FILE" "$GRAPH_FILE" "$EVENT" "$TIMESTAMP" "$PROJECT_ROOT" "$USER_DATA_ROOT" "$NOTE" <<'PY'
+from __future__ import annotations
+
+import re
+import sys
+from pathlib import Path
+
+skill_file = Path(sys.argv[1])
+graph_file = Path(sys.argv[2])
+event = sys.argv[3].strip()
+ts = sys.argv[4].strip()
+project_root = sys.argv[5].strip()
+user_data_root = sys.argv[6].strip()
+note = (sys.argv[7] or "").strip().replace("\n", " ")
+
+
+def event_display_name(raw: str) -> str:
+    r = raw.lower()
+    if r in {"install", "init"}:
+        return "install/init"
+    if r == "upgrade":
+        return "upgrade"
+    if r == "doctor":
+        return "doctor"
+    return "self-improve"
+
+
+def read_existing_created_date() -> str:
+    if not skill_file.exists():
+        return ts[:10]
+    text = skill_file.read_text(encoding="utf-8", errors="replace")
+    m = re.search(r"^created:\s*(\d{4}-\d{2}-\d{2})\s*$", text, flags=re.MULTILINE)
+    if m:
+        return m.group(1)
+    return ts[:10]
+
+
+def load_graph() -> str:
+    if not graph_file.exists():
+        return "_(graph not generated yet)_"
+    txt = graph_file.read_text(encoding="utf-8", errors="replace").strip()
+    if txt == "":
+        return "_(graph is empty)_"
+    return txt
+
+
+created_date = read_existing_created_date()
+updated_date = ts[:10]
+event_name = event_display_name(event)
+graph_markdown = load_graph()
+last_note = note if note else "(none)"
+
+content = f"""---
+id: pensieve-project-skill
+type: skill
+title: Pensieve Project Skill (Auto Generated)
+status: active
+created: {created_date}
+updated: {updated_date}
+tags: [pensieve, skill, project, auto-generated]
+name: pensieve-project-skill
+description: Project-level Pensieve skill file. Auto-maintained route + graph. Do not edit manually.
+---
+
+# Pensieve Project Skill（自动维护）
+
+> AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
+> Source of truth: `{user_data_root}/SKILL.md`
+
+## Lifecycle State
+- Last Event: {event_name}
+- Last Updated (UTC): {ts}
+- Last Note: {last_note}
+
+## Routing
+- Init：初始化项目级 skill 数据目录并补齐种子。
+- Upgrade：对齐目录结构与命名，必要时做最小迁移。
+- Doctor：做结构/frontmatter/链接体检并给出修复建议。
+- Self-Improve：沉淀 knowledge/decision/maxim/pipeline。
+- Loop：进入任务分解与执行闭环。
+- Graph View：直接读取本文件 `## Graph` 段，不再使用独立 pipeline 命令。
+
+## Project Paths
+- Project Root: `{project_root}`
+- Skill Root: `{user_data_root}`
+- Maxims: `{user_data_root}/maxims/`
+- Decisions: `{user_data_root}/decisions/`
+- Knowledge: `{user_data_root}/knowledge/`
+- Pipelines: `{user_data_root}/pipelines/`
+- Loop: `{user_data_root}/loop/`
+
+## Graph
+
+{graph_markdown}
+"""
+
+skill_file.write_text(content.rstrip() + "\n", encoding="utf-8")
+PY
+
+echo "✅ Pensieve project SKILL updated"
+echo "  - skill: $SKILL_FILE"
+echo "  - graph: $GRAPH_FILE"
