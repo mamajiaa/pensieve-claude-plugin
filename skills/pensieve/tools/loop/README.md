@@ -1,6 +1,6 @@
 # Loop (Execution Layer)
 
-Combines the Claude Code Task system with a local tracking directory to auto‑loop execution.
+Combines the Claude Code Task system with a local tracking directory for main-window controlled loop execution.
 
 ## Role Division
 
@@ -8,7 +8,7 @@ Combines the Claude Code Task system with a local tracking directory to auto‑l
 |------|----------------|
 | **Main Window** | Planning: init → fill context → generate tasks → call task-executor |
 | **task-executor** | Execute tasks: read context → load knowledge as needed → execute → capture learnings if needed |
-| **Stop Hook** | Auto-loop: check pending tasks → inject reinforcement → continue |
+| **Main Window (Continuation)** | Continue loop by checking pending tasks and dispatching subagents |
 
 ## Startup Flow (Main Window)
 
@@ -112,11 +112,11 @@ If you need to present tasks to the user, show a snapshot from created tasks (ta
 
 Hard rule: do not generate task lists before maxims are loaded.
 
-### Step 4: Auto-bind Stop Hook to the real taskListId
+### Step 4: Continue from Main Window
 
-After creating the first real task, Stop Hook auto-binds to the most recent active task list in this loop session.
+After creating the first real task, the main window should continue by selecting the next pending task and dispatching one subagent at a time.
 
-> Since `0.3.2`, Stop Hook auto-detects active loops via `/tmp/pensieve-loop-<taskListId>`. No background bind-loop process is needed.
+> Hooks are no longer required for loop continuation.
 
 ### Step 5: Execute tasks
 
@@ -131,14 +131,14 @@ user_data_root: .claude/skills/pensieve
 "
 ```
 
-The agent returns after one task. Stop Hook detects pending tasks, injects reinforcement, and the main window continues with the next task.
+The agent returns after one task. The main window checks pending tasks and continues with the next one.
 
 ## Two Storage Systems
 
 | Storage | Content | Purpose |
 |---------|---------|---------|
 | `~/.claude/tasks/<uuid>/` | Task state (JSON) | Claude Code native |
-| `.claude/skills/pensieve/loop/{date}-{slug}/` | Metadata + docs | Project‑level tracking and learnings (never overwritten) |
+| `.claude/skills/pensieve/loop/{date}-{slug}/` | Context + docs | Project‑level tracking and learnings (never overwritten) |
 
 ## Directory Structure
 
@@ -148,28 +148,25 @@ The agent returns after one task. Stop Hook detects pending tasks, injects reinf
     ├── 2.json
     └── ...
 
-.claude/skills/pensieve/loop/           # Project tracking (metadata + learnings)
+.claude/skills/pensieve/loop/           # Project tracking (context + learnings)
     └── 2026-01-23-login/        # One directory per loop
-        ├── _meta.md             # Metadata (goal, pipeline)
         ├── _context.md          # Conversation context, interventions
         ├── requirements.md      # Requirements (if any)
         └── design.md            # Design notes (if any)
 ```
 
-## Auto-Loop Mechanism
+## Loop Continuation Mechanism
 
-Stop Hook runs whenever Claude stops:
+Main window continues until tasks complete:
 
 ```
-Agent runs → stops
+Agent runs one task → returns
     ↓
-loop-controller.sh checks
+Main window checks task state
     ↓
-├── pending task → block + inject reinforcement → continue
-└── all complete → normal stop
+├── pending task exists → dispatch next subagent
+└── all complete → wrap up
 ```
-
-> Multi-session support: markers store the current session `claude_pid`, so Stop Hook only matches the current session.
 
 ## Reinforcement Message
 

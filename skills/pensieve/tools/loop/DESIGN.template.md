@@ -92,8 +92,8 @@
 Discussion: state synchronization
 
 Options:
-1. Marker binding — init-loop.sh writes /tmp/pensieve-loop-<taskListId>, Stop Hook reads
-2. .active file — simple JSON file
+1. Main-window continuation — read pending tasks and dispatch subagents one by one
+2. .active file — simple JSON file for local state only
 
 User preference: Option 2, because "simpler is better"
 

@@ -31,7 +31,7 @@ description: 先拉取最新版本结构定义，再按需执行用户数据迁�
   - `~/.claude/settings.json`
   - `<project>/.claude/settings.json`
 - 本地现状结构（旧路径与 `.claude/skills/pensieve/` 当前目录）
-- 项目级 SKILL 维护脚本：`<SYSTEM_SKILL_ROOT>/tools/memory/scripts/maintain-auto-memory.sh`
+- 项目级 SKILL 维护脚本：`<SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh`
 
 ### Output contract
 
@@ -200,7 +200,7 @@ Hard rule：如果更新命令失败，必须先查阅 GitHub 最新更新文档
      done
      ```
    - 输出 no-op：`无需迁移`
-   - 运行项目级 SKILL 维护：`bash <SYSTEM_SKILL_ROOT>/tools/memory/scripts/maintain-auto-memory.sh --event upgrade --note \"upgrade no-op\"`
+   - 运行项目级 SKILL 维护：`bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event upgrade --note \"upgrade no-op\"`
    - 直接运行 `/doctor`，由 doctor 判定是否还需本地数据结构调整
    - 结束 upgrade
 4. 若有结构差异，才进入迁移：
@@ -213,7 +213,7 @@ Hard rule：如果更新命令失败，必须先查阅 GitHub 最新更新文档
    - 仅在冲突时做最小合并（必要时产出 `*.migrated.md`）
 5. 输出迁移报告（结构差异 -> 执行动作 -> 结果）。
 6. 运行项目级 SKILL 维护：
-   - `bash <SYSTEM_SKILL_ROOT>/tools/memory/scripts/maintain-auto-memory.sh --event upgrade --note \"upgrade migration completed\"`
+   - `bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event upgrade --note \"upgrade migration completed\"`
 7. 迁移后强制运行 `/doctor`：
    - 由 doctor 给出 `PASS/FAIL` 与“还要怎么改本地结构”的具体清单
    - upgrade 不在此阶段做额外逐文件语义修复

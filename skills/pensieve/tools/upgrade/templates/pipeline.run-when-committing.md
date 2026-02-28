@@ -72,7 +72,7 @@ gate: auto
 6. 写入目标路径，补关联链接
 7. 运行项目级 SKILL 维护：
    ```
-   bash <SYSTEM_SKILL_ROOT>/tools/memory/scripts/maintain-auto-memory.sh --event self-improve --note "auto-improve: {files}"
+   bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event self-improve --note "auto-improve: {files}"
    ```
 8. 输出简短摘要（写入路径 + 沉淀类型）
 

@@ -27,7 +27,7 @@ description: 初始化项目级 `.claude/skills/pensieve/` 用户数据目录并
 - 项目根路径（当前仓库）
 - 已完成 `/upgrade` 的版本检查前置（或已明确当前版本状态）
 - 初始化脚本：`<SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-project-data.sh`
-- 项目级 SKILL 维护脚本：`<SYSTEM_SKILL_ROOT>/tools/memory/scripts/maintain-auto-memory.sh`
+- 项目级 SKILL 维护脚本：`<SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh`
 
 ### Output contract
 

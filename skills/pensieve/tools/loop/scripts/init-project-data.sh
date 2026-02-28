@@ -17,7 +17,7 @@ DATA_ROOT="$(user_data_root)"
 PLUGIN_ROOT="$(plugin_root_from_script "$SCRIPT_DIR")"
 TEMPLATES_ROOT="$PLUGIN_ROOT/skills/pensieve/tools/upgrade/templates"
 SYSTEM_KNOWLEDGE_ROOT="$PLUGIN_ROOT/skills/pensieve/knowledge"
-PROJECT_SKILL_SCRIPT="$PLUGIN_ROOT/skills/pensieve/tools/memory/scripts/maintain-auto-memory.sh"
+PROJECT_SKILL_SCRIPT="$PLUGIN_ROOT/skills/pensieve/tools/project-skill/scripts/maintain-project-skill.sh"
 
 mkdir -p "$DATA_ROOT"/{maxims,decisions,knowledge,loop,pipelines}
 
@@ -87,6 +87,6 @@ echo "  - pipelines/*: seeded $PIPELINE_SEEDED_COUNT new file(s)"
 
 if [[ -x "$PROJECT_SKILL_SCRIPT" ]]; then
   if ! bash "$PROJECT_SKILL_SCRIPT" --event install --note "seeded project skill data via init-project-data.sh"; then
-    echo "⚠️  Project skill update skipped: failed to run maintain-auto-memory.sh" >&2
+    echo "⚠️  Project skill update skipped: failed to run maintain-project-skill.sh" >&2
   fi
 fi

@@ -1,13 +1,9 @@
 #!/bin/bash
-# Pensieve Loop initializer
+# Pensieve Loop initializer (prepare-only)
 #
-# Modes:
-# 1) Prepare loop directory first (recommended):
-#    init-loop.sh <slug>
-#    init-loop.sh <slug> --force
-#
-# 2) Bind task_list_id after tasks are created:
-#    init-loop.sh --bind <task_list_id> <loop_dir_or_name>
+# Usage:
+#   init-loop.sh <slug>
+#   init-loop.sh <slug> --force
 
 set -euo pipefail
 
@@ -21,66 +17,12 @@ SYSTEM_SKILL_ROOT="$PLUGIN_ROOT/skills/pensieve"
 # User data (loop artifacts) live at project level and are never overwritten by plugin updates
 DATA_ROOT="$(ensure_user_data_root)"
 LOOP_BASE_DIR="$DATA_ROOT/loop"
-CLAUDE_TASKS_BASE="$HOME/.claude/tasks"
 
 usage() {
-    cat << EOF
+    cat << EOF_USAGE
 Usage:
   $0 <slug> [--force]
-  $0 --bind <task_list_id> <loop_dir_or_name>
-EOF
-}
-
-fail_task_list_id() {
-    local task_list_id="$1"
-
-    if [[ "$task_list_id" == "default" || -z "$task_list_id" ]]; then
-        echo "Error: taskListId cannot be empty or \"default\""
-        echo ""
-        echo "Please use a real taskListId from TaskCreate output."
-        exit 1
-    fi
-
-    local tasks_dir="$CLAUDE_TASKS_BASE/$task_list_id"
-    if [[ ! -d "$tasks_dir" ]]; then
-        echo "Error: Task directory does not exist: $tasks_dir"
-        echo ""
-        echo "Please ensure you are using a real taskListId from TaskCreate output."
-        exit 1
-    fi
-}
-
-resolve_loop_dir() {
-    local loop_ref="$1"
-    loop_ref="$(to_posix_path "$loop_ref")"
-    local loop_dir=""
-
-    if [[ -d "$loop_ref" ]]; then
-        loop_dir="$loop_ref"
-    elif [[ -d "$LOOP_BASE_DIR/$loop_ref" ]]; then
-        loop_dir="$LOOP_BASE_DIR/$loop_ref"
-    else
-        echo "Error: loop directory not found: $loop_ref"
-        echo "Try an absolute path, or a loop name under: $LOOP_BASE_DIR"
-        exit 1
-    fi
-
-    (cd "$loop_dir" && pwd)
-}
-
-iso_timestamp() {
-    local py
-    py="$(python_bin || true)"
-    if [[ -n "$py" ]]; then
-        "$py" - <<'PY'
-from datetime import datetime, timezone
-print(datetime.now(timezone.utc).isoformat())
-PY
-        return 0
-    fi
-
-    # Portable fallback for environments without Python.
-    date -u +"%Y-%m-%dT%H:%M:%SZ"
+EOF_USAGE
 }
 
 create_loop_dir() {
@@ -104,136 +46,16 @@ create_loop_dir() {
     echo "$loop_dir"
 }
 
-write_marker() {
-    local task_list_id="$1"
-    local loop_dir="$2"
-    local marker_file="/tmp/pensieve-loop-$task_list_id"
-    local timestamp
-    timestamp="$(iso_timestamp)"
-    local claude_pid session_pid
-    claude_pid="$(find_claude_pid || true)"
-    session_pid="$(find_claude_session_pid || true)"
-
-    if PYTHON_BIN="$(python_bin)"; then
-        PENSIEVE_TASK_LIST_ID="$task_list_id" \
-        PENSIEVE_LOOP_DIR="$loop_dir" \
-        PENSIEVE_STARTED_AT="$timestamp" \
-        PENSIEVE_CLAUDE_PID="${claude_pid:-}" \
-        PENSIEVE_SESSION_PID="${session_pid:-}" \
-        "$PYTHON_BIN" - "$marker_file" <<'PY'
-import json
-import os
-import sys
-
-marker_path = sys.argv[1]
-claude_pid_raw = os.environ.get("PENSIEVE_CLAUDE_PID", "").strip()
-session_pid_raw = os.environ.get("PENSIEVE_SESSION_PID", "").strip()
-
-payload = {
-    "task_list_id": os.environ.get("PENSIEVE_TASK_LIST_ID", ""),
-    "loop_dir": os.environ.get("PENSIEVE_LOOP_DIR", ""),
-    "started_at": os.environ.get("PENSIEVE_STARTED_AT", ""),
-    "tasks_planned": False,
-    "claude_pid": int(claude_pid_raw) if claude_pid_raw else None,
-    "session_pid": int(session_pid_raw) if session_pid_raw else None,
-}
-
-with open(marker_path, "w", encoding="utf-8") as f:
-    json.dump(payload, f, ensure_ascii=False, indent=2)
-    f.write("\n")
-PY
-    else
-        cat > "$marker_file" << EOF
-{
-  "task_list_id": "$task_list_id",
-  "loop_dir": "$loop_dir",
-  "started_at": "$timestamp",
-  "tasks_planned": false,
-  "claude_pid": "${claude_pid:-}",
-  "session_pid": "${session_pid:-}"
-}
-EOF
-    fi
-
-    echo "$marker_file"
-}
-
-pending_marker_file() {
-    local loop_dir="$1"
-    echo "/tmp/pensieve-loop-pending-$(basename "$loop_dir")"
-}
-
-write_pending_marker() {
-    local loop_dir="$1"
-    local marker_file
-    marker_file="$(pending_marker_file "$loop_dir")"
-    local timestamp
-    timestamp="$(iso_timestamp)"
-    local claude_pid session_pid
-    claude_pid="$(find_claude_pid || true)"
-    session_pid="$(find_claude_session_pid || true)"
-
-    if PYTHON_BIN="$(python_bin)"; then
-        PENSIEVE_TASK_LIST_ID="" \
-        PENSIEVE_LOOP_DIR="$loop_dir" \
-        PENSIEVE_STARTED_AT="$timestamp" \
-        PENSIEVE_CLAUDE_PID="${claude_pid:-}" \
-        PENSIEVE_SESSION_PID="${session_pid:-}" \
-        "$PYTHON_BIN" - "$marker_file" <<'PY'
-import json
-import os
-import sys
-
-marker_path = sys.argv[1]
-claude_pid_raw = os.environ.get("PENSIEVE_CLAUDE_PID", "").strip()
-session_pid_raw = os.environ.get("PENSIEVE_SESSION_PID", "").strip()
-
-payload = {
-    "task_list_id": os.environ.get("PENSIEVE_TASK_LIST_ID", ""),
-    "loop_dir": os.environ.get("PENSIEVE_LOOP_DIR", ""),
-    "started_at": os.environ.get("PENSIEVE_STARTED_AT", ""),
-    "tasks_planned": False,
-    "claude_pid": int(claude_pid_raw) if claude_pid_raw else None,
-    "session_pid": int(session_pid_raw) if session_pid_raw else None,
-}
-
-with open(marker_path, "w", encoding="utf-8") as f:
-    json.dump(payload, f, ensure_ascii=False, indent=2)
-    f.write("\n")
-PY
-    else
-        cat > "$marker_file" << EOF
-{
-  "task_list_id": "",
-  "loop_dir": "$loop_dir",
-  "started_at": "$timestamp",
-  "tasks_planned": false,
-  "claude_pid": "${claude_pid:-}",
-  "session_pid": "${session_pid:-}"
-}
-EOF
-    fi
-
-    echo "$marker_file"
-}
-
-cleanup_pending_marker() {
-    local loop_dir="$1"
-    local marker_file
-    marker_file="$(pending_marker_file "$loop_dir")"
-    rm -f "$marker_file" 2>/dev/null || true
-}
-
 generate_agent_prompt() {
     local loop_dir="$1"
 
-    cat > "$loop_dir/_agent-prompt.md" << EOF
+    cat > "$loop_dir/_agent-prompt.md" << EOF_PROMPT
 ---
 name: expert-developer
 description: Execute a single dev task, then return
 ---
 
-You are Linus Torvalds — creator and chief architect of the Linux kernel. You have maintained Linux for 30+ years, reviewed millions of lines of code, and built the world's most successful open‑source project. Apply your perspective to ensure this project starts on a solid technical foundation.
+You are Linus Torvalds — creator and chief architect of the Linux kernel. You have maintained Linux for 30+ years, reviewed millions of lines of code, and built the world's most successful open-source project. Apply your perspective to ensure this project starts on a solid technical foundation.
 
 ## Loop Context Directory
 
@@ -242,7 +64,6 @@ Read this loop context directory first:
 
 Read any available context files in this directory, including:
 - \`_context.md\` (conversation and latest constraints)
-- \`_meta.md\` (goal/pipeline metadata)
 - \`requirements.md\` (requirements baseline)
 - \`design.md\` (design decisions)
 - \`_decisions/*.md\` (task-level deviations/decisions)
@@ -251,21 +72,21 @@ Do not rely on a single file when context has multiple artifacts.
 
 ## Maxims
 
-Project‑level maxims (not shipped by the plugin, user‑editable):
+Project-level maxims (not shipped by the plugin, user-editable):
 - Read all maxim files under \`$DATA_ROOT/maxims/\` (\`*.md\`)
 
 ## Current Task
 
-Read via \`TaskGet\` (task_id provided by the caller).
+Read via \`TaskGet\` (current task is provided by the caller).
 
 ## Execution Flow
 
 1. Read the loop context directory and all relevant context files
 2. Read maxims for constraints
 3. \`TaskGet\` to fetch task details
-4. \`TaskUpdate\` → in_progress
+4. \`TaskUpdate\` -> in_progress
 5. Execute the task
-6. \`TaskUpdate\` → completed
+6. \`TaskUpdate\` -> completed
 7. Return
 
 ## Completion Criteria
@@ -274,14 +95,14 @@ Before marking complete, verify:
 - Build passes (no compiler errors)
 - Lint passes (no lint errors)
 
-If validation fails, fix and re‑validate before marking completed.
+If validation fails, fix and re-validate before marking completed.
 
 ## Constraints
 
 - Only do what's in the task description; no extra work
 - Do not loop; return after this task
 - No user interaction; all info comes from context and task
-EOF
+EOF_PROMPT
 
     echo "Created: $loop_dir/_agent-prompt.md"
 }
@@ -291,57 +112,28 @@ if [[ $# -eq 0 ]]; then
     exit 1
 fi
 
-if [[ "$1" == "--bind" ]]; then
-    if [[ $# -ne 3 ]]; then
-        usage
-        exit 1
-    fi
-
-    TASK_LIST_ID="$2"
-    LOOP_DIR="$(resolve_loop_dir "$3")"
-    fail_task_list_id "$TASK_LIST_ID"
-
-    cleanup_pending_marker "$LOOP_DIR"
-    MARKER_FILE="$(write_marker "$TASK_LIST_ID" "$LOOP_DIR")"
-
-    echo ""
-    echo "Loop bound"
-    echo "Task: $CLAUDE_TASKS_BASE/$TASK_LIST_ID"
-    echo "Directory: $LOOP_DIR"
-    echo ""
-    echo "TASK_LIST_ID=$TASK_LIST_ID"
-    echo "LOOP_DIR=$LOOP_DIR"
-    echo "MARKER_FILE=$MARKER_FILE"
-    echo ""
-    echo "Tip: Stop Hook will take over based on $MARKER_FILE. No background binding process is needed."
-    exit 0
-fi
-
 FORCE=""
 if [[ "${!#}" == "--force" ]]; then
     FORCE="--force"
     set -- "${@:1:$(($# - 1))}"
 fi
 
-if [[ $# -eq 1 ]]; then
-    SLUG="$1"
-    LOOP_DIR="$(create_loop_dir "$SLUG" "$FORCE")"
-    generate_agent_prompt "$LOOP_DIR"
-    PENDING_MARKER_FILE="$(write_pending_marker "$LOOP_DIR")"
-
-    echo ""
-    echo "Loop initialized (prepare-only)"
-    echo "Directory: $LOOP_DIR"
-    echo ""
-    echo "LOOP_DIR=$LOOP_DIR"
-    echo "PENDING_MARKER_FILE=$PENDING_MARKER_FILE"
-    echo ""
-    echo "Next steps:"
-    echo "1) Create and fill $LOOP_DIR/_context.md"
-    echo "2) Split tasks and create tasks in Claude Task system"
-    echo "3) Auto-bind will happen when Stop Hook detects the first active task list"
-    exit 0
+if [[ $# -ne 1 ]]; then
+    usage
+    exit 1
 fi
 
-usage
-exit 1
+SLUG="$1"
+LOOP_DIR="$(create_loop_dir "$SLUG" "$FORCE")"
+generate_agent_prompt "$LOOP_DIR"
+
+echo ""
+echo "Loop initialized (prepare-only)"
+echo "Directory: $LOOP_DIR"
+echo ""
+echo "LOOP_DIR=$LOOP_DIR"
+echo ""
+echo "Next steps:"
+echo "1) Create and fill $LOOP_DIR/_context.md"
+echo "2) Split tasks and create tasks in Claude Task system"
+echo "3) Continue from the main window by dispatching one pending task at a time"

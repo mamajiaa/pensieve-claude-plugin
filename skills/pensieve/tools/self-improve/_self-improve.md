@@ -27,7 +27,7 @@ description: 自动沉淀经验。由提交 pipeline 在 git commit 时调用，
 
 - 会话上下文（当前对话中的探索、决策、调试记录）
 - `git diff --cached`（即将提交的变更）
-- 项目级 SKILL 维护脚本：`<SYSTEM_SKILL_ROOT>/tools/memory/scripts/maintain-auto-memory.sh`
+- 项目级 SKILL 维护脚本：`<SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh`
 - 目标类型对应 README：
   - `<SYSTEM_SKILL_ROOT>/maxims/README.md`
   - `<SYSTEM_SKILL_ROOT>/decisions/README.md`
@@ -162,7 +162,7 @@ description: 自动沉淀经验。由提交 pipeline 在 git commit 时调用，
 5. 若新增 `maxim`，确保与相关 `decision/knowledge/pipeline` 建立链接
 6. 如有必要，在关联文档补反向链接
 7. 运行项目级 SKILL 维护：
-   - `bash <SYSTEM_SKILL_ROOT>/tools/memory/scripts/maintain-auto-memory.sh --event self-improve --note "auto-improve: {file1,file2,...}"`
+   - `bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event self-improve --note "auto-improve: {file1,file2,...}"`
 8. 输出简短摘要（写入路径 + 沉淀类型）
 
 ---

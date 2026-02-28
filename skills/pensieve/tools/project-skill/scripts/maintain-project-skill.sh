@@ -1,8 +1,8 @@
 #!/bin/bash
-# Maintain project-level Pensieve SKILL.md as the single auto-maintained memory surface.
+# Maintain project-level Pensieve SKILL.md as the single auto-maintained project-skill surface.
 #
 # Usage:
-#   maintain-auto-memory.sh --event <install|upgrade|doctor|self-improve> [--note "..."]
+#   maintain-project-skill.sh --event <install|upgrade|doctor|self-improve|sync> [--note "..."]
 
 set -euo pipefail
 
@@ -27,7 +27,7 @@ while [[ $# -gt 0 ]]; do
     -h|--help)
       cat <<'USAGE'
 Usage:
-  maintain-auto-memory.sh --event <install|upgrade|doctor|self-improve> [--note "..."]
+  maintain-project-skill.sh --event <install|upgrade|doctor|self-improve|sync> [--note "..."]
 
 Options:
   --event <name>   Lifecycle event to record
@@ -49,7 +49,7 @@ if [[ -z "$EVENT" ]]; then
 fi
 
 case "$EVENT" in
-  install|init|upgrade|doctor|self-improve|selfimprove)
+  install|init|upgrade|doctor|self-improve|selfimprove|sync|auto-sync)
     ;;
   *)
     echo "Unsupported --event: $EVENT" >&2
@@ -98,6 +98,8 @@ def event_display_name(raw: str) -> str:
         return "upgrade"
     if r == "doctor":
         return "doctor"
+    if r in {"sync", "auto-sync"}:
+        return "auto-sync"
     return "self-improve"
 
 
