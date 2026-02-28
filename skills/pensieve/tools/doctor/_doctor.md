@@ -1,5 +1,5 @@
 ---
-description: 只读体检工具：基于 README 规范输出 PASS/FAIL 与 MUST_FIX/SHOULD_FIX 证据清单，不直接改文件。若跳过体检继续开发，结构问题会被持续放大。触发词：doctor、health check、体检、检查格式、检查迁移。
+description: 只读体检工具：基于 README 规范输出 PASS/PASS_WITH_WARNINGS/FAIL 与 MUST_FIX/SHOULD_FIX/INFO 证据清单，不直接改文件。若跳过体检继续开发，结构问题会被持续放大。触发词：doctor、health check、体检、检查格式、检查迁移。
 ---
 
 # Doctor 流程
@@ -31,6 +31,7 @@ description: 只读体检工具：基于 README 规范输出 PASS/FAIL 与 MUST_
 - 按固定模板输出报告
 - 每条问题包含规则来源与修复建议
 - `FAIL` 且迁移相关时，下一步优先 `upgrade`
+- 只要存在任意问题（`MUST_FIX` / `SHOULD_FIX` / `INFO` 任一 > 0），不得输出纯 `PASS`，且不得给出“无需修复/建议下一步: none”
 - 若发现历史规范 README 副本，标记为 `MUST_FIX` 并建议执行 `upgrade` 清理
 - 报告后同步项目级 `SKILL.md`（记录 doctor 检查时间与结论摘要）
 
@@ -156,6 +157,11 @@ bash <SYSTEM_SKILL_ROOT>/tools/doctor/scripts/check-frontmatter.sh
 - pipeline 命名违规（`FM-301/FM-302`）→ `MUST_FIX`
 - `decision` 探索减负缺失（`FM-401~FM-404`）→ `SHOULD_FIX`
 
+结论状态判定（硬规则）：
+- `MUST_FIX > 0` → `FAIL`（建议下一步：`upgrade`）
+- `MUST_FIX = 0` 且（`SHOULD_FIX > 0` 或 `INFO > 0`）→ `PASS_WITH_WARNINGS`（建议下一步：`self-improve`）
+- `MUST_FIX = 0` 且 `SHOULD_FIX = 0` 且 `INFO = 0` → `PASS`（建议下一步：`none`）
+
 ### Phase 2.5：生成图谱并验证链接
 
 在输出结论前先执行图谱生成——图谱验证了知识网络的链接连通性，断链意味着知识无法被追踪：
@@ -235,6 +241,7 @@ bash <SYSTEM_SKILL_ROOT>/tools/upgrade/scripts/generate-user-data-graph.sh
 注意事项：
 - 每条问题包含 `规则来源`（具体到 README/章节），让用户能追溯判定依据。
 - `状态=FAIL` 且迁移相关时，`下一步` 优先给 `upgrade`。
+- 只要 `INFO > 0`，状态至少为 `PASS_WITH_WARNINGS`，且 `下一步` 至少为 `self-improve`。
 - doctor 阶段不改项目用户数据文件，仅 `SKILL.md` 自动维护块可更新——同时修改和检查会混淆状态。
 - `decision` 或 `pipeline` 的断链至少判为 `MUST_FIX`。
 
