@@ -7,7 +7,7 @@ created: 2026-02-28
 updated: 2026-02-28
 tags: [pensieve, pipeline, commit, self-improve]
 name: run-when-committing
-description: 提交代码时调用。先自动沉淀经验，再执行原子化提交。触发词：commit / 提交 / git commit。
+description: 提交阶段强制流程：先判断是否有可沉淀洞察，命中则先自改进沉淀，再做原子化提交。触发词：commit / 提交 / git commit。
 
 stages: [tasks]
 gate: auto
@@ -22,6 +22,14 @@ gate: auto
 **上下文链接（至少一条）**：
 - 基于：[[knowledge/taste-review/content]]
 - 相关：[[decisions]]
+
+---
+
+## 信号门禁（必须）
+
+- 只沉淀“可复用且有证据”的洞察；无法验证的猜测不落库。
+- 分类必须遵守语义分层：IS->`knowledge`，WANT->`decision`，MUST->`maxim`。
+- 禁止用“knowledge 优先”替代语义判断。
 
 ---
 
@@ -101,6 +109,12 @@ gate: auto
 **完成标准**：所有 staged changes 已提交，每个提交独立且可回滚
 
 ---
+
+## 失败回退（必须）
+
+1. `git diff --cached` 为空：跳过 Task 2/Task 3，输出“无 staged 变更，不提交”。
+2. 沉淀步骤失败：记录阻塞原因并跳过沉淀，继续 Task 3；结尾追加“建议运行 `/doctor`”。
+3. 项目级 SKILL 维护失败：保留已沉淀内容，报告失败命令与重试建议，不回滚已写入文件。
 
 ## 执行规则（给 loop 用）
 
