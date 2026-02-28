@@ -20,7 +20,7 @@
 你熟悉的那套方法还在，并且已经升级成可执行系统：
 
 - Linus 风格准则已成为默认行动规则
-- 关键能力挂在 Claude Code 执行链（skills / hooks / task / agent）
+- 关键能力挂在 Claude Code 执行链（skills / task / agent）
 - 审查能力以 `review` pipeline + knowledge 形式落地
 
 你拿到的是工程能力级封装：提示词、流程和执行机制一起交付。
@@ -67,7 +67,7 @@
 ### 3. 绑定 Claude Code 原生能力
 
 - **Skills**：路由意图到工具
-- **Hooks**：Stop 负责自动续跑
+- **Hooks**：`PostToolUse` 自动同步项目级 `SKILL.md` 图谱（loop 不依赖 Stop hook）
 - **Task**：任务状态驱动流程节奏
 - **Agent**：主窗口拆解，子代理执行
 

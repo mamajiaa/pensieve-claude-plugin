@@ -2,7 +2,7 @@
 
 Pensieve 使用**官方插件结构**：
 
-- **插件（系统能力）**：hooks + skills，仅通过插件升级更新
+- **插件（系统能力）**：skills + hooks（默认启用 graph 自动同步），仅通过插件升级更新
 - **项目用户数据**：`.claude/skills/pensieve/`，永不被插件覆盖
 
 ## 快速安装
@@ -164,7 +164,7 @@ claude plugin install pensieve@kingkongshot-marketplace --scope user
 
 ### Hooks 没有触发？
 
-1. 使用 `/hooks` 确认 Stop hook 已启用
+当前仅保留 `PostToolUse` hook：用于在编辑用户数据后自动同步 `SKILL.md` 图谱（loop 不依赖 hooks）。
 
 ### Skill 没有加载？
 
