@@ -1,14 +1,14 @@
 # Loop (Execution Layer)
 
-Combines the Claude Code Task system with a local tracking directory to auto‑loop execution.
+Combines the Claude Code Task system with a local tracking directory for main-window controlled loop execution.
 
 ## Role Division
 
 | Role | Responsibility |
 |------|----------------|
-| **Main Window** | Planning: init → fill context → generate tasks → call task-executor |
-| **task-executor** | Execute tasks: read context → load knowledge as needed → execute → capture learnings if needed |
-| **Stop Hook** | Auto-loop: check pending tasks → inject reinforcement → continue |
+| **Main Window** | Planning: init -> fill context -> generate tasks -> call task-executor |
+| **task-executor** | Execute tasks: read context -> load knowledge as needed -> execute -> capture learnings if needed |
+| **Main Window (Continuation)** | Continue loop by checking pending tasks and dispatching subagents |
 
 ## Startup Flow (Main Window)
 
@@ -24,13 +24,13 @@ Combines the Claude Code Task system with a local tracking directory to auto‑l
 
 ### Step 2: Fill context (Main Window)
 
-In the loop directory (`.claude/pensieve/loop/{date}-{slug}/`):
+In the loop directory (`.claude/skills/pensieve/loop/{date}-{slug}/`):
 
 1. **Create and fill `_context.md`** (see format below; to avoid "Read before Write" friction, init-loop.sh no longer creates a template file)
 2. **Create documents as needed**
-   - `requirements.md` — requirements (estimate 6+ tasks)
-   - `design.md` — design choices (multiple options to weigh)
-   - `plan.md` — code exploration notes (need code understanding)
+   - `requirements.md` -- only when requirements are unclear (goal/scope/constraints not confirmed)
+   - `design.md` -- only when implementation is not obvious
+   - `plan.md` -- code exploration notes (need code understanding)
 
 ### _context.md format
 
@@ -54,7 +54,7 @@ In the loop directory (`.claude/pensieve/loop/{date}-{slug}/`):
 - Constraints: ZZZ
 
 ### Understanding & Assumptions
-[Model’s expectations]
+[Model's expectations]
 - Expected modules involved
 - Expected implementation approach
 - Expected difficulties
@@ -66,6 +66,11 @@ In the loop directory (`.claude/pensieve/loop/{date}-{slug}/`):
 | design | none / path |
 | plan | none / path |
 
+### Context Links (optional)
+- Based on: [[prior decision or knowledge]]
+- Leads to: [[subsequent decision, process, or document]]
+- Related: [[related topic]]
+
 ---
 
 ## Post-Context
@@ -73,7 +78,7 @@ In the loop directory (`.claude/pensieve/loop/{date}-{slug}/`):
 > If execution matches the plan, leave blank or note "no deviation".
 
 ### Deviations
-[Pre‑assumptions vs reality]
+[Pre-assumptions vs reality]
 - Before: XXX
 - Found: YYY
 - Adjustment: ZZZ
@@ -86,29 +91,32 @@ In the loop directory (`.claude/pensieve/loop/{date}-{slug}/`):
 
 Before splitting tasks, read project maxims:
 
-- `<USER_DATA_ROOT>/maxims/custom.md` (if present)
-- Any other files under `<USER_DATA_ROOT>/maxims/`
+- All files under `<USER_DATA_ROOT>/maxims/` (`*.md`)
 
 Then generate tasks based on context + maxims:
 
 | Workload | Task count |
 |----------|------------|
 | A few lines | 1 |
-| One module | 2–3 |
-| Multiple modules | 4–6 |
+| One module | 2-3 |
+| Multiple modules | 4-6 |
 
 Each task includes:
 - subject (imperative, e.g., "Implement user login")
 - description (source + action + completion criteria)
 - activeForm (progressive, e.g., "Implementing user login")
 
+After Phase 2 confirmation, create tasks directly in Claude Task system.
+Do not use a standalone markdown/bullet list as a substitute for real task creation.
+If you need to present tasks to the user, show a snapshot from created tasks (task id + subject).
+
 Hard rule: do not generate task lists before maxims are loaded.
 
-### Step 4: Auto-bind Stop Hook to the real taskListId
+### Step 4: Continue from Main Window
 
-After creating the first real task, Stop Hook auto-binds to the most recent active task list in this loop session.
+After creating the first real task, the main window should continue by selecting the next pending task and dispatching one subagent at a time.
 
-> Since `0.3.2`, Stop Hook auto-detects active loops via `/tmp/pensieve-loop-<taskListId>`. No background bind-loop process is needed.
+> Hooks are no longer required for loop continuation.
 
 ### Step 5: Execute tasks
 
@@ -117,20 +125,20 @@ Call an agent for each task:
 ```
 Task agent=task-executor prompt="
 task_id: 1
-context: .claude/pensieve/loop/{date}-{slug}/_context.md
+context: .claude/skills/pensieve/loop/{date}-{slug}/_context.md
 system_skill_root: <SYSTEM_SKILL_ROOT>
-user_data_root: .claude/pensieve
+user_data_root: .claude/skills/pensieve
 "
 ```
 
-The agent returns after one task. Stop Hook detects pending tasks, injects reinforcement, and the main window continues with the next task.
+The agent returns after one task. The main window checks pending tasks and continues with the next one.
 
 ## Two Storage Systems
 
 | Storage | Content | Purpose |
 |---------|---------|---------|
 | `~/.claude/tasks/<uuid>/` | Task state (JSON) | Claude Code native |
-| `.claude/pensieve/loop/{date}-{slug}/` | Metadata + docs | Project‑level tracking and learnings (never overwritten) |
+| `.claude/skills/pensieve/loop/{date}-{slug}/` | Context + docs | Project-level tracking and learnings (never overwritten) |
 
 ## Directory Structure
 
@@ -140,28 +148,25 @@ The agent returns after one task. Stop Hook detects pending tasks, injects reinf
     ├── 2.json
     └── ...
 
-.claude/pensieve/loop/           # Project tracking (metadata + learnings)
+.claude/skills/pensieve/loop/           # Project tracking (context + learnings)
     └── 2026-01-23-login/        # One directory per loop
-        ├── _meta.md             # Metadata (goal, pipeline)
         ├── _context.md          # Conversation context, interventions
         ├── requirements.md      # Requirements (if any)
         └── design.md            # Design notes (if any)
 ```
 
-## Auto-Loop Mechanism
+## Loop Continuation Mechanism
 
-Stop Hook runs whenever Claude stops:
+Main window continues until tasks complete:
 
 ```
-Agent runs → stops
-    ↓
-loop-controller.sh checks
-    ↓
-├── pending task → block + inject reinforcement → continue
-└── all complete → normal stop
+Agent runs one task -> returns
+    |
+Main window checks task state
+    |
++-- pending task exists -> dispatch next subagent
++-- all complete -> wrap up
 ```
-
-> Multi-session support: markers store the current session `claude_pid`, so Stop Hook only matches the current session.
 
 ## Reinforcement Message
 
@@ -183,7 +188,7 @@ Injected on each continuation:
 
 **Execution requirements**:
 1. Complete the task
-2. TaskUpdate → completed
+2. TaskUpdate -> completed
 3. If intervention occurs, record in _context.md
 ```
 
@@ -192,29 +197,30 @@ Injected on each continuation:
 | Task characteristics | Phase combination |
 |---------------------|-------------------|
 | Clear, small scope | tasks |
-| Need code understanding | plan → tasks |
-| Need technical design | plan → design → tasks |
-| Unclear requirements | plan → requirements → design → tasks |
+| Need code understanding | plan -> tasks |
+| Need technical design | plan -> design -> tasks |
+| Unclear requirements | plan -> requirements -> design -> tasks |
 
 ## Closed-Loop Learning (Main Window)
 
-After the agent returns, run self‑improve:
+After the agent returns, run self-improve:
 
 ```
-Pre‑assumptions → execution → post‑deviations → capture learnings
+Pre-assumptions -> execution -> post-deviations -> capture learnings
 ```
 
 ### Flow
 
 1. Read `tools/self-improve/_self-improve.md`
 2. Compare `_context.md` pre/post sections
-3. Fill Post‑Context (deviations)
+3. Fill Post-Context (deviations)
 4. If meaningful deviation exists, ask user to capture
 5. Upon consent, write using README format
+6. If captured as `decision`/`pipeline`, ensure at least one `Based on/Leads to/Related` link is present
 
 ### Post-Context Example
 
-| Pre‑assumption | Actual finding | Adjustment |
+| Pre-assumption | Actual finding | Adjustment |
 |---------------|----------------|------------|
 | Two code paths are identical | RPWindow adds icon + styles | Add variant prop |
 | 9 components independent | Helper components not reusable | Split into 3 window components |
@@ -228,4 +234,4 @@ Pre‑assumptions → execution → post‑deviations → capture learnings
 
 **Not meaningful** (do not capture):
 - Typos, small adjustments
-- One‑off special cases
+- One-off special cases

@@ -6,6 +6,10 @@ push-to-github.sh
 /resource
 docs/.obsidian/
 # Loop runtime files (project user data)
+.claude/skills/pensieve/loop/.active
+.claude/skills/pensieve/loop/current
+.claude/skills/pensieve/loop/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*/
 .claude/pensieve/loop/.active
 .claude/pensieve/loop/current
 .claude/pensieve/loop/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*/
+/.obsidian

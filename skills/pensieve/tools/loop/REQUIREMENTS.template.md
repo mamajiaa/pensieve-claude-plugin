@@ -2,18 +2,16 @@
 
 **Owner**: Main Window
 
-**Purpose**: An anchor for long projects so you don't forget the original intent.
+**Purpose**: Clarify ambiguous requirements into a stable goal/scope/constraints baseline.
 
 **When to write**:
-- Estimated 6+ tasks
-- Multi‑day execution
-- Multiple modules involved
+- Requirements are unclear (goal/scope/constraints not confirmed)
 
 ---
 
 ## Writing Rules
 
-- Create at `.claude/pensieve/loop/{date}-{slug}/requirements.md`
+- Create at `.claude/skills/pensieve/loop/{date}-{slug}/requirements.md`
 - Write a first draft before asking questions
 - After user confirmation, record the path in `_context.md`
 
@@ -36,6 +34,11 @@
 ## Core Problem
 
 [One sentence: what problem are we solving?]
+
+## Context Links (recommended)
+- Based on: [[prior decision or knowledge]]
+- Leads to: [[subsequent decision or process]]
+- Related: [[related topic]]
 
 ## Success Criteria
 
@@ -75,7 +78,7 @@
 
 User: "I want multiple terminals to share state."
 
-Follow‑ups:
+Follow-ups:
 Q: What scenario do you expect?
 A: I started a task in terminal A and want to continue in terminal B.
 
@@ -100,4 +103,4 @@ Clarified experience:
 | Requirements too vague | Success criteria must be verifiable |
 | Unclear boundaries | "Out of scope" must be explicit |
 | Forgot to update | Update the anchor when requirements change |
-| Writing a PRD | This is an anchor, not a full doc — keep it short |
+| Writing a PRD | This is an anchor, not a full doc -- keep it short |

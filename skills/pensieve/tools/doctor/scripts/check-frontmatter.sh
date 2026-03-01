@@ -1,5 +1,5 @@
 #!/bin/bash
-# Quick frontmatter + pipeline naming validator for project-level Pensieve user data.
+# Quick frontmatter + structural validator for project-level Pensieve user data.
 # No external dependency; uses Python stdlib only.
 
 set -euo pipefail
@@ -21,7 +21,7 @@ Usage:
   check-frontmatter.sh [--root <path>]
 
 Options:
-  --root <path>   Scan root. Default: <project>/.claude/pensieve
+  --root <path>   Scan root. Default: <project>/.claude/skills/pensieve
   -h, --help      Show help
 USAGE
       exit 0
@@ -194,6 +194,16 @@ def parse_frontmatter(text: str) -> tuple[dict[str, object] | None, list[str], s
     return data, errors, None
 
 
+def body_without_frontmatter(text: str) -> str:
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return text
+    for i in range(1, len(lines)):
+        if lines[i].strip() == "---":
+            return "\n".join(lines[i + 1 :])
+    return text
+
+
 def valid_date(s: str) -> bool:
     if not date_re.match(s):
         return False
@@ -252,11 +262,11 @@ for p in files:
 
     v_type = fm.get("type")
     if isinstance(v_type, str) and v_type and v_type not in allowed_types:
-        issues.append(Issue("MUST_FIX", "FM-201", rel, f"invalid type: {v_type} (allowed:  {', '.join(sorted(allowed_types))}）"))
+        issues.append(Issue("MUST_FIX", "FM-201", rel, f"invalid type: {v_type} (allowed: {', '.join(sorted(allowed_types))})"))
 
     v_status = fm.get("status")
     if isinstance(v_status, str) and v_status and v_status not in allowed_status:
-        issues.append(Issue("MUST_FIX", "FM-202", rel, f"invalid status: {v_status} (allowed:  {', '.join(sorted(allowed_status))}）"))
+        issues.append(Issue("MUST_FIX", "FM-202", rel, f"invalid status: {v_status} (allowed: {', '.join(sorted(allowed_status))})"))
 
     v_id = fm.get("id")
     if isinstance(v_id, str) and v_id and not id_re.match(v_id):
@@ -270,6 +280,46 @@ for p in files:
     v_tags = fm.get("tags")
     if v_tags is not None and not isinstance(v_tags, list):
         issues.append(Issue("MUST_FIX", "FM-205", rel, "invalid tags (must be an array, e.g. [pensieve, maxim])"))
+
+    if rel.startswith("decisions/"):
+        body = body_without_frontmatter(text)
+        if not re.search(r"^\s*##\s*Exploration Shortcut\s*$", body, flags=re.MULTILINE):
+            issues.append(
+                Issue(
+                    "SHOULD_FIX",
+                    "FM-401",
+                    rel,
+                    "decision should include an `## Exploration Shortcut` section to clarify how to reduce inquiry and exploration cost next time",
+                )
+            )
+        else:
+            if "What to ask less next time" not in body:
+                issues.append(
+                    Issue(
+                        "SHOULD_FIX",
+                        "FM-402",
+                        rel,
+                        "decision `Exploration Shortcut` section is missing a 'What to ask less next time' entry",
+                    )
+                )
+            if "What to look up less next time" not in body:
+                issues.append(
+                    Issue(
+                        "SHOULD_FIX",
+                        "FM-403",
+                        rel,
+                        "decision `Exploration Shortcut` section is missing a 'What to look up less next time' entry",
+                    )
+                )
+            if "Invalidation conditions" not in body:
+                issues.append(
+                    Issue(
+                        "SHOULD_FIX",
+                        "FM-404",
+                        rel,
+                        "decision `Exploration Shortcut` section is missing an 'Invalidation conditions (when to re-evaluate)' entry",
+                    )
+                )
 
 must_fix = [x for x in issues if x.level == "MUST_FIX"]
 should_fix = [x for x in issues if x.level == "SHOULD_FIX"]

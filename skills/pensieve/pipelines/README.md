@@ -1,126 +1,170 @@
 # Pipelines
 
-Executable workflows that define a full loop from input to validation.
+Executable workflows that define a full loop from input through validation to output.
 
-> Note: Built‑in tools were moved to `tools/`; the plugin no longer ships pipelines. Initial pipelines are seeded at install/migration into `.claude/pensieve/pipelines/` and are user‑editable.
+> Note: Built-in tools were moved to `tools/`. The plugin no longer ships pipelines. Initial pipelines are seeded at install/migration into `.claude/skills/pensieve/pipelines/` and are user-editable.
 
 ## Purpose
 
-Pipelines exist to **build verifiable execution loops and deterministic task blueprints**.
+The goal of a pipeline is to build **verifiable execution loops**, not to pile up information.
 
-**Pipelines orchestrate flow — they do not aggregate information.**  
-All background information should live elsewhere and be **referenced**:
+In Pensieve, determine the semantic layer first, then decide whether a pipeline is needed:
+- `knowledge` = IS (this is how it is)
+- `decision` = WANT (I want it this way)
+- `maxim` = MUST (it must be this way)
+- `pipeline` = HOW (how to execute in order and verify)
 
-- **Knowledge**: external references, checklists, best practices
-- **Maxims**: universal principles and values
-- **Decisions**: context‑specific choices and rationale
-- **External skills/tools**: heavy instructions or specialized workflows
+Pipelines orchestrate flow -- they do not store knowledge. Background information should be split into other carriers and referenced via links:
 
-A pipeline is not a checklist; it's a closed‑loop system that matches how LLMs work:
+- **Knowledge**: external standards, references, checklists
+- **Maxims**: cross-scenario principles
+- **Decisions**: context-specific choices and rationale
+- **External skills/tools**: specialized capabilities and heavy instructions
+
+## Pre-Pipeline Self-Check (Mandatory)
+
+Before writing, ask:
+
+**"Does this content directly change the task's ordering, inputs, steps, or completion criteria?"**
+
+- If "no": the content does not belong in the pipeline body; it must be extracted and referenced via `[[...]]`.
+- If "yes": keep it in the pipeline body.
+
+Quick split rules:
+1. Theory, principles, long explanations -> `knowledge`
+2. Project trade-offs, strategy conclusions -> `decision`
+3. Cross-scenario principles -> `maxim`
+4. Pipeline retains only: task orchestration + validation loop + key constraints
+
+### When NOT to Write a Pipeline
+
+By default, do not create a new pipeline when:
+
+- The main problem is "slow locating, slow judgment," not "confused step ordering"
+- Conclusions are primarily constraints/boundaries/anti-patterns with no fixed steps
+- Similar tasks have not yet recurred, and the process is still evolving
+
+These should be written into `knowledge` / `decision` / `maxim` by semantic layer, not directly as a pipeline.
+
+Closed-loop model:
 
 ```
-Input → Execute → Validate → Output
-         ↑      ↓
-         └── Feedback ──┘
+Input -> Execute -> Validate -> Output
+         ^        |
+         +-- Feedback --+
 ```
 
-### What makes a good pipeline
+## What Makes a Good Pipeline
 
-| Trait | Why it matters (LLM view) |
-|-------|----------------------------|
-| **Closed loop** | LLMs drift; they need a clear start and end |
-| **Real signals** | Validate via actual outputs, not code inference |
-| **File‑based logs** | Traceable; errors map to concrete steps |
-| **Testable** | Verifies correctness without "feelings" |
-| **Tool‑friendly** | Identify steps where tools remove uncertainty |
+| Trait | Value (LLM Perspective) |
+|-------|------------------------|
+| Clear closed loop | Prevents drift; clear when to start/end |
+| Uses real signals | Validates via actual output, not "looks right" |
+| File-based trail | Traceable; can locate the problem step |
+| Testable | Does not depend on "feeling correct" |
+| Tool-friendly | Clear which steps should leverage tools to reduce uncertainty |
 
-### Validation must be based on real feedback
+## Validation Must Be Based on Real Feedback
 
-**Anti‑pattern**: read code → "seems correct" → continue
+Anti-pattern: read code -> feels correct -> continue
 
-**Correct**: execute code → get real output → read output → validate
+Correct approach: execute -> get output/logs -> judge based on results
 
 | Validation type | Real feedback source |
 |-----------------|----------------------|
 | Build | Compiler output, build logs |
-| Tests | Test results, coverage reports |
-| Runtime | App logs, error stacks |
+| Tests | Test results, coverage |
+| Runtime | Application logs, error stacks |
 | Integration | API responses, DB state |
 
-**Key**: Use real runtime feedback, not model inference. Systems don't lie; model inference does.
+Key point: prioritize system feedback; do not rely on model inference.
 
 ## Capture Criteria
 
-Ask yourself: **If this workflow isn't solidified, what decisions will be repeated?**
+Core question: **If this workflow is not solidified, which decisions will be repeatedly re-made?**
 
-### Do we need a new pipeline?
+### Do We Need a New Pipeline?
 
-**First ask**: Can we solve this by composing existing pipelines?
+First ask: can we solve this by composing existing pipelines?
 
 | Situation | Action |
 |-----------|--------|
-| Existing pipeline combo works | Re‑order/compose; do not add |
-| Missing a validation step | Add to an existing pipeline |
+| Existing pipeline combination covers it | Compose/reorder; do not add new |
+| Only missing a validation step | Add to an existing pipeline |
 | Entirely different execution loop | Create a new pipeline |
 
-### Signals that it's worth capturing
+Before adding, pass one more gate:
+
+- The same task structure has appeared multiple times
+- Step ordering cannot be swapped
+- Each step can define a verifiable completion criterion
+
+### Signals Worth Capturing
 
 | Signal | Explanation |
 |--------|-------------|
-| Multiple loops share similar task structure | Steps stabilized; extract a pipeline |
-| A step is repeatedly missed | Use a pipeline to enforce completeness |
-| Execution depends on multiple knowledge sources | Pipeline should stitch them together |
+| Multiple loops share the same task structure | Steps have stabilized; ready to extract |
+| A step is repeatedly missed | Pipeline needed to enforce completeness |
+| Execution depends on multiple knowledge sources | Pipeline should unify orchestration |
 
-### Evolution path
+### Evolution Path
 
-```
-Reach baseline → refine (tools, sequencing)
-```
+1. First reach a runnable baseline (even if validation is manual)
+2. Then tool-ify fragile/repeated steps
+3. Finally reorder steps to reduce backtracking
 
-1. **Baseline**: It runs, with basic validation—even if manual
-2. **Tooling**: Turn repeated/fragile steps into tools
-3. **Sequencing**: Reorder steps to reduce backtracking
-
-**Anti‑pattern**: Perfectionism up front; optimizing before it ever runs.
+Anti-pattern: pursuing "perfect design" before it has ever run.
 
 ## Relationships & Evolution
 
 | Direction | Description |
 |-----------|-------------|
-| Pipeline ← Knowledge | External standards guide execution |
-| Pipeline → Tasks | Pipeline defines the loop; tasks are concrete actions |
-| Pipeline ↔ Decision | Decisions formed during execution can refine pipelines |
+| Pipeline <- Knowledge | External standards constrain the flow |
+| Pipeline -> Tasks | Pipeline defines the blueprint; tasks are runtime instances |
+| Pipeline <-> Decision | Decisions from execution can feed back into the flow |
 
-### Pipeline vs Tasks
+## Link Rules (Pipeline-Mandatory)
+
+Every pipeline body must include at least one explicit link for tracing sources and impact.
+
+Recommended fields:
+- `Based on`: which decisions/knowledge it depends on
+- `Leads to`: what outputs or subsequent flows it triggers
+- `Related`: adjacent flows or related topics
+
+Hard rule:
+- Any long paragraph that does not directly serve task orchestration must be migrated to a linked file.
+
+## Pipeline vs Tasks
 
 | Type | Essence | Focus |
 |------|---------|-------|
-| Pipeline | Task blueprint + validation loop | "What to create and in which order" |
-| Tasks | Runtime instances | "Execute this specific step now" |
+| Pipeline | Task blueprint + validation loop | "In what order to do what" |
+| Tasks | Runtime instances | "Execute this step now" |
 
-Pipelines should directly provide task templates; runtime tasks are instantiated from that template.
+Pipelines should directly produce instantiable task templates.
 
 ## Writing Guide
 
 ### Directory Structure
 
 ```
-.claude/pensieve/pipelines/
+.claude/skills/pensieve/pipelines/
 ├── run-when-*.md
 ```
 
 ### Naming Convention
 
-Hard rules:
-- pipeline filenames must use the invocation-intent pattern: `run-when-*.md`
-- legacy names are not kept for compatibility (`review.md` must be renamed)
+Hard rule (mandatory):
+- Pipeline filenames must use the trigger-intent style: `run-when-*.md`
+- Legacy naming is not preserved for compatibility (e.g. `review.md` must be renamed)
 
 | Pattern | Type | Notes |
-|--------|------|------|
-| `run-when-*.md` | user-defined | filename should reveal when to call it |
-| `_*.md` | forbidden | reserved for legacy system naming |
+|---------|------|-------|
+| `run-when-*.md` | user-defined | Filename directly reveals "when to call it" |
+| `_*.md` | forbidden | Legacy system naming, no longer used |
 
-### File Format
+### File Template
 
 ```markdown
 # Pipeline Name
@@ -133,23 +177,21 @@ status: active
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 tags: [pensieve, pipeline]
-description: Short summary. Triggered when user says "trigger1", "trigger2".
+description: [Constrained scenario + cost of skipping + trigger words]. Example: this pipeline must be run in X scenario; skipping causes Y risk. Trigger words: a, b, c.
 ---
 
-Role: You are [doing what]...
+## Signal Gate (Mandatory)
 
-## Core Principles
+- Only output high-signal results (reproducible, locatable, evidence-backed)
+- Candidate issues must be validated before entering final output
+- Declare confidence threshold (e.g. >= 80)
+- Declare "do not report" items (style preferences, speculative risks, etc.)
 
-- **Principle 1**: short, operational
-- **Principle 2**: short, operational
-
----
-
-## Task Blueprint
+## Task Blueprint (Create tasks in order)
 
 ### Task 1: Task Name
 
-**Goal**: What this task should achieve
+**Goal**: This task's objective
 
 **Read Inputs**:
 1. Required file/path
@@ -159,131 +201,79 @@ Role: You are [doing what]...
 1. Specific action
 2. Specific action
 
-**Done When**: Objective completion criteria
+**Done When**: Verifiable completion criteria
 
 ---
 
 ### Task 2: Task Name
 
-**Goal**: What this task should achieve
+**Goal**: This task's objective
 
 **Read Inputs**:
-1. Previous task output
-
-**CRITICAL**: Key warning (if any)
+1. Previous task's output
 
 **Steps**:
 1. Specific action
-2. **Present to user and wait for confirmation**
+2. **Validate candidate results and filter false positives**
 
-**Done When**: Objective completion criteria
+**Done When**: Only high-signal results remain
 
 ---
 
-## Related Files
+### Task 3: Final Output
 
-- `path/to/file` — description
+**Goal**: Produce actionable results
+
+**Read Inputs**:
+1. Preceding task outputs
+
+**Steps**:
+1. Output final results sorted by severity
+2. Attach evidence to each conclusion (file/line number/rule source)
+3. Provide fix priority and next steps
+
+**Done When**: Report is directly actionable
+
+---
+
+## Failure Fallback (Mandatory)
+
+1. Input missing: return missing items and stop; do not force execution.
+2. Insufficient evidence: mark "cannot verify" and filter out; do not include in final output.
+3. All candidates filtered: explicitly output "no high-signal issues."
+
+## Execution Rules
+
+1. Create execution tasks in 1:1 order with the Task Blueprint; do not merge or skip.
+2. Fill missing information within the current task; do not add extra phases.
+3. Only persist to knowledge/decision/maxim/pipeline when reusable and evidence-backed.
+
+## Related Files (Optional)
+
+- `path/to/file` -- description
 ```
 
 ### Format Checklist
 
-| Element | Notes |
-|---------|------|
-| Filename | Must match `run-when-*.md` and indicate invocation intent |
+| Element | Requirement |
+|---------|------------|
+| Filename | Must be `run-when-*.md`; trigger scenario discernible from filename |
 | Required frontmatter | `id/type/title/status/created/updated/tags/description` |
-| `description` | In frontmatter; include trigger words |
-| Role line | Starts with "You are..." and defines Claude's role |
-| Core Principles | 1–3 short operational rules |
-| No knowledge dump | Long background belongs in Knowledge/Maxims/Decisions/Skills |
-| Task Blueprint | Must include explicit `Task 1/2/3...` in order |
-| **Goal** | Every task must have a goal |
-| **Read Inputs** | Required files/paths must be explicit |
-| **Steps** | Numbered, concrete steps |
-| **Done When** | Completion criteria must be testable |
+| `description` | In frontmatter; includes trigger words |
+| Signal gate | Must declare high-signal threshold and "do not report" items |
+| No knowledge dump | Long background goes to Knowledge/Maxims/Decisions/Skills |
+| Content split | If a paragraph does not affect task orchestration, it must be split out and referenced via `[[...]]` |
+| Task Blueprint | Must have explicit `Task 1/2/3...` in order |
+| **Goal** | Every task must have one |
+| **Read Inputs** | Files/paths must be explicit |
+| **Steps** | Numbered, concrete, executable |
+| **Done When** | Must be verifiable |
 | **CRITICAL** / **DO NOT SKIP** | Strong markers for key steps |
-| User confirmation | Explicit "Wait for confirmation" |
-
-### Example
-
-```markdown
-# Review Pipeline
-
----
-description: Code review flow. Triggered by "review code", "review", "check this change".
----
-
-You are conducting a systematic code review, balancing thoroughness with pragmatism.
-
-## Core Principles
-
-- **Evidence‑based**: Every issue must cite specific code
-- **Severity‑aware**: Distinguish critical bugs from nitpicks
-- **Actionable**: Provide concrete fix suggestions
-
----
-
-## Task Blueprint
-
-### Task 1: Understand Changes
-
-**Goal**: Get a complete picture of what changed
-
-**Read Inputs**:
-1. User-provided diff/commit/PR scope
-2. `knowledge/taste-review/content.md`
-
-**Steps**:
-1. Read the diff or specified commits
-2. List all modified files
-3. Identify scope (feature, refactor, bugfix, etc.)
-
-**Done When**: Can list all modified files and change types
-
----
-
-### Task 2: Systematic Review
-
-**Goal**: Check each file against review criteria
-
-**Read Inputs**:
-1. Task 1 output file list
-2. `knowledge/taste-review/content.md`
-
-**CRITICAL**: Every WARNING/CRITICAL must cite specific line numbers.
-
-**Steps**:
-1. Apply the checklist from knowledge (no extra theory here)
-2. Record findings with severity: PASS / WARNING / CRITICAL
-3. Track user-visible behavior change risk
-
-**Done When**: Each file has evidence-backed conclusion
-
----
-
-### Task 3: Report
-
-**Goal**: Deliver an actionable review summary
-
-**Read Inputs**:
-1. Task 2 findings
-
-**Steps**:
-1. Summarize findings by severity
-2. Provide overall assessment and concrete fix suggestions
-3. **Present the report to the user and wait for confirmation**
-
-**Done When**: Report includes all findings and prioritized fixes
-
----
-
-## Related Files
-
-- `knowledge/taste-review/` — Review criteria and checklist
-```
+| Failure fallback | Must have explicit fallback handling |
+| Links | Body must contain at least one valid link |
 
 ## Notes
 
-- Pipelines must **fit the project** — there is no universal best pipeline
-- Early projects: simple pipelines, loose validation
-- Mature projects: refined pipelines, strict validation
-- Improvements come from real execution feedback, not speculation
+- Pipelines should be lightweight and executable
+- Solve one closed-loop problem at a time; avoid oversized workflows
+- When uncertain, start with a minimal runnable version and iterate

@@ -1,197 +1,90 @@
+---
+description: Read-only check tool that outputs PASS/PASS_WITH_WARNINGS/FAIL with a MUST_FIX/SHOULD_FIX/INFO evidence list based on README specs. Does not modify user data files. Trigger words: doctor, health check, check.
+---
 # Doctor Flow
 
----
-description: README-driven health check for project user data. Trigger words include "doctor", "health check", "format check", and "migration check".
----
-
-You are Pensieve Doctor. Your role is **read-only diagnosis**. Do not modify user data.
-
-Scope boundaries:
-- `/doctor`: check and report
-- `/upgrade`: migrate and clean legacy layout
-- `/selfimprove`: capture learnings and improvements
-
-## Tool Contract
+> Tool boundaries: `<SYSTEM_SKILL_ROOT>/references/tool-boundaries.md` | Shared rules: `<SYSTEM_SKILL_ROOT>/references/shared-rules.md` | Directory layout: `<SYSTEM_SKILL_ROOT>/references/directory-layout.md`
 
 ### Use when
-
 - User requests health check, compliance check, or post-migration validation
 - Need to produce `MUST_FIX/SHOULD_FIX` findings with evidence
-- Need to determine whether old path parallels / naming conflicts still exist
-
-### Do not use when
-
-- User requests direct migration or data cleanup (route to `/upgrade`)
-- User requests capturing learnings, writing maxims/decisions/pipelines (route to `/selfimprove`)
-- User requests immediate file edits (doctor is read-only diagnosis)
-
-### Required inputs
-
-- Spec source files (maxims/decisions/pipelines/knowledge/upgrade)
-- Project user data directory `.claude/pensieve/`
-- Quick-check and graph script outputs:
-  - `check-frontmatter.sh`
-  - `generate-user-data-graph.sh`
-
-### Output contract
-
-- Must output report using the fixed template
-- Every finding must include rule source and fix suggestion
-- When `FAIL` and migration-related, next step prioritizes `/upgrade`
+- Need to confirm old-path parallels, naming conflicts, or non-project-level legacy residue
 
 ### Failure fallback
+- Spec file unreadable: abort judgment, mark "unable to determine"
+- Quick-check script failed: do not issue final conclusion, report the blocker first
+- Graph read failed: do not issue final conclusion, fix graph step first
 
-- Spec file unreadable: abort judgment and mark "unable to determine" — do not output false conclusions
-- Quick-check script failed: do not issue final conclusion — report the blocker first
-- Graph read failed: do not issue final conclusion — fix the graph step first
-
-### Negative examples
-
-- "Check and fix while you're at it" -> out of scope, doctor is read-only
-- "Skip quick-check and give me PASS" -> forbidden, violates mandatory step
-
-Hard rules:
-- Do not hardcode standards.
-- Always read spec files first, then derive checks from those specs.
-- `/doctor` is not an upgrade prerequisite; default workflow is upgrade-first.
-
-## Default Flow (Upgrade-first)
-
-1. Run `/upgrade` first (even with dirty data)
-2. Run `/doctor` and produce a compliance report
-3. If MUST_FIX remains, continue `/upgrade` or manual repair, then rerun `/doctor`
-4. After passing, run `/selfimprove` only if needed
+Derive check items from specs rather than hardcoding.
 
 ---
+Spec sources (see `shared-rules.md` section on spec sources): `<SYSTEM_SKILL_ROOT>/maxims/README.md`, `decisions/README.md`, `pipelines/README.md`, `knowledge/README.md`, `tools/doctor/migrations/README.md`, `tools/upgrade/_upgrade.md` (upgrade flow only).
 
-## Required Spec Sources
-
-Read these files first and treat them as the single source of truth:
-
-1. `<SYSTEM_SKILL_ROOT>/maxims/README.md`
-2. `<SYSTEM_SKILL_ROOT>/decisions/README.md`
-3. `<SYSTEM_SKILL_ROOT>/pipelines/README.md`
-4. `<SYSTEM_SKILL_ROOT>/knowledge/README.md`
-5. `<SYSTEM_SKILL_ROOT>/tools/upgrade/_upgrade.md` (only for migration/legacy-path rules)
-
-Rules:
-- If specs do not explicitly say `must/required/hard rule/at least one`, do not mark MUST_FIX.
-- Limited inference is allowed, but label it as inferred in the report.
-
----
-
-## Check Scope
-
-Project-level user data:
-
-```
-.claude/pensieve/
-  maxims/
-  decisions/
-  knowledge/
-  pipelines/
-  loop/
-```
-
-Legacy candidate paths (as defined by upgrade specs):
-- `<project>/skills/pensieve/`
-- `<project>/.claude/skills/pensieve/`
-- other historical user-data paths from upgrade rules
-
-Plugin activation config (for naming consistency checks):
-- `~/.claude/settings.json`
-- `<project>/.claude/settings.json`
-
-> These settings paths were added to detect plugin-key conflicts (MUST_FIX #8).
-
----
+Check scope: project-level user data (latest per `migrations/README.md`) and legacy path candidates (deprecated list). Plugin config: `~/.claude/settings.json`, `<project>/.claude/settings.json`.
 
 ## Severity Rules
+**MUST_FIX**:
+1. Old and new parallel dual sources exist
+2. Violates README `must / required / hard rule / at least one`
+3. `decision`/`pipeline` missing link fields or all links are invalid
+4. User data root directory or critical category directories missing
+5. `pipeline` substitutes task orchestration with large knowledge dumps without decomposing into linked references
+6. `pipeline` filename does not use the `run-when-*.md` pattern
+7. User data directory exists but missing initial seeds
+8. `enabledPlugins` retains both old and new keys simultaneously, or missing the new key
+9. Found plugin-level/user-level pensieve skill copies not converged to project-level
+10. Found standalone graph files (`_pensieve-graph*.md`/`pensieve-graph*.md`/`graph*.md`)
+11. Found legacy spec README copies in project-level subdirectories
+12. `~/.claude/projects/<project>/memory/MEMORY.md` missing Pensieve guidance block or not aligned with system SKILL.md `description`
 
-### MUST_FIX
+**SHOULD_FIX**: recommended/prefer rules not met but do not block the main flow. Includes `decision` missing "Exploration Shortcut" section or missing "What to ask less next time"/"What to look up less next time"/"Invalidation conditions".
 
-Mark MUST_FIX when any of these is true:
-1. Structural conflict: old/new parallel sources make truth ambiguous.
-2. Hard-rule violation: explicit `must/required/hard rule/at least one` is broken.
-3. Traceability break: required links missing/invalid for `decision` or `pipeline`.
-4. Missing base structure: required root/category directories are missing.
-5. Pipeline drift: large knowledge dump replaces orchestration and no linked decomposition exists.
-6. Naming violation: pipeline filename is not `run-when-*.md` (including legacy `review.md`).
-7. Initialization gap: user-data root exists but seed files are missing (e.g., empty `maxims/*.md` or missing `pipelines/run-when-reviewing-code.md`).
-8. Plugin-key conflict: `enabledPlugins` keeps old and new Pensieve keys in parallel, or misses the new key.
-7. Initialization gap: user-data root exists but seed files are missing (e.g., empty `maxims/*.md` or missing `pipelines/run-when-reviewing-code.md`).
-8. Plugin-key conflict: `enabledPlugins` keeps old and new Pensieve keys in parallel, or misses the new key.
+**INFO**: observations, statistics, or tradeoff items requiring user decision.
 
-### SHOULD_FIX
-
-Recommended/preferred rules are not met and maintainability is degraded, but primary flow still works.
-
-### INFO
-
-Observations, metrics, or tradeoff items requiring user choice.
+**Status determination** (hard rule): `MUST_FIX > 0` -> `FAIL` (-> `upgrade`) | `MUST_FIX = 0` and `SHOULD_FIX + INFO > 0` -> `PASS_WITH_WARNINGS` (-> `self-improve`) | all zero -> `PASS` (-> `none`)
 
 ---
+## Phase 1: Read specs and generate check matrix
+**Goal**: Extract all check items from spec files and build an internal check matrix.
+**Actions**:
+1. Read all "spec source" files, extract directory structure, naming, required sections/fields, link rules
+2. Extract latest/deprecated lists from `migrations/README.md`
+3. Structure checks are implemented by `scan-structure.sh`
 
-## Execution
+## Phase 2: Scan files and validate
+**Goal**: Run shared structure scan and incorporate results into the judgment.
+**Actions**:
+1. Run:
+```bash
+bash <SYSTEM_SKILL_ROOT>/tools/doctor/scripts/scan-structure.sh --output .state/pensieve-structure-scan.json
+```
+2. Read `status`, `summary.must_fix_count`/`should_fix_count`, `flags.*`, `findings[]`
+3. If `must_fix_count > 0`, conclusion is at least `FAIL`, recommended action prioritizes `upgrade`
 
-### Phase 1: Build check matrix from specs
-
-Extract:
-- directory structure rules
-- naming rules
-- required sections/fields
-- link rules (especially decision/pipeline)
-- migration and legacy-path rules
-
-### Phase 2: Scan files and validate
-
-- Scan `.claude/pensieve/**`
-- Scan legacy candidate paths
-- Scan Pensieve-related `enabledPlugins` keys in user/project `settings.json`
-  (both `~/.claude/settings.json` and `<project>/.claude/settings.json`)
-- Produce pass/fail/unknown per rule
-
-### Phase 2.2: Mandatory frontmatter quick check
-
-Before final conclusion, run:
-
+## Phase 2.2: Frontmatter quick check
+**Goal**: Cover frontmatter format validation and incorporate into judgment.
+**Actions**:
+1. Run:
 ```bash
 bash <SYSTEM_SKILL_ROOT>/tools/doctor/scripts/check-frontmatter.sh
 ```
+2. Read files scanned, MUST_FIX/SHOULD_FIX counts and details
+3. Frontmatter syntax errors/missing/required field missing/invalid values -> `MUST_FIX`; pipeline naming violations (`FM-301/FM-302`) -> `MUST_FIX`; `decision` exploration shortcut missing (`FM-401~FM-404`) -> `SHOULD_FIX`
 
-Read and incorporate:
-- Files scanned
-- MUST_FIX count/details
-- SHOULD_FIX count/details
-
-Rules:
-- Syntax damage in frontmatter => MUST_FIX
-- Missing frontmatter / required fields / invalid values => MUST_FIX
-- Pipeline naming violations (`FM-301/FM-302`) => MUST_FIX
-- Do not output final conclusion without running this check
-
-### Phase 2.5: Mandatory graph generation before conclusion
-
-Run and read graph result:
-
+## Phase 2.5: Generate graph and verify links
+**Goal**: Verify knowledge network link connectivity.
+**Actions**:
+1. Run:
 ```bash
 bash <SYSTEM_SKILL_ROOT>/tools/upgrade/scripts/generate-user-data-graph.sh
 ```
+2. Read note count/link count/resolved/unresolved, sample at least first 5 unresolved links
+3. When file scan conflicts with graph, use the more conservative judgment
 
-Use these fields in conclusion:
-- Notes scanned
-- Links found
-- Links resolved
-- Links unresolved
-- Unresolved link list (sample at least first 5)
-
-Rules:
-- No graph read => no final conclusion
-- If graph and file scan conflict, choose the more conservative (higher severity) result
-
-### Phase 3: Output fixed-format report
-
-Use this exact report structure:
+## Phase 3: Output fixed-format report
+**Goal**: Output using fixed template; every finding must include its rule source.
+**Actions**:
+1. Template:
 
 ```markdown
 # Pensieve Doctor Report
@@ -199,40 +92,43 @@ Use this exact report structure:
 ## 0) Header
 - Check time: {YYYY-MM-DD HH:mm:ss}
 - Project root: `{absolute-path}`
-- Data root: `{absolute-path}/.claude/pensieve`
+- Data root: `{absolute-path}/.claude/skills/pensieve`
 
-## 1) Executive Summary
+## 1) Executive Summary (read this first)
 - Overall status: {PASS | PASS_WITH_WARNINGS | FAIL}
 - MUST_FIX: {n}
 - SHOULD_FIX: {n}
 - INFO: {n}
-- Recommended next step: {`/upgrade` | `/selfimprove` | `none`}
+- Recommended next step: {`upgrade` | `self-improve` | `none`}
 
 ## 1.5) Graph Summary (pre-conclusion evidence)
-- Graph file: `{.claude/pensieve/graph.md}`
+- Graph file: `{<project>/.claude/skills/pensieve/SKILL.md#Graph}`
 - Notes scanned: {n}
 - Links found: {n}
 - Links resolved: {n}
 - Links unresolved: {n}
 - Observation: {one sentence}
 
-## 2) MUST_FIX (priority order)
-1. [D-001] {issue}
+## 2) Priority Fixes (MUST_FIX, by priority)
+1. [D-001] {one-line issue}
 File: `{path}`
 Rule source: `{rule source}`
-Fix: {one-line fix}
+Fix: {one-line fix suggestion}
 
-## 3) SHOULD_FIX
-1. [D-101] {issue} (`{path}`)
+## 3) Recommended Fixes (SHOULD_FIX)
+1. [D-101] {one-line issue} (`{path}`)
 
 ## 4) Migration & Structure Check
-- Legacy path found: {yes/no}
-- Parallel old/new sources: {yes/no}
+- Legacy paths found: {yes/no}
+- Old/new parallel sources found: {yes/no}
+- Non-project-level skill root found: {yes/no}
+- Standalone graph files found: {yes/no}
 - Missing critical directories: {yes/no}
-- Suggested action: {`/upgrade` or `none`}
+- MEMORY.md missing/drifted: {yes/no}
+- Suggested action: {`upgrade` or `none`}
 
 ## 5) Three-Step Action Plan
-1. {step 1}
+1. {step 1 (specific, actionable)}
 2. {step 2}
 3. {step 3}
 
@@ -240,17 +136,30 @@ Fix: {one-line fix}
 | ID | Severity | Category | File/Path | Rule Source | Issue | Fix |
 |---|---|---|---|---|---|---|
 
-## 7) Graph Unresolved Links (Appendix)
+## 7) Graph Broken Links (Appendix)
 | Source File | Unresolved Link | Note |
 |---|---|---|
 
-## 8) Frontmatter Check Results (Appendix)
+## 8) Frontmatter Quick Check Results (Appendix)
 | File | Level | Code | Issue |
 |---|---|---|---|
 ```
 
-Constraints:
-- Every finding must cite a concrete rule source.
-- If status is FAIL and migration-related, recommend `/upgrade` first.
-- Doctor must not auto-edit files.
-- If required decision/pipeline links are unresolved in graph, mark at least MUST_FIX.
+2. When `FAIL` and migration-related, `next step` prioritizes `upgrade`; `decision`/`pipeline` broken links are at least `MUST_FIX`
+3. Doctor does not modify user data files; only allowed to auto-maintain `SKILL.md` and auto memory
+
+## Phase 3.5: Maintain project-level SKILL + MEMORY
+**Goal**: Sync SKILL and MEMORY after report output.
+**Actions**:
+1. Run:
+```bash
+bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event doctor --note "doctor summary: status={PASS|PASS_WITH_WARNINGS|FAIL}, must_fix={n}, should_fix={n}"
+```
+2. Only maintain `.claude/skills/pensieve/SKILL.md` and `~/.claude/projects/<project>/memory/MEMORY.md` guidance block
+
+## Phase 4: Auto Memory alignment check
+**Goal**: Confirm auto memory contains Pensieve guidance block; missing/drifted is MUST_FIX and cannot be downgraded.
+**Actions**:
+1. Read `<SYSTEM_SKILL_ROOT>/SKILL.md` frontmatter `description` and project `MEMORY.md`
+2. Check that guidance block contains a description consistent with system `description` and a "prefer invoking `pensieve` skill" guidance line
+3. Missing or drifted: mark `MUST_FIX`, execute alignment write (only maintain guidance block, do not alter other content)

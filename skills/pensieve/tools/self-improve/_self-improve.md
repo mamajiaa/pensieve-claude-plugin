@@ -1,217 +1,99 @@
-# Self-Improve Pipeline
-
 ---
-description: Knowledge capture workflow. Trigger when loop completes or user says "capture", "record", or "save".
+description: Automatically persist reusable conclusions into knowledge/decision/maxim/pipeline during commits or retrospectives, writing directly to user data.
 ---
 
-You are helping capture learnings and patterns into Pensieve's knowledge system.
+# Auto Self-Improve
 
-**System prompts** (tools/scripts/system knowledge) live in the plugin and are updated only via plugin updates.
+> Tool boundaries: see `<SYSTEM_SKILL_ROOT>/references/tool-boundaries.md` | Shared rules: see `<SYSTEM_SKILL_ROOT>/references/shared-rules.md`
 
-**User data** lives in project-level `.claude/pensieve/` and is never overwritten by the plugin.
+Write experience and patterns into Pensieve's four user data types: `maxim / decision / pipeline / knowledge`.
 
 ## Tool Contract
 
 ### Use when
-
-- Loop completes and lessons need to be captured
-- User explicitly requests "capture/record/reflect/standardize"
-- Goal is to create or improve `maxim / decision / pipeline / knowledge`
-
-### Do not use when
-
-- User wants migration/directory cleanup/legacy compatibility (route to `/upgrade`)
-- User wants structural compliance judgment (route to `/doctor`)
-- User has not confirmed what to capture and which category (ask first, then continue)
-
-### Required inputs
-
-- User-confirmed "core conclusion" and target category
-- Target category README:
-  - `<SYSTEM_SKILL_ROOT>/maxims/README.md`
-  - `<SYSTEM_SKILL_ROOT>/decisions/README.md`
-  - `<SYSTEM_SKILL_ROOT>/pipelines/README.md`
-  - `<SYSTEM_SKILL_ROOT>/knowledge/README.md`
-
-### Output contract
-
-- Present category recommendation and draft first, then wait for user confirmation
-- After writing, report back: file path + backlink changes
-- `decision/pipeline` must include at least 1 valid `[[...]]` link
+- Commit pipeline (`run-when-committing.md`) calls it (auto-trigger)
+- Post-loop wrap-up and knowledge capture
+- User explicitly requests "capture, record, retrospective, standardize"
 
 ### Failure fallback
+- Structural issues found (old path parallelism / directory missing / widespread format violations): skip writing, suggest running `doctor`
+- Cannot determine classification in one pass: split by three layers (IS -> `knowledge`, WANT -> `decision`, MUST -> `maxim`)
 
-- Structural issues found (old path parallel / directory missing / widespread format violations): pause writing, suggest `/doctor` first, then `/upgrade` if needed
-- Cannot determine category: provide 2-3 candidates and ask for confirmation — do not write blindly
+---
 
-### Negative examples
+## Semantic Layer Assignment
 
-- "Auto-capture everything from this session, no need for my confirmation" -> forbidden, no auto-capture
-- "Also migrate the old directories while you're at it" -> not self-improve scope
+Determine the semantic layer first, then decide which type to write:
+1. **knowledge (IS)**: system facts, current state, boundaries, mechanisms
+2. **decision (WANT)**: project preferences, strategic trade-offs, target direction
+3. **maxim (MUST)**: cross-project hard constraints and bottom lines
 
-Determine what's worth preserving, categorize it correctly, and write it in the proper format.
+The same insight can be split and written into multiple layers. `pipeline` only expresses HOW (execution order and verification loops) and does not replace IS/WANT/MUST.
+
+### Pipeline Gate
+- Same task type has recurred across multiple sessions/loops
+- Execution order significantly affects outcome (steps cannot be arbitrarily swapped)
+- Each step has a verifiable completion criterion
+
+---
 
 ## Core Principles
-
-- **User confirmation required**: Never auto-capture — always ask first
-- **Read before write**: Must read the target README before creating any file
-- **Deletion over addition**: Simpler system is more reliable
-- **Right category**: Match content to the correct knowledge type
-
----
-
-## Phase 1: Understand Intent
-
-**Goal**: Clarify what the user wants to capture
-
-**Actions**:
-1. Identify the source:
-   - Loop deviation (expected vs actual)
-   - Discovered pattern during work
-   - Explicit user instruction
-   - External reference material
-
-2. Ask clarifying questions if needed:
-   - What specific insight should be captured?
-   - What triggered this realization?
-   - How general is this learning?
+- **Auto-capture**: execute directly when triggered by pipeline
+- **Read before write**: read the corresponding README before creating any file
+- **Stable classification**: only use `maxim / decision / pipeline / knowledge`
+- **Conclusion-first**: title and first sentence must independently convey the conclusion
+- **One maxim per file**: each `maxim` is a standalone file
+- **Pipelines only orchestrate**: `pipeline` retains only task orchestration and validation; theory/background goes to external links
+- **Goal is to reduce exploration**: capture should make the "symptom-to-locating" path shorter next time
 
 ---
 
-## Phase 2: Audit Existing Pensieve (Optional)
+## Locating Acceleration Knowledge Model
 
-**Goal**: Find improvement opportunities in current project Pensieve data
+When a problem requires "exploring the codebase to answer" and the content belongs to IS (fact layer), `knowledge` should cover:
+1. **State transitions**: after an action triggers, how data and views change
+2. **Symptom -> root cause -> locating**: what phenomenon is seen, where to look, why
+3. **Boundaries and ownership**: who has write access, who can only call, how cross-module flows work
+4. **Does not exist / removed**: which capabilities are not in the current system, to avoid repeated misjudgment
+5. **Anti-patterns and forbidden zones**: paths that look feasible but will fail, and why
 
-**Actions**:
-1. Ask the user if they want a Pensieve audit:
-   - "Want me to review your current `.claude/pensieve/` contents for improvements?"
-2. If yes:
-   - Read each category README:
-     - `<SYSTEM_SKILL_ROOT>/maxims/README.md`
-     - `<SYSTEM_SKILL_ROOT>/decisions/README.md`
-     - `<SYSTEM_SKILL_ROOT>/pipelines/README.md`
-     - `<SYSTEM_SKILL_ROOT>/knowledge/README.md`
-   - Review the corresponding project files under `.claude/pensieve/`
-   - Flag format violations, missing fields, outdated content, or mis‑categorized items
-   - Provide a concise review report with suggested fixes
-3. **Do not edit anything without explicit user approval**
-
-If the user declines, skip this phase and continue.
+### Locating Acceleration Checklist (For Exploration-Type Problems)
+- At least 1 "symptom -> root cause -> locating" mapping
+- At least 1 "boundaries and ownership" constraint
+- At least 1 "anti-pattern / do not do this"
+- Provide a verification signal (one of: logs, tests, runtime result, observable behavior)
 
 ---
 
-## Phase 3: Categorize
+## Phase 1: Extract and Classify
 
-**Goal**: Determine the correct knowledge type
+**Goal**: Extract insights from session context + diff and determine classification.
 
 **Actions**:
-1. Evaluate content against each category:
+1. Read session context and `git diff --cached`
+2. Extract core insights (can be multiple); determine semantic layer (IS/WANT/MUST); split into multiple writes when multi-layer
+3. Determine whether `pipeline` (HOW) is needed: only create when gate criteria are met
+4. Path rules:
+   - `maxim`: `.claude/skills/pensieve/maxims/{one-sentence-conclusion}.md`
+   - `decision`: `.claude/skills/pensieve/decisions/{date}-{conclusion}.md`
+   - `pipeline`: `.claude/skills/pensieve/pipelines/run-when-*.md`
+   - `knowledge`: `.claude/skills/pensieve/knowledge/{name}/content.md`
 
-| Type | Characteristics | README |
-|------|-----------------|--------|
-| **maxim** | Universal principles — applies across projects, languages, domains | `maxims/README.md` |
-| **decision** | Context-dependent choices — specific to situation or project | `decisions/README.md` |
-| **pipeline** | Executable workflows — repeatable process with clear steps | `pipelines/README.md` |
-| **knowledge** | External references — docs, tutorials, specifications | `knowledge/README.md` |
+---
 
-2. **Present categorization to user**:
-   ```markdown
-   ## Capture Recommendation
+## Phase 2: Read Spec + Write
 
-   [Content summary] → Recommend **[type]**
+**Goal**: Write according to spec and maintain link connectivity.
 
-   Reason: [Explanation based on README criteria]
-
-   Do you agree?
+**Actions**:
+1. Read the target README (`<SYSTEM_SKILL_ROOT>/{type}/README.md`); generate content following its format: conclusion-style title + one-line conclusion + core content + semantic links (`<SYSTEM_SKILL_ROOT>/references/shared-rules.md` section: Semantic Link Rules)
+2. Type-specific requirements:
+   - `decision`: include locating acceleration triad (what to skip asking next time / what to skip searching next time / invalidation conditions)
+   - Exploration-type `knowledge`: include locating acceleration checklist items
+   - `pipeline`: self-check "have all paragraphs not affecting task orchestration been linked externally?"
+3. Write to target path; add back-links in related documents (if needed)
+4. Maintain project-level SKILL:
+   ```bash
+   bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event self-improve --note "auto-improve: {file1,file2,...}"
    ```
-
-**CRITICAL**: Wait for user confirmation before proceeding.
-
----
-
-## Phase 4: Read Target README
-
-**Goal**: Understand the exact format and criteria for the chosen category
-
-**DO NOT SKIP**: This phase is mandatory. The README defines:
-- Capture criteria (what's worth capturing)
-- File format requirements
-- Naming conventions
-- Examples
-
-**Actions**:
-1. Read the corresponding README:
-   ```
-   Read <SYSTEM_SKILL_ROOT>/{type}/README.md
-   ```
-
-2. Verify the content meets the capture criteria defined in README
-
-3. If content doesn't meet criteria, explain to user and ask how to proceed
-
----
-
-## Phase 5: Draft Content
-
-**Goal**: Write content following the README format exactly
-
-**Actions**:
-1. Draft the file content following README specifications
-
-2. Choose the target location:
-   - **pipeline** → `.claude/pensieve/pipelines/run-when-*.md` (project user data)
-   - **maxim** → `.claude/pensieve/maxims/{name}.md` (project user data)
-   - **decision** → `.claude/pensieve/decisions/{date}-{conclusion}.md` (project user data)
-   - **knowledge** → `.claude/pensieve/knowledge/{name}/content.md` (project user data)
-
-3. **Present draft to user for review**:
-   ```markdown
-   ## Draft Preview
-
-   File: `{target_path}`
-
-   ---
-   [draft content]
-   ---
-
-   Write it?
-   ```
-
-**CRITICAL**: Wait for user approval before writing.
-
----
-
-## Phase 6: Write
-
-**Goal**: Persist the knowledge
-
-**DO NOT START WITHOUT USER APPROVAL** from Phase 4.
-
-**Actions**:
-1. Write the file to `{target_path}`
-2. Confirm successful write to user
-3. Suggest any related follow-up actions (e.g., update other files that reference this)
-
----
-
-## Knowledge Evolution
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  ┌─────────────┐   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐  │
-│  │   maxims/   │   │ decisions/  │   │ pipelines/  │   │ knowledge/  │  │
-│  │  future guide│ ←│ past lessons│   │ workflows   │   │ external in │  │
-│  └─────────────┘   └─────────────┘   └─────────────┘   └─────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
-
-Evolution path: decision → repeated pattern → maxim → guides → pipeline
-```
-
----
-
-## Related Files
-
-- `maxims/README.md` — Maxim format and criteria
-- `decisions/README.md` — Decision format and criteria
-- `pipelines/README.md` — Pipeline format and criteria
-- `knowledge/README.md` — Knowledge format and criteria
+5. Output brief summary (write path + capture type)

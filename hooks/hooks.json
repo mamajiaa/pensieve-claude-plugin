@@ -1,22 +1,23 @@
 {
-  "description": "Pensieve hooks: SessionStart injects system/user context; Stop enforces Loop continuation via task state",
+  "description": "Pensieve hooks: SessionStart checks init/doctor marker state; PostToolUse syncs project SKILL graph and Claude auto-memory guidance block.",
   "hooks": {
     "SessionStart": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "bash -lc 'root=\"${CLAUDE_PLUGIN_ROOT:-}\"; [[ -n \"$root\" ]] || exit 0; if [[ \"${root:1:1}\" == \":\" && \"${root:0:1}\" =~ [A-Za-z] ]]; then if command -v cygpath >/dev/null 2>&1; then root=\"$(cygpath -u \"$root\")\"; else drive=\"${root:0:1}\"; rest=\"${root:2}\"; rest=\"${rest//\\\\//}\"; drive=\"$(printf \"%s\" \"$drive\" | tr \"A-Z\" \"a-z\")\"; root=\"/$drive$rest\"; fi; fi; exec \"$root/hooks/inject-routes.sh\"'"
+            "command": "bash -lc 'root=\"${CLAUDE_PLUGIN_ROOT:-}\"; [[ -n \"$root\" ]] || exit 0; if [[ \"${root:1:1}\" == \":\" && \"${root:0:1}\" =~ [A-Za-z] ]]; then if command -v cygpath >/dev/null 2>&1; then root=\"$(cygpath -u \"$root\")\"; else drive=\"${root:0:1}\"; rest=\"${root:2}\"; rest=\"${rest//\\\\//}\"; drive=\"$(printf \"%s\" \"$drive\" | tr \"A-Z\" \"a-z\")\"; root=\"/$drive$rest\"; fi; fi; exec \"$root/hooks/pensieve-session-marker.sh\" --mode session-start'"
           }
         ]
       }
     ],
-    "Stop": [
+    "PostToolUse": [
       {
+        "matcher": "Write|Edit|MultiEdit",
         "hooks": [
           {
             "type": "command",
-            "command": "bash -lc 'root=\"${CLAUDE_PLUGIN_ROOT:-}\"; [[ -n \"$root\" ]] || exit 0; if [[ \"${root:1:1}\" == \":\" && \"${root:0:1}\" =~ [A-Za-z] ]]; then if command -v cygpath >/dev/null 2>&1; then root=\"$(cygpath -u \"$root\")\"; else drive=\"${root:0:1}\"; rest=\"${root:2}\"; rest=\"${rest//\\\\//}\"; drive=\"$(printf \"%s\" \"$drive\" | tr \"A-Z\" \"a-z\")\"; root=\"/$drive$rest\"; fi; fi; exec \"$root/hooks/loop-controller.sh\"'"
+            "command": "bash -lc 'root=\"${CLAUDE_PLUGIN_ROOT:-}\"; [[ -n \"$root\" ]] || exit 0; if [[ \"${root:1:1}\" == \":\" && \"${root:0:1}\" =~ [A-Za-z] ]]; then if command -v cygpath >/dev/null 2>&1; then root=\"$(cygpath -u \"$root\")\"; else drive=\"${root:0:1}\"; rest=\"${root:2}\"; rest=\"${rest//\\\\//}\"; drive=\"$(printf \"%s\" \"$drive\" | tr \"A-Z\" \"a-z\")\"; root=\"/$drive$rest\"; fi; fi; exec \"$root/hooks/sync-project-skill-graph.sh\"'"
           }
         ]
       }
