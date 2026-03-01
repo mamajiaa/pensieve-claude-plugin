@@ -1,5 +1,5 @@
 #!/bin/bash
-# Maintain project-level Pensieve SKILL.md as the single auto-maintained project-skill surface.
+# Maintain project-level Pensieve SKILL.md and MEMORY.md guidance block.
 #
 # Usage:
 #   maintain-project-skill.sh --event <install|upgrade|doctor|self-improve|sync> [--note "..."]
@@ -62,6 +62,7 @@ USER_DATA_ROOT="$(user_data_root)"
 SKILL_FILE="$(project_skill_file)"
 PLUGIN_ROOT="$(plugin_root_from_script "$SCRIPT_DIR")"
 GRAPH_SCRIPT="$PLUGIN_ROOT/skills/pensieve/tools/upgrade/scripts/generate-user-data-graph.sh"
+AUTO_MEMORY_SCRIPT="$PLUGIN_ROOT/skills/pensieve/tools/project-skill/scripts/maintain-auto-memory.sh"
 TMP_GRAPH_FILE="$(mktemp "${TMPDIR:-/tmp}/pensieve-graph.XXXXXX")"
 
 cleanup_tmp_graph() {
@@ -91,9 +92,9 @@ done
 
 PYTHON_BIN="$(python_bin || true)"
 [[ -n "$PYTHON_BIN" ]] || { echo "Python not found" >&2; exit 1; }
-TIMESTAMP="$(runtime_now_utc)"
+TODAY_UTC="$(date -u +"%Y-%m-%d")"
 
-"$PYTHON_BIN" - "$SKILL_FILE" "$TMP_GRAPH_FILE" "$EVENT" "$TIMESTAMP" "$PROJECT_ROOT" "$USER_DATA_ROOT" "$NOTE" <<'PY'
+"$PYTHON_BIN" - "$SKILL_FILE" "$TMP_GRAPH_FILE" "$EVENT" "$TODAY_UTC" "$PROJECT_ROOT" "$USER_DATA_ROOT" "$NOTE" <<'PY'
 from __future__ import annotations
 
 import re
@@ -103,7 +104,7 @@ from pathlib import Path
 skill_file = Path(sys.argv[1])
 graph_file = Path(sys.argv[2])
 event = sys.argv[3].strip()
-ts = sys.argv[4].strip()
+today = sys.argv[4].strip()
 project_root = sys.argv[5].strip()
 user_data_root = sys.argv[6].strip()
 note = (sys.argv[7] or "").strip().replace("\n", " ")
@@ -124,12 +125,12 @@ def event_display_name(raw: str) -> str:
 
 def read_existing_created_date() -> str:
     if not skill_file.exists():
-        return ts[:10]
+        return today
     text = skill_file.read_text(encoding="utf-8", errors="replace")
     m = re.search(r"^created:\s*(\d{4}-\d{2}-\d{2})\s*$", text, flags=re.MULTILINE)
     if m:
         return m.group(1)
-    return ts[:10]
+    return today
 
 
 def load_graph() -> str:
@@ -142,7 +143,6 @@ def load_graph() -> str:
 
 
 created_date = read_existing_created_date()
-updated_date = ts[:10]
 event_name = event_display_name(event)
 graph_markdown = load_graph()
 last_note = note if note else "(none)"
@@ -153,7 +153,6 @@ type: skill
 title: Pensieve Project Skill (Auto Generated)
 status: active
 created: {created_date}
-updated: {updated_date}
 tags: [pensieve, skill, project, auto-generated]
 name: pensieve-project-skill
 description: Project-level Pensieve skill file. Auto-maintained route + graph. Do not edit manually.
@@ -166,7 +165,6 @@ description: Project-level Pensieve skill file. Auto-maintained route + graph. D
 
 ## Lifecycle State
 - Last Event: {event_name}
-- Last Updated (UTC): {ts}
 - Last Note: {last_note}
 
 ## Routing
@@ -196,3 +194,9 @@ PY
 
 echo "✅ Pensieve project SKILL updated"
 echo "  - skill: $SKILL_FILE"
+
+if [[ -x "$AUTO_MEMORY_SCRIPT" ]]; then
+  if ! bash "$AUTO_MEMORY_SCRIPT" --event "$EVENT"; then
+    echo "⚠️  Auto memory update skipped: failed to run maintain-auto-memory.sh" >&2
+  fi
+fi

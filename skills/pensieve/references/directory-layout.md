@@ -29,6 +29,7 @@
 ## 自动维护文件
 
 - `SKILL.md` — 项目级路由 + 图谱（工具自动更新）
+- `<project>/MEMORY.md` — Claude Code 项目级 memory（自动维护 Pensieve 引导块；描述与系统 skill `description` 对齐）
 
 ## 历史路径（deprecated）
 

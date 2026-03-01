@@ -40,6 +40,7 @@ description: 版本检查入口：先同步最新版本定义并确认是否有�
 - 关键文件都要对齐模板；内容不一致时先备份再替换
 - 不输出 `PASS/FAIL`、`MUST_FIX/SHOULD_FIX`——合规判定由 `doctor` 负责
 - 输出项目级 `SKILL.md` 更新结果
+- 输出项目根 `MEMORY.md`（Pensieve 引导块）更新结果
 
 ### Failure fallback
 

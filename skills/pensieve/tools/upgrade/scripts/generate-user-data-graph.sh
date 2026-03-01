@@ -73,7 +73,6 @@ done < <(find "$ROOT" -type f -name '*.md' | LC_ALL=C sort)
 run_awk() {
 awk \
     -v root="$ROOT" \
-    -v generated_at="$(runtime_now_utc)" \
     -v output="$OUTPUT" '
 function trim(s) {
     sub(/^[[:space:]]+/, "", s)
@@ -186,7 +185,6 @@ END {
     print "# Pensieve 用户数据图谱（自动生成）"
     print ""
     print "> 本文件由脚本自动生成，不需要手动维护。"
-    print "> 生成时间（UTC）: `" generated_at "`"
     print ""
     print "- 根目录: `" root "`"
     print "- 包含分类: maxims, decisions, knowledge, pipelines"

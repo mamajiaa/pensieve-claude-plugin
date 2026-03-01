@@ -82,7 +82,7 @@ claude plugin install pensieve@kingkongshot-marketplace --scope user
 
 ### `doctor` — 体检
 
-只读扫描全部用户数据：frontmatter 格式、语义链接完整性、目录结构合规性。输出固定格式的 PASS / PASS_WITH_WARNINGS / FAIL 报告和三步行动计划。**不改任何文件**。
+只读扫描全部用户数据：frontmatter 格式、语义链接完整性、目录结构合规性。输出固定格式的 PASS / PASS_WITH_WARNINGS / FAIL 报告和三步行动计划。默认不改用户数据文件，仅自动维护 `SKILL.md` 与项目根 `MEMORY.md` 的 Pensieve 引导块。
 
 > "检查一下数据有没有问题"
 

@@ -160,6 +160,11 @@ legacy_readme_re = re.compile(r"(?i)^readme(?:.*\.md)?$")
 # Match plugin-internal knowledge path, but ignore project-scoped ".claude/skills/..." references.
 plugin_path_re = re.compile(r"(?<!\.claude/)skills/pensieve/knowledge/")
 plugin_skill_root = plugin_root / "skills" / "pensieve"
+system_skill_file = plugin_skill_root / "SKILL.md"
+memory_file = project_root / "MEMORY.md"
+memory_start_marker = "<!-- pensieve:auto-memory:start -->"
+memory_end_marker = "<!-- pensieve:auto-memory:end -->"
+memory_guidance_line = "- 引导：当需求涉及项目知识沉淀、结构体检、版本迁移或复杂任务拆解时，优先调用 `pensieve` skill。"
 
 
 def add_finding(
@@ -214,6 +219,31 @@ def load_json(path: Path) -> tuple[dict | None, str | None]:
     if not isinstance(data, dict):
         return None, "root must be a JSON object"
     return data, None
+
+
+def load_system_skill_description(path: Path) -> str | None:
+    if not path.is_file():
+        return None
+    text = read_text_normalized(path)
+    m = re.search(r"^---\n(.*?)\n---\n?", text, flags=re.MULTILINE | re.DOTALL)
+    if not m:
+        return None
+    for line in m.group(1).splitlines():
+        if line.startswith("description:"):
+            value = line.split(":", 1)[1].strip()
+            return value if value else None
+    return None
+
+
+def extract_pensieve_memory_block(text: str) -> str:
+    pattern = re.compile(
+        re.escape(memory_start_marker) + r"(.*?)" + re.escape(memory_end_marker),
+        flags=re.DOTALL,
+    )
+    m = pattern.search(text)
+    if not m:
+        return text
+    return m.group(0)
 
 
 if not root.exists():
@@ -377,6 +407,39 @@ if not new_key_enabled:
         "执行 upgrade 写入 pensieve@kingkongshot-marketplace: true。",
     )
 
+system_skill_description = load_system_skill_description(system_skill_file)
+if system_skill_description is None:
+    add_finding(
+        "STR-901",
+        "MUST_FIX",
+        "scanner_template_missing",
+        system_skill_file,
+        "扫描所需系统 skill 描述缺失，无法校验 MEMORY.md 的 Pensieve 引导块。",
+        "修复插件安装或更新到完整版本后重试。",
+    )
+else:
+    if not memory_file.is_file():
+        add_finding(
+            "STR-501",
+            "MUST_FIX",
+            "missing_memory_file",
+            memory_file,
+            "缺少 Claude Code 项目级 MEMORY.md。",
+            "执行 init/upgrade/doctor 触发 auto memory 补齐，或手动创建 MEMORY.md 并写入 Pensieve 引导块。",
+        )
+    else:
+        memory_text = read_text_normalized(memory_file)
+        memory_block = extract_pensieve_memory_block(memory_text)
+        if system_skill_description not in memory_block or memory_guidance_line not in memory_block:
+            add_finding(
+                "STR-502",
+                "MUST_FIX",
+                "memory_content_drift",
+                memory_file,
+                "MEMORY.md 缺少 Pensieve 说明，或内容未与系统 skill 的 description 对齐。",
+                "执行 init/upgrade/doctor 触发 auto memory 对齐，确保描述与 skill description 一致并包含 pensieve skill 引导。",
+            )
+
 must_fix = sum(1 for f in findings if f.severity == "MUST_FIX")
 should_fix = sum(1 for f in findings if f.severity == "SHOULD_FIX")
 status = "aligned" if must_fix == 0 else "drift"
@@ -393,6 +456,8 @@ flags = {
     "has_settings_parse_errors": any(f.finding_id == "STR-401" for f in findings),
     "has_legacy_enabled_plugins_key": any(f.finding_id == "STR-402" for f in findings),
     "has_missing_new_enabled_plugins_key": any(f.finding_id == "STR-403" for f in findings),
+    "has_missing_memory_file": any(f.finding_id == "STR-501" for f in findings),
+    "has_memory_content_drift": any(f.finding_id == "STR-502" for f in findings),
 }
 
 report = {

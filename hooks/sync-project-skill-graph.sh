@@ -1,6 +1,7 @@
 #!/bin/bash
 # PostToolUse hook:
-# When project user-data files are edited, auto-refresh `.claude/skills/pensieve/SKILL.md` graph block.
+# When project user-data files are edited, auto-refresh `.claude/skills/pensieve/SKILL.md`
+# and keep project-level `MEMORY.md` Pensieve guidance block in sync.
 
 set -euo pipefail
 
