@@ -1,21 +1,12 @@
 # 用户数据结构迁移规范
 
-用于维护 Pensieve 项目级用户数据的**历史结构**、**当前目标结构**与**处理规则**。
-
-## 目的
-
-- 提供单一事实源：历史目录怎么处理、当前目录长什么样。
-- 让 Doctor/Upgrade 使用同一份结构规则，避免口径漂移。
-- 结构检查实现统一由脚本 `<SYSTEM_SKILL_ROOT>/tools/doctor/scripts/scan-structure.sh` 承载，避免两套判定逻辑分叉。
+Doctor / Upgrade 共用的结构历史、目标结构与处理规则（单一事实源）。结构检查统一由脚本 `<SYSTEM_SKILL_ROOT>/tools/doctor/scripts/scan-structure.sh` 承载。
 
 ## 当前目标结构（Latest, Active）
 
-唯一目标根目录：
-
-`<project>/.claude/skills/pensieve/`
+唯一目标根目录：`<project>/.claude/skills/pensieve/`
 
 最小目录结构：
-
 - `maxims/`
 - `decisions/`
 - `knowledge/`
@@ -23,19 +14,16 @@
 - `loop/`
 
 关键文件（初始化后应存在，且 Upgrade 需对齐内容）：
-
 - `pipelines/run-when-reviewing-code.md`
 - `pipelines/run-when-committing.md`
 - `knowledge/taste-review/content.md`
 
 关键文件内容来源（单一事实源）：
-
 - `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/pipeline.run-when-reviewing-code.md`
 - `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/pipeline.run-when-committing.md`
 - `<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md`
 
 自动维护文件（允许工具更新）：
-
 - `SKILL.md`
 
 ## 历史结构与处理规则
@@ -52,8 +40,7 @@
 
 ## 迁移判定（给 Doctor/Upgrade）
 
-判为“存在结构迁移问题”的条件：
-
+判为"存在结构迁移问题"的条件：
 1. 发现 deprecated 路径与 active 路径并行存在（双源）。
 2. active 路径缺失最小目录结构。
 3. active 路径缺失关键种子文件。
@@ -61,8 +48,7 @@
 5. 发现独立 graph 文件（`_pensieve-graph*.md` / `pensieve-graph*.md` / `graph*.md`）。
 6. 发现项目级子目录历史规范 README 副本（`{maxims,decisions,knowledge,pipelines,loop}/{README*.md,readme*.md}`）。
 
-判为“结构层 no-op”的条件：
-
+判为"结构层 no-op"的条件：
 1. 仅存在 active 路径。
 2. 最小目录结构齐全。
 3. 关键种子文件齐全且内容与模板一致。
@@ -72,7 +58,6 @@
 ## 关键文件内容对齐策略
 
 当关键文件缺失或内容不一致时，Upgrade 必须执行完整对齐：
-
 1. 若目标文件存在，先备份为 `*.bak.<timestamp>`。
 2. 使用模板文件覆盖目标文件。
 3. 在迁移报告中列出被替换文件与备份路径。
@@ -80,7 +65,6 @@
 ## 迁移内容边界
 
 允许迁移：
-
 - `maxims/*.md`（非系统 `_` 前缀）
 - `decisions/*.md`
 - `knowledge/**`
@@ -88,7 +72,6 @@
 - `loop/**`
 
 不应迁移：
-
 - 插件内系统文件（`<SYSTEM_SKILL_ROOT>/` 下内容）
 - 历史系统副本中的模板/脚本/说明文档（除明确属于用户数据的条目外）
 - 项目级子目录历史规范 README 副本（`{maxims,decisions,knowledge,pipelines,loop}/{README*.md,readme*.md}`）

@@ -1,8 +1,6 @@
 # 共享规则
 
-所有工具的跨领域硬规则。单一事实源——各 tool file 引用此处，不再内联。
-
----
+所有工具的跨领域硬规则。各 tool file 引用此处，不再内联。
 
 ## 版本更新优先（Hard Rule）
 
@@ -15,17 +13,13 @@
 - 默认流程：`upgrade`（版本检查）→（可选）`doctor` → `self-improve`。
 - `doctor` 不是 `upgrade` 的前置门槛。
 
----
-
 ## 确认再执行（Hard Rule）
 
 用户未显式下达工具命令时，先用一句话确认再执行。禁止按候选意图自动开跑。
 
 - Loop Phase 2 上下文摘要必须获得用户确认后才进入 Phase 3。
-- Self-Improve 在显式触发或 pipeline 触发时可直接沉淀，无需额外确认。
-- 写操作以各工具 `Tool Contract` 为准，不额外增加全局“先草稿后落盘”门槛。
-
----
+- Self-Improve 在显式触发或 pipeline 触发时可直接写入，无需额外确认。
+- 写操作以各工具文件为准，不额外增加全局"先草稿后写入"门槛。
 
 ## 语义链接规则（Hard Rule）
 
@@ -38,8 +32,6 @@
 - `maxim`：建议填写来源链接（可空）
 
 Loop 输出若成为 `decision` 或 `pipeline`，必须在 wrap-up 前补齐链接。
-
----
 
 ## 数据边界
 
@@ -54,8 +46,6 @@ Loop 输出若成为 `decision` 或 `pipeline`，必须在 wrap-up 前补齐链�
 - `<SYSTEM_SKILL_ROOT>` = 插件内 `skills/pensieve/` 绝对路径
 - `<USER_DATA_ROOT>` = 项目级 `.claude/skills/pensieve/` 绝对路径
 
----
-
 ## 规范来源（先读后写）
 
 创建或检查任何类型的用户数据前，先读取对应的格式规范 README：
@@ -68,8 +58,6 @@ Loop 输出若成为 `decision` 或 `pipeline`，必须在 wrap-up 前补齐链�
 约束：
 - 规范没有明确写 `must / required / hard rule / at least one` 的，不得判为 MUST_FIX。
 - 允许基于规范做有限推断，但必须标注"推断项"。
-
----
 
 ## 置信度门禁（Pipeline 输出质量）
 

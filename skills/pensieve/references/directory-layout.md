@@ -1,8 +1,6 @@
 # 项目级目录约定
 
-详细的结构迁移历史与判定规则见 `tools/doctor/migrations/README.md`（单一事实源）。
-
----
+结构迁移历史与判定规则见 `tools/doctor/migrations/README.md`（单一事实源）。
 
 ## 当前目标结构
 
@@ -29,7 +27,7 @@
 ## 自动维护文件
 
 - `SKILL.md` — 项目级路由 + 图谱（工具自动更新）
-- `~/.claude/projects/<project>/memory/MEMORY.md` — Claude Code auto memory 入口（自动维护 Pensieve 引导块；描述与系统 skill `description` 对齐）
+- `~/.claude/projects/<project>/memory/MEMORY.md` — Claude Code auto memory 入口（自动维护 Pensieve 引导块）
 
 ## 历史路径（deprecated）
 
