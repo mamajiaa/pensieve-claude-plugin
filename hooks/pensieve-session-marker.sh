@@ -285,11 +285,19 @@ if not initialized:
 else:
     messages.append("- 建议动作：执行 `doctor` 并更新 marker。")
 
+user_parts: list[str] = []
+if not initialized:
+    user_parts.append("项目未初始化")
+if not self_check_ok:
+    user_parts.append("体检版本不匹配")
+user_summary = f"Pensieve（v{plugin_version}）：{'，'.join(user_parts)}。输入 /pensieve 执行修复。"
+
 payload = {
     "hookSpecificOutput": {
         "hookEventName": "SessionStart",
         "additionalContext": "\n".join(messages),
-    }
+    },
+    "systemMessage": user_summary,
 }
 print(json.dumps(payload, ensure_ascii=False))
 PY
