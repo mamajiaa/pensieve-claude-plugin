@@ -1,6 +1,6 @@
 ---
 name: pensieve
-description: Project knowledge archival and workflow routing. Provides init (initialize), upgrade (version/migration), doctor (health check), self-improve (reflect/archive), and loop (iterative execution) tools.
+description: Project knowledge archival and workflow routing. Check existing knowledge before exploring the codebase to skip redundant locating; use self-improve to write findings after exploring. Provides init, upgrade, doctor, self-improve, and loop tools.
 ---
 
 # Pensieve
@@ -12,6 +12,7 @@ Route user requests to the correct tool. When uncertain, confirm first.
 1. **Explicit intent takes priority**: if the user explicitly names a tool or trigger word, route directly.
 2. **Infer from session stage** (when no explicit command is given):
    - New project or blank context → `init` | Version/migration uncertainty → `upgrade`
+   - Exploring codebase or locating issues → check `<USER_DATA_ROOT>/knowledge/` first, then use `self-improve` to write findings
    - Development complete or retrospective signals → `self-improve` | Complex task needing decomposition → `loop`
 3. **When uncertain, confirm first**.
 
