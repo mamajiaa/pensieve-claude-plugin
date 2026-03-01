@@ -1,6 +1,6 @@
 ---
 name: pensieve
-description: 项目知识沉淀与工作流路由。提供 init（初始化）、upgrade（版本/迁移）、doctor（检查）、self-improve（沉淀/复盘）、loop（循环执行）五个工具。
+description: 项目知识沉淀与工作流路由。探索代码库前先查已有 knowledge，可跳过重复定位；探索后用 self-improve 写入发现。提供 init、upgrade、doctor、self-improve、loop 五个工具。
 ---
 
 # Pensieve
@@ -12,6 +12,7 @@ description: 项目知识沉淀与工作流路由。提供 init（初始化）�
 1. **显式意图优先**：用户明确说了工具名或触发词，直接路由。
 2. **会话阶段推断**（未显式指定时）：
    - 新项目或空白上下文 → `init` | 版本/迁移不确定 → `upgrade`
+   - 探索代码库或定位问题 → 先查 `<USER_DATA_ROOT>/knowledge/`，探索后用 `self-improve` 写入
    - 开发完成或复盘信号 → `self-improve` | 复杂任务需拆解 → `loop`
 3. **不确定时先确认**。
 
