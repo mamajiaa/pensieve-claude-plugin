@@ -2,18 +2,16 @@
 
 **Owner**: Main Window
 
-**Purpose**: When multiple options exist, record the choice and rationale.
+**Purpose**: Record design choice and rationale when implementation is not obvious.
 
 **When to write**:
 - Implementation is not obvious
-- Multiple viable options require trade‑offs
-- The decision will impact later work
 
 ---
 
 ## Writing Rules
 
-- Create at `.claude/pensieve/loop/{date}-{slug}/design.md`
+- Create at `.claude/skills/pensieve/loop/{date}-{slug}/design.md`
 - Do necessary code exploration during design
 - After user confirmation, record the path in `_context.md`
 
@@ -36,7 +34,7 @@
 
 | Type | Path | Key Excerpt |
 |------|------|----------|
-| requirement | `.claude/pensieve/loop/{date}-{slug}/requirements.md` | Core problem: ... |
+| requirement | `.claude/skills/pensieve/loop/{date}-{slug}/requirements.md` | Core problem: ... |
 | decision | `decisions/2026-01-20-xxx.md` | "Quoted text" |
 | maxim | `maxims/linus.md` | "Good taste" |
 | conversation | _context.md#requirements-clarification | User said: "..." |
@@ -44,7 +42,12 @@
 
 ## Approach Overview
 
-[High‑level description; avoid too much detail]
+[High-level description; avoid too much detail]
+
+## Context Links (recommended)
+- Based on: [[prior decision or knowledge]]
+- Leads to: [[subsequent decision or process]]
+- Related: [[related topic]]
 
 ## Decision Rationale
 
@@ -89,8 +92,8 @@
 Discussion: state synchronization
 
 Options:
-1. Marker binding — init-loop.sh writes /tmp/pensieve-loop-<taskListId>, Stop Hook reads
-2. .active file — simple JSON file
+1. Main-window continuation -- read pending tasks and dispatch subagents one by one
+2. .active file -- simple JSON file for local state only
 
 User preference: Option 2, because "simpler is better"
 
@@ -106,5 +109,5 @@ Final choice: .active file
 | Only describe the approach, not the rationale | "Why" matters more than "how" |
 | No alternatives | Consider at least one alternative |
 | Ignoring risks | Be honest about what can go wrong |
-| Too detailed | This is design, not implementation — stay high‑level |
+| Too detailed | This is design, not implementation -- stay high-level |
 | Detached from requirements | Every decision should trace back to requirements |

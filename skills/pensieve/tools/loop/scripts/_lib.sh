@@ -3,7 +3,7 @@
 #
 # Conventions:
 # - System capability lives inside the plugin: <plugin>/skills/pensieve
-# - User data lives at project level: <project>/.claude/pensieve
+# - User data lives at project level: <project>/.claude/skills/pensieve
 
 plugin_root_from_script() {
     local script_dir="$1"
@@ -61,7 +61,44 @@ project_root() {
 user_data_root() {
     local pr
     pr="$(project_root)"
-    echo "$pr/.claude/pensieve"
+    echo "$pr/.claude/skills/pensieve"
+}
+
+# Claude Code auto memory directory:
+#   ~/.claude/projects/<encoded-project-root>/memory
+auto_memory_project_key() {
+    local pr
+    pr="$(to_posix_path "$(project_root)")"
+    [[ -n "$pr" ]] || {
+        echo ""
+        return 0
+    }
+
+    local encoded
+    encoded="${pr//\//-}"
+    if [[ "$encoded" != -* ]]; then
+        encoded="-$encoded"
+    fi
+    echo "$encoded"
+}
+
+auto_memory_dir() {
+    local home_dir key
+    home_dir="$(to_posix_path "${HOME:-$(cd ~ && pwd)}")"
+    key="$(auto_memory_project_key)"
+    echo "$home_dir/.claude/projects/$key/memory"
+}
+
+auto_memory_file() {
+    local dr
+    dr="$(auto_memory_dir)"
+    echo "$dr/MEMORY.md"
+}
+
+project_skill_file() {
+    local dr
+    dr="$(user_data_root)"
+    echo "$dr/SKILL.md"
 }
 
 ensure_user_data_root() {
@@ -216,98 +253,4 @@ else:
 PY
 }
 
-# ============================================
-# Claude Code process detection (for Loop marker binding)
-# ============================================
-
-# Print nearest `claude` PID in current process tree (stdout), non‑zero if not found
-find_claude_pid() {
-    local pid="$$"
-    while [[ "$pid" -gt 1 ]]; do
-        local comm
-        comm=$(ps -o comm= -p "$pid" 2>/dev/null | sed 's/^[[:space:]]*//')
-        comm=$(basename "$comm")
-        if [[ "$comm" == "claude" ]]; then
-            echo "$pid"
-            return 0
-        fi
-        pid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ')
-        [[ -z "$pid" ]] && break
-    done
-    return 1
-}
-
-# Print the shell PID that launched this `claude` (stdout), non‑zero if not found
-find_claude_session_pid() {
-    local claude_pid
-    claude_pid="$(find_claude_pid)" || return 1
-    ps -o ppid= -p "$claude_pid" 2>/dev/null | tr -d ' '
-}
-
-# ============================================
-# _meta.md reading
-# ============================================
-
-# Read task_list_id from _meta.md
-# arg: $1 = _meta.md path
-# returns: task_list_id or empty string
-read_task_list_id_from_meta() {
-    local meta_file="$1"
-    [[ ! -f "$meta_file" ]] && echo "" && return 0
-
-    sed -n '/^---$/,/^---$/p' "$meta_file" | grep "^task_list_id:" | sed 's/^task_list_id: *//'
-}
-
-# ============================================
-# Loop directory scan
-# ============================================
-
-# Find loop dir with pending tasks
-# arg: $1 = loop base dir
-# returns: loop dir path (stdout) or non‑zero
-find_active_loop() {
-    local loop_base_dir="$1"
-
-    for loop_dir in "$loop_base_dir"/????-??-??-*/; do
-        [[ ! -d "$loop_dir" ]] && continue
-
-        local meta_file="$loop_dir/_meta.md"
-        [[ ! -f "$meta_file" ]] && continue
-
-        local task_list_id
-        task_list_id=$(read_task_list_id_from_meta "$meta_file")
-        [[ -z "$task_list_id" ]] && continue
-
-        local tasks_dir="$HOME/.claude/tasks/$task_list_id"
-        [[ ! -d "$tasks_dir" ]] && continue
-
-        # Check for pending or in_progress tasks
-        for task_file in "$tasks_dir"/*.json; do
-            [[ -f "$task_file" ]] || continue
-            local status
-            status=$(json_get_value "$task_file" "status" "")
-            if [[ "$status" == "pending" || "$status" == "in_progress" ]]; then
-                echo "${loop_dir%/}"
-                return 0
-            fi
-        done
-    done
-
-    return 1
-}
-
-# Find loop directory by name
-# arg: $1 = loop base dir, $2 = loop name (e.g., 2026-01-24-feature)
-# returns: loop dir path or empty
-find_loop_by_name() {
-    local loop_base_dir="$1"
-    local loop_name="$2"
-    local loop_dir="$loop_base_dir/$loop_name"
-
-    if [[ -d "$loop_dir" ]]; then
-        echo "$loop_dir"
-        return 0
-    fi
-
-    return 1
-}
+# Note: legacy loop helpers were removed after continuation moved to main-window control.

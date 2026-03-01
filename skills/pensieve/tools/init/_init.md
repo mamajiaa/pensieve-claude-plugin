@@ -1,68 +1,61 @@
+---
+description: Initialize the `.claude/skills/pensieve/` directory and seed files, perform baseline exploration and code review, and produce candidate items for retention. Idempotent; never overwrites existing data.
+---
+
 # Init Tool
 
----
-description: Initialize project-level `.claude/pensieve/` user data directory and seed base files (idempotent, never overwrites existing files)
----
+> Tool boundaries: `<SYSTEM_SKILL_ROOT>/references/tool-boundaries.md` | Shared rules: `<SYSTEM_SKILL_ROOT>/references/shared-rules.md`
 
-You are the Init tool. Your job is to initialize the project-level user data directory, ensuring new projects work out of the box with self-contained dependencies (can run without the plugin).
+Initialize the project-level user data directory, ensuring new projects work out of the box with self-contained dependencies.
 
 ## Tool Contract
 
 ### Use when
-
 - New project first-time setup with Pensieve
-- `.claude/pensieve/` does not exist or is missing base directories
-- Need to seed initial files (maxims / review pipeline / review knowledge)
-
-### Do not use when
-
-- User requests a plugin version update or version status check (route to `/upgrade`)
-- Need to migrate legacy directories or clean old copies (route to `/upgrade`)
-- Need compliance judgment and severity grading (route to `/doctor`)
-- Need to capture learnings or improve workflows (route to `/selfimprove`)
-
-### Required inputs
-
-- `<SYSTEM_SKILL_ROOT>` (injected by SessionStart)
-- Project root path (current repository)
-- Completed `/upgrade` version pre-check (or confirmed current version status)
-- Initializer script: `<SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-project-data.sh`
-
-### Output contract
-
-- Output initialization result (target directory + seed file status)
-- Explicitly state "will not overwrite existing user files"
-- If legacy old paths are found, prompt user to run `/upgrade` next
-- Explicitly state that the review pipeline defaults to referencing project-level `.claude/pensieve/knowledge/`
+- `.claude/skills/pensieve/` does not exist or is missing base directories/seed files
+- After initialization, need to quickly establish a project-level review baseline
 
 ### Failure fallback
+- Script execution fails: output failure reason and retry command
+- Missing `<SYSTEM_SKILL_ROOT>`: prompt restart / check plugin injection, stop execution
+- Repository has no commit history or Git is unavailable: skip exploration and code review, mark `SKIPPED`
 
-- Script execution fails: output failure reason and retry command — no silent fallback
-- Missing `<SYSTEM_SKILL_ROOT>`: prompt restart / check plugin injection, then stop execution
-- Version status unknown: prompt to run `/upgrade` for version pre-check before continuing init
+## Phase 1: Directory and seed initialization
 
-### Negative examples
+**Goal**: Create project data directories and seed all required files.
 
-- "There's an old `skills/pensieve/` in the project, migrate it for me" -> do not continue init, route to `/upgrade`
-- "Give me a PASS/FAIL health check first" -> not init's job, route to `/doctor`
-
-## Execution Steps
-
+**Actions**:
 1. Verify `<SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-project-data.sh` exists.
 2. Run:
-
 ```bash
 bash <SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-project-data.sh
 ```
+3. Verify minimum results: `{maxims,decisions,knowledge,pipelines,loop}` directories exist; `pipelines/run-when-reviewing-code.md`, `pipelines/run-when-committing.md`, `knowledge/taste-review/content.md` exist.
+4. Verify project-level SKILL: `.claude/skills/pensieve/SKILL.md` contains auto-generated marker and graph section; `~/.claude/projects/<project>/memory/MEMORY.md` contains Pensieve guidance block.
+5. If legacy directories are detected (`skills/pensieve/` or `.claude/pensieve/`), prompt user to run `upgrade`.
 
-3. Verify minimum results:
-   - `.claude/pensieve/{maxims,decisions,knowledge,pipelines,loop}` exist
-   - `.claude/pensieve/pipelines/run-when-reviewing-code.md` exists
-   - `.claude/pensieve/knowledge/taste-review/content.md` exists
-4. If legacy directories are detected (e.g., `skills/pensieve/` or `.claude/skills/pensieve/`), append reminder: please run `/upgrade` to handle migration and cleanup.
+## Phase 2: Baseline exploration
+
+**Goal**: Read-only scan of Git history and code structure, producing a candidate list for retention.
+
+**Actions**:
+1. Read recent commit history (default 30 commits, or user-specified window).
+2. Summarize high-frequency changed files/modules and risk hotspots.
+3. Produce a candidate list (annotated with suggested type: `knowledge/decision/maxim/pipeline`), each with supporting evidence. Do not list items without evidence.
+
+## Phase 3: Code review and wrap-up
+
+**Goal**: Run review pipeline against hotspots, output summary and next steps.
+
+**Actions**:
+1. Load `.claude/skills/pensieve/pipelines/run-when-reviewing-code.md`, using "hotspot files + recent key commits" as the review scope.
+2. Output review summary (complexity hotspots, special branches, potential breaking-change risks).
+3. Wrap-up output: initialization result + candidate summary + review summary.
+4. Next steps: run `doctor` to check seed file format; if retention is needed, run `self-improve`.
 
 ## Constraints
 
-- Only initialize and seed; do not perform migration or cleanup.
-- Never overwrite existing user files.
-- Do not output `/doctor`-style compliance severity conclusions.
+- Initialization may include read-only exploration and code review, but does not directly write retention content; that is handled by `self-improve`.
+- Does not perform migration cleanup; that is handled by `upgrade`.
+- Never overwrites existing user files.
+- Does not output `doctor`-style compliance severity conclusions.

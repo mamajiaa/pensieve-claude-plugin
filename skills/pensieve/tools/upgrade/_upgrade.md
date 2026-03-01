@@ -1,224 +1,143 @@
+---
+description: Version check and migration alignment -- sync to latest version; when a new version is available, perform structure alignment and old-path cleanup; if already up-to-date, ask whether to run doctor.
+---
+
 # Upgrade Tool
 
----
-description: Sync to latest version structure definitions first, then migrate user data as needed (no-op if no diff)
----
+> Tool boundaries: see `<SYSTEM_SKILL_ROOT>/references/tool-boundaries.md` | Shared rules: see `<SYSTEM_SKILL_ROOT>/references/shared-rules.md` | Directory conventions: see `<SYSTEM_SKILL_ROOT>/references/directory-layout.md`
 
-You are the Upgrade Tool. Your job is to sync to the latest version first, then determine whether migration is needed based on the latest directory structure. Only execute migration when structural diff exists; otherwise output no-op and hand off to `/doctor` for local data judgment.
+Sync to the latest version first and confirm version status. If already up-to-date, stop upgrade and ask the user whether to run `doctor`; only enter migration alignment when a new version is confirmed.
 
 ## Tool Contract
 
 ### Use when
 
-- User requests a plugin version update or version status check
-- User needs to migrate legacy data into `.claude/pensieve/`
-- Old path parallelism exists and needs consolidation to a single source of truth
-- User needs to clean old plugin naming and switch to the new reference
-
-### Do not use when
-
-- New project first-time setup that only needs `.claude/pensieve/` creation (route to `/init`)
-- User only wants compliance status and severity grading (route to `/doctor`)
-- User only wants to capture learnings or create new workflows (route to `/selfimprove`)
-- User only wants to view available pipelines (route to `/pipeline`)
-
-### Required inputs
-
-- Latest version source (prefer GitHub / Marketplace; synced to local plugin after update)
-- Version status (whether update + restart per `<PLUGIN_ROOT>/docs/update.md` is completed)
-- Both settings paths:
-  - `~/.claude/settings.json`
-  - `<project>/.claude/settings.json`
-- Current local structure (old paths and `.claude/pensieve/` directory state)
-
-### Output contract
-
-- Must output "structural comparison conclusion" (whether structural diff exists)
-- If diff: output migration report (old path -> new path, including conflict handling)
-- If no diff: explicitly output no-op (no migration needed)
-- Do not output `PASS/FAIL` or `MUST_FIX/SHOULD_FIX`
-- Regardless of migration outcome, always recommend next step: `/doctor`
+- User requests plugin version update, version status check, or migration of legacy data to `.claude/skills/pensieve/`
+- User has old paths / plugin-level copies / standalone graph files / legacy spec README copies that need cleanup and consolidation
 
 ### Failure fallback
 
-- Update status cannot be confirmed: stop at "confirm update + restart" — do not enter migration
-- Cannot pull latest version definitions: check GitHub latest docs first and suggest retry — do not enter migration
-- File conflicts cannot auto-merge: generate `*.migrated.md` and record manual merge points
+- Cannot confirm update status: stop at "confirm update + restart"; do not enter migration
+- Cannot pull latest version definition: refer to GitHub latest docs and suggest retry; do not enter migration
+- User file conflicts cannot auto-merge: generate `*.migrated.md` and record manual merge points
 
-### Negative examples
+## Upgrade-Specific Rules
 
-- "Run doctor first, then decide whether to upgrade" -> conflicts with upgrade-first rule
-- "Also give me PASS/FAIL during migration" -> crosses into doctor territory
+- Clean old plugin naming first, then migrate user data
+- Pull latest version structure definitions from GitHub/Marketplace first, then make local structure judgments
+- Directory history and the latest target structure use `migrations/README.md` as the single source of truth
+- Version check is the only hard gate: do not enter migration before confirming a new version; if no new version, only ask whether to run `doctor`
+- When update commands fail, consult [GitHub docs/update.md](https://github.com/kingkongshot/Pensieve/blob/main/docs/update.md) before continuing
 
-Hard rule: clean up old plugin naming first, then migrate user data. Do not keep old and new naming in parallel.
-Hard rule: version update pre-check is owned by Upgrade and is the highest priority gate.
-Hard rule: sync latest version structure definitions from GitHub/Marketplace first, then perform local structural judgment.
-Hard rule: if "no new version + no local structural diff", go straight to no-op — do not enter per-file migration.
-Hard rule: after upgrade/migration, run one mandatory doctor check.
-Hard rule: do not treat "run doctor before upgrade" as a gate; default flow is upgrade-first.
-Hard rule: before entering migration, check plugin docs `<PLUGIN_ROOT>/docs/update.md`; if a new plugin version exists (or cannot confirm), update plugin and restart Claude Code first.
-Hard rule: if update command fails, check the latest GitHub update docs ([docs/update.md](https://github.com/kingkongshot/Pensieve/blob/main/docs/update.md)) before continuing; do not enter migration in a failure state.
+> Global upgrade-first rule: see `<SYSTEM_SKILL_ROOT>/references/shared-rules.md`
 
-## Responsibility Boundary (Upgrade vs Doctor)
+---
 
-- Upgrade first handles **version update and latest structure definition sync**, then executes migration actions as needed.
-- Upgrade only performs structural actions (create/copy/rename/clean/minimal merge) — no per-file semantic review.
-- Upgrade should not output `PASS/FAIL` or `MUST_FIX/SHOULD_FIX` diagnosis.
-- Compliance judgment and "what still needs adjusting in local data structure" is owned by `/doctor`; Upgrade only reports what was done.
+## Phase 1: Version Check (Only Hard Gate)
 
-## Version Check Pre-Requisite (Before Migration)
+**Goal**: Confirm whether a new version exists and decide whether to enter migration.
 
-Before any migration action, sync to the latest version structure definitions:
+**Actions**:
+1. Execute plugin update commands per `<PLUGIN_ROOT>/docs/update.md`
+2. If update fails, consult [GitHub docs/update.md](https://github.com/kingkongshot/Pensieve/blob/main/docs/update.md) and retry
+3. New version found and update completed: restart Claude Code first, then enter Phase 2
+4. Already up-to-date: output "currently on latest version," ask user whether to run `doctor`, maintain project-level SKILL and end: `bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event upgrade --note "upgrade skipped: version up-to-date; asked whether to run doctor"`
+5. Cannot confirm version status: ask user first; do not enter migration until confirmed
 
-1. Run plugin update commands per `<PLUGIN_ROOT>/docs/update.md` (pulls latest from GitHub/Marketplace).
-2. If local docs are unavailable or update fails, check the latest GitHub update docs ([docs/update.md](https://github.com/kingkongshot/Pensieve/blob/main/docs/update.md)) and retry.
-3. After running update commands:
-   - New version found and updated: must restart Claude Code first, then resume `/upgrade`.
-   - Already on latest (no changes): proceed directly with `/upgrade`.
-4. If version status cannot be confirmed, ask the user whether "update + restart" is completed; do not enter structural judgment or migration until confirmed.
+## Phase 2: Structure Scan and Judgment
 
-## Target Structure (Project-Level, Never Overwritten by Plugin)
+**Goal**: Scan current structure and determine whether migration is needed.
 
-```
-<project>/.claude/pensieve/
-  maxims/      # user/team maxims (one maxim per file)
-  decisions/   # decision records (ADR)
-  knowledge/   # user references
-  pipelines/   # project-level pipelines
-  loop/        # loop artifacts (one dir per loop)
-```
+**Actions**:
+1. Execute shared structure scan:
+   ```bash
+   bash <SYSTEM_SKILL_ROOT>/tools/doctor/scripts/scan-structure.sh --output .state/pensieve-structure-scan.pre.json
+   ```
+2. Read `summary.must_fix_count`, `flags.*`, `findings[]`
+3. `must_fix_count = 0` -> no-op; maintain project-level SKILL then run `doctor`: `bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event upgrade --note "upgrade no-op after new version sync (structure + critical content aligned)"`
+4. `must_fix_count > 0` -> enter Phase 3
 
-## Structural Diff Gate (Judge Before Migrating)
+## Phase 3: Migration Alignment
 
-Perform structural comparison first — no per-file deep reads:
+**Goal**: Clean old plugin naming, migrate user data, align key files.
 
-1. Whether old path parallels exist (e.g., `skills/pensieve/`, `.claude/skills/pensieve/`).
-2. Whether `.claude/pensieve/` is missing critical directories or naming (e.g., `run-when-*.md`).
-3. Whether `enabledPlugins` has old key parallels or is missing the new key.
-4. Whether the review pipeline still references plugin-internal knowledge paths (`<SYSTEM_SKILL_ROOT>/knowledge/...`).
+### 3a. Clean Old Plugin Naming
 
-Judgment rules:
-- **No structural diff**: output no-op (no migration needed), then proceed to `/doctor`.
-- **Structural diff found**: execute minimal migration actions, then proceed to `/doctor`.
+1. Fix `enabledPlugins` (two-level settings: `~/.claude/settings.json` and `<project>/.claude/settings.json`):
+   - Remove `pensieve@Pensieve`, `pensieve@pensieve-claude-plugin`
+   - Keep/add `pensieve@kingkongshot-marketplace: true`
+2. Execute plugin cleanup commands:
+   ```bash
+   CLAUDECODE= claude plugin uninstall pensieve@Pensieve --scope user || true
+   CLAUDECODE= claude plugin uninstall pensieve@pensieve-claude-plugin --scope user || true
+   CLAUDECODE= claude plugin uninstall pensieve@Pensieve --scope project || true
+   CLAUDECODE= claude plugin uninstall pensieve@pensieve-claude-plugin --scope project || true
+   CLAUDECODE= claude plugin marketplace update kingkongshot/Pensieve
+   CLAUDECODE= claude plugin update pensieve@kingkongshot-marketplace --scope user
+   ```
 
-## Migration Principles
+### 3b. Clean Old Directories and Copies
 
-- Clean old plugin identifiers first: remove old install references and old keys in `settings.json` before data migration.
-- Old references to clean:
-  - `pensieve@Pensieve`
-  - `pensieve@pensieve-claude-plugin`
-- New single reference:
-  - `pensieve@kingkongshot-marketplace`
-- System capability stays inside the plugin: content under `<SYSTEM_SKILL_ROOT>/` is plugin-managed; do not move or overwrite it.
-- Old system files are no longer needed: remove old project copies after migration (never touch plugin internals).
-- No-diff means no migration: if the structural gate passes, go straight to no-op — no per-file deliberation.
-- Review dependency internalization: `.claude/pensieve/pipelines/run-when-reviewing-code.md` should reference `.claude/pensieve/knowledge/taste-review/content.md`, not plugin paths.
-- User data is project-level: migrate only user-authored content into `.claude/pensieve/`.
-- Do not overwrite user data: if target files exist, keep them; suffix or merge as needed.
-- Preserve structure: keep subdirectory hierarchy and filenames as much as possible.
-- Seed initial content from templates: initial maxims and pipeline templates are copied from plugin templates.
-- If versions diverge: read both versions first, then follow directory README rules for merge/migration.
+1. Delete old installation directories:
+   - `<project>/skills/pensieve/`
+   - `<project>/.claude/pensieve/`
+   - `<user-home>/.claude/skills/pensieve/`
+   - `<user-home>/.claude/pensieve/`
+2. Delete standalone graph files: `_pensieve-graph*.md`, `pensieve-graph*.md`, `graph*.md`
+3. Delete project-level subdirectory legacy spec README copies:
+   ```bash
+   for d in maxims decisions knowledge pipelines loop; do
+     find ".claude/skills/pensieve/$d" -maxdepth 1 -type f \( -iname 'readme*.md' -o -iname 'readme' \) -delete 2>/dev/null || true
+   done
+   ```
+4. When uncertain, back up before deleting
 
-## Common Old Locations for User Data
+### 3c. Migrate User-Authored Content
 
-May exist in:
+Target path: `.claude/skills/pensieve/` (only user data root)
 
-- `skills/pensieve/` or its subdirectories in the project repo
-- user-created `maxims/`, `decisions/`, `knowledge/`, `pipelines/`, `loop/` folders
+1. Migrate user files: `maxims/*.md` (non-`_` prefix), `decisions/*.md`, `knowledge/*`, `pipelines/*.md`, `loop/*`
+2. Do not migrate system files (`_` prefix), legacy copied directories' system READMEs/templates/scripts
+3. Old `maxims/_linus.md` and `pipelines/review.md`: merge into new naming then delete old copies
+4. On conflict, do minimal merge (produce `*.migrated.md` when needed)
+5. Seed from templates: initial maxims and pipeline templates come from the plugin
 
-### What to migrate
+### 3d. Align Key Files
 
-- User-authored files (non-system):
-  - `maxims/*.md` (non-`_` files)
-  - `decisions/*.md`
-  - `knowledge/*`
-  - `pipelines/*.md`
-  - `loop/*`
+Overwrite targets:
+- `.claude/skills/pensieve/pipelines/run-when-reviewing-code.md`
+- `.claude/skills/pensieve/pipelines/run-when-committing.md`
+- `.claude/skills/pensieve/knowledge/taste-review/content.md`
 
-> Older versions shipped `maxims/_linus.md` and `pipelines/review.md` inside plugin/project copies. If still used, copy content into:
-> - `.claude/pensieve/maxims/{your-maxim}.md`
-> - `.claude/pensieve/pipelines/run-when-reviewing-code.md`
-> Then delete old copies to avoid confusion.
+Template sources: `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/` and `<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md`
 
-### Template locations (plugin)
+Handling strategy:
+- Target file missing: copy directly from template
+- Target file exists but content differs: back up as `*.bak.<timestamp>` first, then replace with template
+- Rewrite review pipeline path references to point to `.claude/skills/pensieve/knowledge/taste-review/content.md`
 
-- `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/maxims/*.md`
-- `<SYSTEM_SKILL_ROOT>/tools/upgrade/templates/pipeline.run-when-reviewing-code.md`
-- `<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md` (project knowledge seed source)
+## Phase 4: Verification and Report
 
-### What NOT to migrate
+**Goal**: Confirm migration convergence, output report, and run doctor.
 
-- System files (usually `_`-prefixed):
-  - `pipelines/_*.md`
-  - `maxims/_*.md`
-  - system README/templates/scripts in old copied locations
-
-## Clean Up Old System Files (Project Only)
-
-After migration, delete old system copies inside the project to avoid confusion:
-
-- `<project>/skills/pensieve/`
-- `<project>/.claude/skills/pensieve/`
-- old system `README.md` and `_*.md` prompt files
-
-If unsure whether something is a system copy, back it up before deleting.
-
-## Clean Up Old Plugin Naming (Must Run First)
-
-Before migrating user data, check these files:
-
-- user scope: `~/.claude/settings.json`
-- project scope: `<project>/.claude/settings.json`
-
-In `enabledPlugins`:
-
-- remove `pensieve@Pensieve`
-- remove `pensieve@pensieve-claude-plugin`
-- keep/add `pensieve@kingkongshot-marketplace: true`
-
-If multiple keys exist, do not keep compatibility keys. Leave only the new key.
-
-## Migration Steps (Best done by an LLM, execution-focused)
-
-1. Run "Version Check Pre-Requisite (Before Migration)" to ensure latest version structure definitions are synced.
-2. Run "Structural Diff Gate" (old path parallel / directory missing / naming drift / plugin key drift).
-3. If no structural diff:
-   - Output no-op: `No migration needed`
-   - Proceed directly to `/doctor` for local data structure judgment
-   - End upgrade
-4. If structural diff exists, enter migration:
-   - Fix `enabledPlugins` (remove old keys, keep new key)
-   - Clean old install references (if present)
-   - Execute minimal structural migration (directory creation, naming normalization, old copy cleanup)
-   - If `.claude/pensieve/knowledge/taste-review/content.md` is missing, seed from plugin knowledge
-   - Rewrite review pipeline references from `<SYSTEM_SKILL_ROOT>/knowledge/taste-review/content.md` to `.claude/pensieve/knowledge/taste-review/content.md`
-   - Only do minimal merge on conflicts (produce `*.migrated.md` when needed)
-5. Output migration report (structural diff -> actions taken -> results).
-6. Mandatory post-migration `/doctor` run:
-   - Doctor issues `PASS/FAIL` and specific "what still needs adjusting" list
-   - Upgrade does not do additional per-file semantic repair at this stage
-
-## Plugin Cleanup and Update Commands (In Order)
-
-When running `claude` commands from inside a Claude Code session (model executing on your behalf), prefix with `CLAUDECODE=` to clear the nested session detection variable.
-
-```bash
-# Remove old install references (ignore if not installed)
-CLAUDECODE= claude plugin uninstall pensieve@Pensieve --scope user || true
-CLAUDECODE= claude plugin uninstall pensieve@pensieve-claude-plugin --scope user || true
-
-# If project-scope install exists, clean it too
-CLAUDECODE= claude plugin uninstall pensieve@Pensieve --scope project || true
-CLAUDECODE= claude plugin uninstall pensieve@pensieve-claude-plugin --scope project || true
-
-# Refresh marketplace and update new plugin reference
-CLAUDECODE= claude plugin marketplace update kingkongshot/Pensieve
-CLAUDECODE= claude plugin update pensieve@kingkongshot-marketplace --scope user
-```
+**Actions**:
+1. Execute post scan:
+   ```bash
+   bash <SYSTEM_SKILL_ROOT>/tools/doctor/scripts/scan-structure.sh --output .state/pensieve-structure-scan.post.json --fail-on-drift
+   ```
+2. If post scan still has MUST_FIX items, declare non-convergence and stop with a diff list
+3. Output migration report (old path -> new path, replaced key files, cleaned old paths)
+4. Maintain project-level SKILL: `bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event upgrade --note "upgrade migration completed after new version sync"`
+5. Output project-level `SKILL.md` update result and Claude auto memory `~/.claude/projects/<project>/memory/MEMORY.md` (Pensieve guidance block) update result
+6. Run `doctor`
 
 ## Constraints
 
-- Do not delete plugin internal system files.
-- Do not modify plugin-managed system content.
-- You may edit `settings.json` only for Pensieve-related `enabledPlugins` keys.
-- Do not output diagnosis-grade conclusions in upgrade stage (`MUST_FIX/SHOULD_FIX`).
+- Do not delete plugin internal system files
+- Do not modify plugin-managed system content
+- Only edit `settings.json` for Pensieve-related `enabledPlugins` keys
+- Do not output diagnosis-grade conclusions during upgrade stage (`PASS/FAIL`, `MUST_FIX/SHOULD_FIX`)
+- Do not preserve standalone graph files (graph is unified in project-level `SKILL.md#Graph`)
+- Do not preserve project-level subdirectory spec README copies (spec single source of truth is in plugin-side `<SYSTEM_SKILL_ROOT>/*/README.md`)
+
+> Data boundary (system vs user): see `<SYSTEM_SKILL_ROOT>/references/shared-rules.md`

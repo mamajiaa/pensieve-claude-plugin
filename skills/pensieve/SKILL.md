@@ -1,129 +1,53 @@
 ---
 name: pensieve
-description: Load this skill immediately when the user expresses any intent. System capabilities (tools/knowledge/scripts) live inside the plugin and are maintained through plugin updates. User data must live at project-level `.claude/pensieve/` and is never overwritten by the plugin. When the user asks to improve Pensieve system behavior (plugin content), you must use the Self-Improve tool (`tools/self-improve/_self-improve.md`).
+description: Project knowledge archival and workflow routing. Provides init (initialize), upgrade (version/migration), doctor (health check), self-improve (reflect/archive), and loop (iterative execution) tools.
 ---
 
 # Pensieve
 
-Route user intent to the right tool/pipeline.
+Route user requests to the correct tool. When uncertain, confirm first.
 
-## User Intent Routing (First Step)
+## Intent Routing
 
-Before calling any tool, perform intent routing:
+1. **Explicit intent takes priority**: if the user explicitly names a tool or trigger word, route directly.
+2. **Infer from session stage** (when no explicit command is given):
+   - New project or blank context → `init` | Version/migration uncertainty → `upgrade`
+   - Development complete or retrospective signals → `self-improve` | Complex task needing decomposition → `loop`
+3. **When uncertain, confirm first**.
 
-1. **Check explicit commands first**: if the user explicitly says `loop` / `/selfimprove` / `/upgrade` / `/init` / `pipeline` / `doctor`, route directly by instruction — no guessing.
-2. **Infer from session stage** (only when user gives no explicit command):
-   - **Heavy conversation with clear conclusions** (goals, constraints, approach decided): candidate intent is "enter development execution" (suggest `loop` for complex tasks).
-   - **Development complete or nearly done** (signals like "reflect/capture/standardize/reuse next time"): candidate intent is "enter self-improve" (suggest Self-Improve).
-   - **Blank start or new project** (no development context yet): candidate intent is "initialize user data first" (suggest Init).
-3. **Ask before acting (never auto-execute)**: unless the user issued an explicit tool command, confirm with a one-line question before proceeding. Suggested options: develop / initialize / self-improve / upgrade.
+<example>
+User: "Initialize pensieve" → Route: tools/init/_init.md
+User: "Check if there are any data issues" → Route: tools/doctor/_doctor.md
+User: "This task is complex, run it with loop" → Route: tools/loop/_loop.md
+</example>
 
-## Version Update Priority (Hard Rule)
+## Global Rules (Summary)
 
-- Version update pre-check is owned by `/upgrade` and has the highest priority.
-- Whenever the user mentions "update version / plugin issue / version uncertainty / compatibility problem", route to `/upgrade` first.
-- Before running `/init` or `/doctor`, if version status is unknown, complete `/upgrade` version pre-check first.
+1. **Upgrade priority**: version/compatibility/migration issues go through upgrade for version confirmation first.
+2. **Confirm before executing**: when the user has not explicitly issued a command, confirm first.
+3. **Keep links connected**: `decision/pipeline` must have at least one `[[...]]` link.
+4. **Read spec before writing data**: read the corresponding README before creating/checking user data.
 
-## Tool Contract Enforcement (P0 Hard Rule)
+> Full rules in `references/shared-rules.md`
 
-Before executing any tool, read the corresponding tool file's `## Tool Contract` and enforce it strictly:
+## Tool Execution Protocol
 
-1. Proceed only if `Use when` matches and `Do not use when` does not match.
-2. All `Required inputs` must be satisfied; if inputs are missing, collect them first — never run blind.
-3. Output must satisfy `Output contract`; no freestyle formatting.
-4. On failure, follow `Failure fallback`; never skip a failure and proceed to the next stage.
+Before executing any tool, read its `### Use when` section to confirm applicability. For tool boundaries and redirect rules, see `references/tool-boundaries.md`.
 
-## Design conventions
+## Routing Table
 
-- **System capability (updated via plugin)**: inside `skills/pensieve/`
-  - tools / scripts / system knowledge / format READMEs
-  - **No built‑in pipelines / maxims content**
-- **User data (project-level, never overwritten)**: `.claude/pensieve/`
-  - `maxims/`: your team principles (one maxim per file)
-  - `decisions/`: project decision records
-  - `knowledge/`: external references you add
-  - `pipelines/`: project pipelines (seeded on install)
-  - `loop/`: loop run outputs (one dir per loop)
+| Intent | Tool spec (read first) | Trigger words |
+|--------|------------------------|---------------|
+| Initialize | `<SYSTEM_SKILL_ROOT>/tools/init/_init.md` | init, initialize |
+| Version update | `<SYSTEM_SKILL_ROOT>/tools/upgrade/_upgrade.md` | upgrade, migrate, version |
+| Health check | `<SYSTEM_SKILL_ROOT>/tools/doctor/_doctor.md` | doctor, check, format check |
+| Archive experience | `<SYSTEM_SKILL_ROOT>/tools/self-improve/_self-improve.md` | self-improve, archive, reflect |
+| Iterative execution | `<SYSTEM_SKILL_ROOT>/tools/loop/_loop.md` | loop, iterative execution, execute pipeline |
 
-## Built-in Tools (6)
+## Routing Failure Fallback
 
-### 1) Init Tool
+1. **Ambiguous intent**: return candidate routes and ask the user to confirm.
+2. **Tool entry unreadable**: stop and report the missing path.
+3. **Incomplete input**: collect missing information before executing.
 
-**When to use**:
-- First-time initialization of `.claude/pensieve/` directory and seed files for a new project
-
-**Entry**:
-- Command: `commands/init.md`
-- Tool file: `tools/init/_init.md`
-
-**Triggers**:
-- "init" / "initialize"
-
-### 2) Loop Tool
-
-**When to use**:
-- The task is complex and needs split + auto‑loop execution
-
-**Entry**:
-- Command: `commands/loop.md`
-- Tool file: `tools/loop/_loop.md`
-
-**Triggers**:
-- `loop` / "use loop"
-
-### 3) Self‑Improve Tool
-
-**When to use**:
-- User asks to improve Pensieve (pipelines/scripts/rules/behavior)
-- After a loop ends for feedback & improvement
-
-**Entry**:
-- Command: `commands/selfimprove.md`
-- Tool file: `tools/self-improve/_self-improve.md`
-
-**Triggers**:
-- "self‑improve" / "improve Pensieve"
-
-### 4) Pipeline Tool
-
-**When to use**:
-- User wants to list pipelines for the current project
-
-**Entry**:
-- Command: `commands/pipeline.md`
-- Tool file: `tools/pipeline/_pipeline.md`
-
-**Triggers**:
-- "pipeline" / "use pipeline"
-
-### 5) Doctor Tool
-
-**When to use**:
-- Mandatory post-upgrade validation (structure/format compliance)
-- Optional post-install health check
-- User asks to validate user-data quality
-
-**Entry**:
-- Command: `commands/doctor.md`
-- Tool file: `tools/doctor/_doctor.md`
-
-**Triggers**:
-- "doctor" / "health check" / "format check" / "migration check"
-
-### 6) Upgrade Tool
-
-**When to use**:
-- User requests a plugin version update or needs to confirm version status
-- User needs to migrate legacy data into `.claude/pensieve/`
-- User asks for the ideal user-data structure
-
-**Entry**:
-- Command: `commands/upgrade.md`
-- Tool file: `tools/upgrade/_upgrade.md`
-
-**Triggers**:
-- "upgrade" / "migrate user data"
-
----
-
-SessionStart injects the **system capability path** and **project user‑data path** into context as the single source of truth at runtime.
+`<SYSTEM_SKILL_ROOT>` is injected by the SessionStart hook; user data path is fixed at `<project>/.claude/skills/pensieve/`.

@@ -30,7 +30,7 @@ If the update command fails (network, permissions, CLI version issues, etc.), ch
 
 - [docs/update.md (main branch)](https://github.com/kingkongshot/Pensieve/blob/main/docs/update.md)
 
-Do not proceed with `/upgrade` until the update failure is resolved.
+Do not proceed with the Upgrade tool until the update failure is resolved.
 
 ---
 
@@ -45,47 +45,51 @@ System prompts (tools/scripts/system knowledge) are packaged inside the plugin a
 Restart Claude Code and say `loop` to verify the update.
 
 **Version check pre-requisite (required)**:
-Before running `/upgrade` or `/doctor`, complete "plugin update + restart" per this file first.
+Before running the Upgrade or Doctor tools, complete "plugin update + restart" per this file first.
 If already on the latest version, proceed to the next step.
 
 **Upgrade core logic (version-first)**:
-- `/upgrade` first syncs to the latest version structure definitions (from GitHub/Marketplace)
-- Then runs structural diff gate (old path parallel / directory & naming drift / plugin key drift)
-- If no diff: `/upgrade` should no-op — no per-file migration
-- If diff found: execute minimal structural migration
-- Review dependency should be project-internalized: pipeline references `.claude/pensieve/knowledge/...`, not `<SYSTEM_SKILL_ROOT>/knowledge/...`
-- Final judgment is always delegated to `/doctor` for "what still needs adjusting in local data structure"
+- The Upgrade tool first syncs to the latest version structure definitions (from GitHub/Marketplace)
+- Then runs a full migration alignment gate (old path parallel / directory & naming drift / plugin key drift / key file content drift)
+- If structure AND key file content are both consistent: Upgrade may no-op
+- If ANY dimension is inconsistent: execute full migration alignment (migration + key file content alignment + old path cleanup)
+- Key files (`run-when-*.md`, `knowledge/taste-review/content.md`) are replaced when content is mismatched (with backup first)
+- Review dependency should be project-internalized: pipeline references `.claude/skills/pensieve/knowledge/...`, not `<SYSTEM_SKILL_ROOT>/knowledge/...`
+- Final judgment is always delegated to Doctor for "what still needs adjusting in local data structure"
 
 Then:
-- Even with dirty legacy data, run `/upgrade` first (do not treat `/doctor` as a pre-upgrade gate)
-- Run `/doctor` once after every upgrade/migration (required)
-- If doctor reports migration/structure issues, run `/upgrade` then rerun `/doctor`
-- If doctor passes, run `/selfimprove` as needed
+- Even with dirty legacy data, run the Upgrade tool first (do not treat Doctor as a pre-upgrade gate)
+- Run Doctor once after every upgrade/migration (required)
+- If Doctor reports migration/structure issues, run Upgrade then rerun Doctor
+- If Doctor passes, run Self-Improve as needed
+- After running Upgrade, Doctor, or Self-Improve, the following should be maintained:
+  - Project-level `.claude/skills/pensieve/SKILL.md` (fixed routing + graph)
+  - The Pensieve guidance block in Claude auto memory `~/.claude/projects/<project>/memory/MEMORY.md` (description aligned with system skill `description`)
 
 Recommended order:
 1. Check and update the plugin (or confirm already on latest version), then restart Claude Code
-2. Run `/upgrade` (structural diff first; no-op if no diff)
-3. Run `/doctor` once (required)
-4. If doctor reports issues, continue `/upgrade` then rerun `/doctor`
-5. Run `/selfimprove` only when you want to capture reusable improvements
+2. Run Upgrade (full migration alignment; no-op only if structure and key content are both consistent)
+3. Run Doctor once (required)
+4. If Doctor reports issues, continue with Upgrade then rerun Doctor
+5. Run Self-Improve only when you want to capture reusable improvements
 
-If you are guiding the user, remind them they only need a few commands:
-- `/loop`
-- `/doctor`
-- `/selfimprove`
-- `/pipeline`
-- `/upgrade`
+If you are guiding the user, remind them they only need to express these intents:
+- Loop execution
+- Doctor health check
+- Self-Improve capture
+- Upgrade migration
+- View graph (read the project-level `SKILL.md` under `## Graph`)
 
 ---
 
 ## Preserved User Data
 
-Project user data in `.claude/pensieve/` is never overwritten by plugin updates:
+Project user data in `.claude/skills/pensieve/` is never overwritten by plugin updates:
 
 | Directory | Content |
 |------|------|
-| `.claude/pensieve/maxims/` | Custom maxims |
-| `.claude/pensieve/decisions/` | Decisions |
-| `.claude/pensieve/knowledge/` | Custom knowledge |
-| `.claude/pensieve/pipelines/` | Project pipelines |
-| `.claude/pensieve/loop/` | Loop history |
+| `.claude/skills/pensieve/maxims/` | Custom maxims |
+| `.claude/skills/pensieve/decisions/` | Decisions |
+| `.claude/skills/pensieve/knowledge/` | Custom knowledge |
+| `.claude/skills/pensieve/pipelines/` | Project pipelines |
+| `.claude/skills/pensieve/loop/` | Loop history |
