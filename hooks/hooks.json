@@ -1,5 +1,5 @@
 {
-  "description": "Pensieve hooks: SessionStart checks init/doctor marker state; PostToolUse syncs project SKILL graph and MEMORY guidance block.",
+  "description": "Pensieve hooks: SessionStart checks init/doctor marker state; PostToolUse syncs project SKILL graph and Claude auto-memory guidance block.",
   "hooks": {
     "SessionStart": [
       {

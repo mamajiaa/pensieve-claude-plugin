@@ -9,7 +9,7 @@
 | 工具 | 职责 | 不负责 |
 |------|------|--------|
 | `upgrade` | 版本同步 + 结构迁移 | 不给 PASS/FAIL，不做逐文件语义审查 |
-| `doctor` | 只读体检 + 合规报告 | 不改用户数据文件，不做迁移（仅允许自动维护 `SKILL.md` 与 `<project>/MEMORY.md` 引导块） |
+| `doctor` | 只读体检 + 合规报告 | 不改用户数据文件，不做迁移（仅允许自动维护 `SKILL.md` 与 auto memory `~/.claude/projects/<project>/memory/MEMORY.md` 引导块） |
 | `self-improve` | 沉淀经验到四类用户数据 | 不做迁移/体检 |
 | `init` | 初始化项目目录 + 种子化 + 基线探索与品味分析（只读） | 不做迁移清理，不直接写入沉淀 |
 | `loop` | 拆解复杂任务 + 子代理循环执行 | 小任务直接完成，不开 loop |
@@ -38,6 +38,6 @@
 | "先给我 PASS/FAIL 体检结论" | init 或 upgrade 给结论 | `doctor` |
 | "初始化后直接把候选写进 knowledge/decision" | init 直接落库 | `self-improve` |
 | "先跑 doctor，再决定要不要 upgrade" | 直接跳过版本确认 | `upgrade`（先做版本检查；无新版本时再询问是否跑 `doctor`） |
-| "边检查边帮我改" | doctor 批量修改用户数据文件 | 先 `doctor` 报告，再手动修（仅保留 `SKILL.md`/`MEMORY.md` 自动维护） |
+| "边检查边帮我改" | doctor 批量修改用户数据文件 | 先 `doctor` 报告，再手动修（仅保留 `SKILL.md`/auto memory `MEMORY.md` 自动维护） |
 | "先自动把这次会话都沉淀了，不用我确认" | 自动沉淀 | `self-improve`（可直接写入） |
 | "改 1 个文案文件，顺便 loop" | 开 loop | 直接完成 |

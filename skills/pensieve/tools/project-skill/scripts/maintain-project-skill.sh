@@ -1,5 +1,5 @@
 #!/bin/bash
-# Maintain project-level Pensieve SKILL.md and MEMORY.md guidance block.
+# Maintain project-level Pensieve SKILL.md and Claude auto memory guidance block.
 #
 # Usage:
 #   maintain-project-skill.sh --event <install|upgrade|doctor|self-improve|sync> [--note "..."]

@@ -34,7 +34,7 @@ description: 初始化项目级 `.claude/skills/pensieve/` 并补齐种子文件
 - 说明不会覆盖已有用户文件
 - 若发现历史旧路径，提示运行 `upgrade`
 - 回报项目级 `SKILL.md` 更新结果
-- 回报项目根 `MEMORY.md`（Pensieve 引导块）更新结果
+- 回报 Claude auto memory `~/.claude/projects/<project>/memory/MEMORY.md`（Pensieve 引导块）更新结果
 - 说明候选仅分析，不自动写入沉淀文件
 - 给出下一步：运行 `doctor`
 
@@ -69,7 +69,7 @@ bash <SYSTEM_SKILL_ROOT>/tools/loop/scripts/init-project-data.sh
 4. 核验项目级 SKILL：
    - `.claude/skills/pensieve/SKILL.md` 已创建/更新
    - 文件内包含自动生成标记与 graph 段落
-   - `<project>/MEMORY.md` 已创建或包含 Pensieve 引导块（描述与系统 skill `description` 对齐，且包含“优先调用 `pensieve` skill”）
+   - `~/.claude/projects/<project>/memory/MEMORY.md` 已创建或包含 Pensieve 引导块（描述与系统 skill `description` 对齐，且包含“优先调用 `pensieve` skill”）
 5. 若扫描到历史目录（`skills/pensieve/` 或 `.claude/pensieve/`），追加提醒：运行 `upgrade` 处理迁移与清理。
 6. 执行基线探索（只读）：
    - 读取最近提交记录（默认最近 30 条，或用户指定窗口）

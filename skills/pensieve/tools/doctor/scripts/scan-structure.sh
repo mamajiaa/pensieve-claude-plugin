@@ -73,6 +73,7 @@ if [[ -z "$ROOT" ]]; then
   ROOT="$(user_data_root)"
 fi
 ROOT="$(to_posix_path "$ROOT")"
+AUTO_MEMORY_FILE="$(to_posix_path "$(auto_memory_file)")"
 
 if [[ "$OUTPUT" != "-" ]]; then
   OUTPUT="$(to_posix_path "$OUTPUT")"
@@ -89,7 +90,7 @@ TIMESTAMP="$(runtime_now_utc)"
 PYTHON_BIN="$(python_bin || true)"
 [[ -n "$PYTHON_BIN" ]] || { echo "Python not found" >&2; exit 1; }
 
-"$PYTHON_BIN" - "$ROOT" "$PROJECT_ROOT" "$PLUGIN_ROOT" "$HOME_DIR" "$FORMAT" "$OUTPUT" "$TIMESTAMP" "$FAIL_ON_DRIFT" <<'PY'
+"$PYTHON_BIN" - "$ROOT" "$PROJECT_ROOT" "$PLUGIN_ROOT" "$HOME_DIR" "$AUTO_MEMORY_FILE" "$FORMAT" "$OUTPUT" "$TIMESTAMP" "$FAIL_ON_DRIFT" <<'PY'
 from __future__ import annotations
 
 import json
@@ -123,10 +124,11 @@ root = Path(sys.argv[1])
 project_root = Path(sys.argv[2])
 plugin_root = Path(sys.argv[3])
 home_dir = Path(sys.argv[4]) if sys.argv[4] else Path.home()
-fmt = sys.argv[5]
-output = sys.argv[6]
-generated_at = sys.argv[7]
-fail_on_drift = sys.argv[8] == "1"
+memory_file = Path(sys.argv[5])
+fmt = sys.argv[6]
+output = sys.argv[7]
+generated_at = sys.argv[8]
+fail_on_drift = sys.argv[9] == "1"
 
 findings: list[Finding] = []
 dedupe_keys: set[tuple[str, str, str]] = set()
@@ -161,7 +163,6 @@ legacy_readme_re = re.compile(r"(?i)^readme(?:.*\.md)?$")
 plugin_path_re = re.compile(r"(?<!\.claude/)skills/pensieve/knowledge/")
 plugin_skill_root = plugin_root / "skills" / "pensieve"
 system_skill_file = plugin_skill_root / "SKILL.md"
-memory_file = project_root / "MEMORY.md"
 memory_start_marker = "<!-- pensieve:auto-memory:start -->"
 memory_end_marker = "<!-- pensieve:auto-memory:end -->"
 memory_guidance_line = "- 引导：当需求涉及项目知识沉淀、结构体检、版本迁移或复杂任务拆解时，优先调用 `pensieve` skill。"
@@ -424,8 +425,8 @@ else:
             "MUST_FIX",
             "missing_memory_file",
             memory_file,
-            "缺少 Claude Code 项目级 MEMORY.md。",
-            "执行 init/upgrade/doctor 触发 auto memory 补齐，或手动创建 MEMORY.md 并写入 Pensieve 引导块。",
+            "缺少 Claude Code auto memory 入口 MEMORY.md。",
+            "执行 init/upgrade/doctor 触发 auto memory 补齐，或在 ~/.claude/projects/<project>/memory/MEMORY.md 写入 Pensieve 引导块。",
         )
     else:
         memory_text = read_text_normalized(memory_file)
@@ -437,7 +438,7 @@ else:
                 "memory_content_drift",
                 memory_file,
                 "MEMORY.md 缺少 Pensieve 说明，或内容未与系统 skill 的 description 对齐。",
-                "执行 init/upgrade/doctor 触发 auto memory 对齐，确保描述与 skill description 一致并包含 pensieve skill 引导。",
+                "执行 init/upgrade/doctor 触发 auto memory 对齐，确保 ~/.claude/projects/<project>/memory/MEMORY.md 与 skill description 一致并包含 pensieve skill 引导。",
             )
 
 must_fix = sum(1 for f in findings if f.severity == "MUST_FIX")
@@ -466,6 +467,7 @@ report = {
     "root": str(root),
     "project_root": str(project_root),
     "plugin_root": str(plugin_root),
+    "auto_memory_file": str(memory_file),
     "summary": {
         "must_fix_count": must_fix,
         "should_fix_count": should_fix,

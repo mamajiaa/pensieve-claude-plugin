@@ -75,7 +75,7 @@ mkdir -p .claude/skills/pensieve/{maxims,decisions,knowledge,pipelines,loop}
 
 > `<SYSTEM_SKILL_ROOT>` 可由 `CLAUDE_PLUGIN_ROOT` 推导：`$CLAUDE_PLUGIN_ROOT/skills/pensieve`。
 > 初始化脚本会自动维护项目级 `SKILL.md`：写入固定路由 + 最新 graph（自动生成，请勿手改）。
-> 同时会自动维护 `<project>/MEMORY.md` 的 Pensieve 引导块（描述与系统 skill `description` 对齐，并引导优先使用 `pensieve` skill）。
+> 同时会自动维护 Claude auto memory：`~/.claude/projects/<project>/memory/MEMORY.md` 的 Pensieve 引导块（描述与系统 skill `description` 对齐，并引导优先使用 `pensieve` skill）。
 > 说明：脚本只负责"目录 + 种子 + SKILL 同步"。新增的"提交记录/代码探索 + review pipeline 品味分析"由 Init 工具执行，不在脚本内自动运行。
 
 ### 4. 重启 Claude Code
@@ -149,7 +149,7 @@ claude plugin install pensieve@kingkongshot-marketplace --scope user
    - `.claude/skills/pensieve/knowledge/taste-review/content.md`
    - `.claude/skills/pensieve/SKILL.md` 已存在
    - `SKILL.md` 包含自动生成标记与 graph 段落
-   - `<project>/MEMORY.md` 已存在并包含 Pensieve 引导块（与系统 skill `description` 对齐）
+   - `~/.claude/projects/<project>/memory/MEMORY.md` 已存在并包含 Pensieve 引导块（与系统 skill `description` 对齐）
 3. 若走 Init 工具完整流程，确认输出包含：
    - 提交记录与代码热点探索摘要
    - 可沉淀候选清单（仅候选，不自动写入）
@@ -175,7 +175,7 @@ claude plugin install pensieve@kingkongshot-marketplace --scope user
 
 当前包含两个 hooks：
 - `SessionStart`：检查项目目录下的 marker（`<project>/.state/pensieve-session-marker.json`，记录版本 / 初始化状态 / doctor 自检版本）。仅当状态不满足时注入提示，并给出 marker 绝对路径；由主窗口在修复完成后主动执行 `pensieve-session-marker.sh --mode record --event ...` 更新。首次 `record` 会自动创建 `<project>/.state/.gitignore`（忽略 `.state` 内运行时文件）。
-- `PostToolUse`：在编辑用户数据后自动同步 `SKILL.md` 图谱，并维护项目根 `MEMORY.md` 的 Pensieve 引导块（loop 不依赖 hooks）。
+- `PostToolUse`：在编辑用户数据后自动同步 `SKILL.md` 图谱，并维护 Claude auto memory `~/.claude/projects/<project>/memory/MEMORY.md` 的 Pensieve 引导块（loop 不依赖 hooks）。
 
 ### Skill 没有加载？
 

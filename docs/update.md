@@ -64,7 +64,7 @@ CLAUDECODE= claude plugin update pensieve@kingkongshot-marketplace --scope user
 - 如果 doctor 通过，按需再执行 Self-Improve 沉淀经验
 - Upgrade、Doctor、Self-Improve 执行后都应维护：
   - 项目级 `.claude/skills/pensieve/SKILL.md`（固定路由 + graph）
-  - 项目根 `MEMORY.md` 的 Pensieve 引导块（描述与系统 skill `description` 对齐）
+  - Claude auto memory `~/.claude/projects/<project>/memory/MEMORY.md` 的 Pensieve 引导块（描述与系统 skill `description` 对齐）
 
 推荐顺序：
 1. 检查并更新插件（或确认已是最新版本），然后重启 Claude Code

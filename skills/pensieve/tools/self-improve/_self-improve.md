@@ -29,7 +29,7 @@ description: 用于提交或复盘时自动沉淀可复用结论（knowledge/dec
 - 写入后输出简短摘要：写入路径 + 沉淀类型
 - 链接规则按 `<SYSTEM_SKILL_ROOT>/references/shared-rules.md` § 语义链接规则
 - 探索型问题包含"探索减负检查项"（见下文）
-- 写入后同步项目级 `SKILL.md`，并维护项目根 `MEMORY.md` 的 Pensieve 引导块
+- 写入后同步项目级 `SKILL.md`，并维护 Claude auto memory `~/.claude/projects/<project>/memory/MEMORY.md` 的 Pensieve 引导块
 - 质量门禁由调用方（pipeline）负责
 
 ### Failure fallback

@@ -1,5 +1,5 @@
 ---
-description: 只读体检工具：基于 README 规范输出 PASS/PASS_WITH_WARNINGS/FAIL 与 MUST_FIX/SHOULD_FIX/INFO 证据清单，不改用户数据文件（仅允许自动维护 SKILL.md / MEMORY.md 引导块）。若跳过体检继续开发，结构问题会被持续放大。触发词：doctor、health check、体检、检查格式、检查迁移。
+description: 只读体检工具：基于 README 规范输出 PASS/PASS_WITH_WARNINGS/FAIL 与 MUST_FIX/SHOULD_FIX/INFO 证据清单，不改用户数据文件（仅允许自动维护 SKILL.md / auto memory MEMORY.md 引导块）。若跳过体检继续开发，结构问题会被持续放大。触发词：doctor、health check、体检、检查格式、检查迁移。
 ---
 
 # Doctor 流程
@@ -33,7 +33,7 @@ description: 只读体检工具：基于 README 规范输出 PASS/PASS_WITH_WARN
 - `FAIL` 且迁移相关时，下一步优先 `upgrade`
 - 只要存在任意问题（`MUST_FIX` / `SHOULD_FIX` / `INFO` 任一 > 0），不得输出纯 `PASS`，且不得给出“无需修复/建议下一步: none”
 - 若发现历史规范 README 副本，标记为 `MUST_FIX` 并建议执行 `upgrade` 清理
-- 报告后同步项目级 `SKILL.md`（记录 doctor 检查时间与结论摘要）并维护项目根 `MEMORY.md` 的 Pensieve 引导块
+- 报告后同步项目级 `SKILL.md`（记录 doctor 检查时间与结论摘要）并维护 Claude auto memory `~/.claude/projects/<project>/memory/MEMORY.md` 的 Pensieve 引导块
 
 ### Failure fallback
 
@@ -92,7 +92,7 @@ description: 只读体检工具：基于 README 规范输出 PASS/PASS_WITH_WARN
 9. **范围违规**：发现插件级/用户级 pensieve skill 副本，未收敛到项目级单根目录。
 10. **遗留文件**：发现独立 graph 文件（`_pensieve-graph*.md`/`pensieve-graph*.md`/`graph*.md`）。
 11. **规范副本遗留**：发现项目级子目录中的历史规范 README 副本（`.claude/skills/pensieve/{maxims,decisions,knowledge,pipelines,loop}/{README*.md,readme*.md}`）。
-12. **Memory 缺失或漂移**：`<project>/MEMORY.md` 缺失 Pensieve 引导块，或内容未与系统 `skills/pensieve/SKILL.md` 的 `description` 对齐。
+12. **Memory 缺失或漂移**：`~/.claude/projects/<project>/memory/MEMORY.md` 缺失 Pensieve 引导块，或内容未与系统 `skills/pensieve/SKILL.md` 的 `description` 对齐。
 
 ### SHOULD_FIX
 
@@ -244,7 +244,7 @@ bash <SYSTEM_SKILL_ROOT>/tools/upgrade/scripts/generate-user-data-graph.sh
 - 每条问题包含 `规则来源`（具体到 README/章节），让用户能追溯判定依据。
 - `状态=FAIL` 且迁移相关时，`下一步` 优先给 `upgrade`。
 - 只要 `INFO > 0`，状态至少为 `PASS_WITH_WARNINGS`，且 `下一步` 至少为 `self-improve`。
-- doctor 阶段不改项目用户数据目录（`.claude/skills/pensieve/`）中的用户文件；仅允许自动维护 `SKILL.md` 与项目根 `MEMORY.md`。
+- doctor 阶段不改项目用户数据目录（`.claude/skills/pensieve/`）中的用户文件；仅允许自动维护 `SKILL.md` 与 auto memory `~/.claude/projects/<project>/memory/MEMORY.md`。
 - `decision` 或 `pipeline` 的断链至少判为 `MUST_FIX`。
 
 ### Phase 3.5：维护项目级 SKILL + MEMORY
@@ -257,14 +257,14 @@ bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh -
 
 仅允许自动维护：
 - `.claude/skills/pensieve/SKILL.md`
-- `<project>/MEMORY.md`（Pensieve 引导块）
+- `~/.claude/projects/<project>/memory/MEMORY.md`（Pensieve 引导块）
 
 ### Phase 4：Auto Memory 补齐检查
 
-检查 Claude Code 项目级 memory（`<project>/MEMORY.md`）是否包含 Pensieve 使用说明。
+检查 Claude Code auto memory（`~/.claude/projects/<project>/memory/MEMORY.md`）是否包含 Pensieve 使用说明。
 
 1. 读取系统 skill 描述：`<SYSTEM_SKILL_ROOT>/SKILL.md` frontmatter 的 `description`
-2. 读取 `<project>/MEMORY.md`
+2. 读取 `~/.claude/projects/<project>/memory/MEMORY.md`
 3. 检查 Pensieve 引导块是否存在且满足：
    - 包含与系统 skill `description` 一致的描述文本
    - 包含“优先调用 `pensieve` skill”的引导语

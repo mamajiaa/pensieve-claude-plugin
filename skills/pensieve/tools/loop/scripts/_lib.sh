@@ -64,9 +64,35 @@ user_data_root() {
     echo "$pr/.claude/skills/pensieve"
 }
 
-# Backward-compatible alias. "memory dir" is now the project skill dir.
+# Claude Code auto memory directory:
+#   ~/.claude/projects/<encoded-project-root>/memory
+auto_memory_project_key() {
+    local pr
+    pr="$(to_posix_path "$(project_root)")"
+    [[ -n "$pr" ]] || {
+        echo ""
+        return 0
+    }
+
+    local encoded
+    encoded="${pr//\//-}"
+    if [[ "$encoded" != -* ]]; then
+        encoded="-$encoded"
+    fi
+    echo "$encoded"
+}
+
 auto_memory_dir() {
-    user_data_root
+    local home_dir key
+    home_dir="$(to_posix_path "${HOME:-$(cd ~ && pwd)}")"
+    key="$(auto_memory_project_key)"
+    echo "$home_dir/.claude/projects/$key/memory"
+}
+
+auto_memory_file() {
+    local dr
+    dr="$(auto_memory_dir)"
+    echo "$dr/MEMORY.md"
 }
 
 project_skill_file() {

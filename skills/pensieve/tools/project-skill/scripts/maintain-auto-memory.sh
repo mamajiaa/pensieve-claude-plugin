@@ -1,5 +1,5 @@
 #!/bin/bash
-# Maintain project-level MEMORY.md guidance for using the Pensieve skill.
+# Maintain Claude Code auto memory guidance block for using the Pensieve skill.
 #
 # Usage:
 #   maintain-auto-memory.sh [--event <name>]
@@ -36,9 +36,8 @@ USAGE
   esac
 done
 
-PROJECT_ROOT="$(to_posix_path "$(project_root)")"
 PLUGIN_ROOT="$(plugin_root_from_script "$SCRIPT_DIR")"
-MEMORY_FILE="$PROJECT_ROOT/MEMORY.md"
+MEMORY_FILE="$(auto_memory_file)"
 SYSTEM_SKILL_FILE="$PLUGIN_ROOT/skills/pensieve/SKILL.md"
 
 PYTHON_BIN="$(python_bin || true)"
