@@ -49,7 +49,7 @@ Route: tools/loop/_loop.md
 
 ## 全局规则（摘要）
 
-1. **Upgrade 优先**：版本/兼容/迁移问题先走 upgrade，因为结构不对齐时其他工具的输出不可信。
+1. **Upgrade 优先**：版本/兼容/迁移问题先走 upgrade 做版本确认；若已是最新，再询问是否继续 `doctor` 自检。
 2. **先确认再执行**：用户未显式下达时先确认——错误执行的回滚成本远高于一次确认。
 3. **链接保持连通**：`decision/pipeline` 至少一条 `[[...]]` 链接（`基于/导致/相关`），这样知识网络才能被图谱追踪。
 4. **先读规范再写数据**：创建/检查用户数据前先读对应 README，避免格式偏离后需要返工修复。
@@ -58,19 +58,19 @@ Route: tools/loop/_loop.md
 
 ## 工具执行协议
 
-执行任一工具前，读取其 `## Tool Contract` 段落。Tool Contract 描述了工具的适用场景、所需输入、输出格式和失败处理方式——跳过这一步容易导致输入不完整或输出格式不一致。
+执行任一工具前，读取其 `## Tool Contract` 段落。Tool Contract 描述了工具的适用场景、所需输入、输出格式和失败处理方式——跳过这一步容易导致输入不完整或输出格式不一致。只拿到路由参数（如 `upgrade`）时，不得直接执行，必须先打开下表对应的工具规范文件。
 
 > 工具边界与重定向见 `references/tool-boundaries.md`
 
 ## 路由表
 
-| 意图 | 入口 | 触发词 |
-|------|------|--------|
-| 初始化 | `tools/init/_init.md` | init, 初始化 |
-| 版本升级 | `tools/upgrade/_upgrade.md` | upgrade, 迁移, 版本 |
-| 体检 | `tools/doctor/_doctor.md` | doctor, 体检, 检查格式 |
-| 沉淀经验 | `tools/self-improve/_self-improve.md` | self-improve, 沉淀, 复盘 |
-| 循环执行 | `tools/loop/_loop.md` | loop, 循环执行, 执行 pipeline |
+| 意图 | 入口 | 工具规范（先读） | 触发词 |
+|------|------|------------------|--------|
+| 初始化 | `tools/init/_init.md` | `<SYSTEM_SKILL_ROOT>/tools/init/_init.md` | init, 初始化 |
+| 版本升级 | `tools/upgrade/_upgrade.md` | `<SYSTEM_SKILL_ROOT>/tools/upgrade/_upgrade.md` | upgrade, 迁移, 版本 |
+| 体检 | `tools/doctor/_doctor.md` | `<SYSTEM_SKILL_ROOT>/tools/doctor/_doctor.md` | doctor, 体检, 检查格式 |
+| 沉淀经验 | `tools/self-improve/_self-improve.md` | `<SYSTEM_SKILL_ROOT>/tools/self-improve/_self-improve.md` | self-improve, 沉淀, 复盘 |
+| 循环执行 | `tools/loop/_loop.md` | `<SYSTEM_SKILL_ROOT>/tools/loop/_loop.md` | loop, 循环执行, 执行 pipeline |
 
 ## 路由失败回退
 

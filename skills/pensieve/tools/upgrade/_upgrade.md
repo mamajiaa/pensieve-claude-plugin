@@ -1,12 +1,12 @@
 ---
-description: 版本与迁移入口：先同步最新版本定义，再执行完整迁移校准（结构、关键文件内容、旧路径清理、插件键统一）。仅在结构与关键内容都一致时 no-op；完成后交由 `doctor` 复检。数据侧只保留项目级 `.claude/skills/pensieve/`，发现插件级/用户级副本、独立 graph 文件或历史规范 README 副本会清理。
+description: 版本检查入口：先同步最新版本定义并确认是否有新版本。若已是最新，停止 upgrade 并询问用户是否运行 `doctor` 自检；仅在确认有新版本时才执行迁移校准（结构、关键文件内容、旧路径清理、插件键统一）。
 ---
 
 # 升级工具
 
 > 工具边界见 `<SYSTEM_SKILL_ROOT>/references/tool-boundaries.md` | 共享规则见 `<SYSTEM_SKILL_ROOT>/references/shared-rules.md` | 目录约定见 `<SYSTEM_SKILL_ROOT>/references/directory-layout.md`
 
-先同步最新版本，再执行"完整迁移校准"判定（结构 + 关键文件内容）。任一项不一致即迁移；仅全部一致时 no-op，然后交给 `doctor`。
+先同步最新版本并确认版本状态。若已是最新，停止 upgrade 并询问用户是否运行 `doctor` 自检；仅在确认有新版本时才进入迁移校准。
 
 ## Tool Contract
 
@@ -32,12 +32,13 @@ description: 版本与迁移入口：先同步最新版本定义，再执行完�
 
 ### Output contract
 
-- 输出"完整迁移校准结论"（结构 + 关键文件内容）
-- 有差异：输出迁移报告（旧路径 → 新路径、已替换关键文件、已清理旧路径）
-- 无差异：输出 no-op（结构与关键内容均一致）
+- 先输出版本检查结论（有新版本 / 已是最新 / 无法确认）
+- 已是最新：仅询问用户是否运行 `doctor` 自检，不进入迁移
+- 有新版本：输出迁移校准结论（结构 + 关键文件内容）
+- 有新版本且有差异：输出迁移报告（旧路径 → 新路径、已替换关键文件、已清理旧路径）
+- 有新版本但无差异：输出 no-op（结构与关键内容均一致）
 - 关键文件都要对齐模板；内容不一致时先备份再替换
 - 不输出 `PASS/FAIL`、`MUST_FIX/SHOULD_FIX`——合规判定由 `doctor` 负责
-- 给出下一步 `doctor`
 - 输出项目级 `SKILL.md` 更新结果
 
 ### Failure fallback
@@ -49,7 +50,7 @@ description: 版本与迁移入口：先同步最新版本定义，再执行完�
 
 ### Negative examples
 
-- "先跑 doctor，再决定要不要 upgrade" → upgrade 应先于 doctor，因为结构不对齐时 doctor 的判定基础不可靠
+- "版本已经最新，仍然直接进入迁移" → 不允许；无新版本时必须停在询问 `doctor` 自检
 - "迁移时顺便给我判定 PASS/FAIL" → 迁移关注的是"对齐结构"，合规判定是另一个维度，由 doctor 负责
 
 ## Upgrade 特有规则
@@ -59,8 +60,8 @@ description: 版本与迁移入口：先同步最新版本定义，再执行完�
 - **先清理旧插件命名，再迁移用户数据**：新旧并行会导致 Claude Code 加载两份插件，行为不可预测。
 - **先从 GitHub/Marketplace 拉取最新版本结构定义，再做本地结构判定**：用本地旧定义做判定可能遗漏新增的必需目录。
 - **目录历史与最新目标结构以 `migrations/README.md` 为准**：单一事实源避免多处定义不一致。
-- **主窗口默认推动"完整迁移校准"**：提供多套迁移模式给用户选择会增加出错概率，大多数用户只需要"对齐到最新"。
-- **"无新版本 + 无结构差异 + 关键文件内容一致" → 才允许 no-op**：宽松的 no-op 条件会跳过内容漂移修复。
+- **版本检查是唯一硬门禁**：未确认有新版本前，不进入迁移步骤。
+- **无新版本即停止迁移**：只询问用户是否运行 `doctor` 自检，不自动继续。
 - **发现旧路径/插件级副本/独立 graph 文件/历史规范 README 副本要清理**：多源并行与规范副本漂移是结构问题的主要来源。
 - **升级或迁移后执行一次 `doctor`**：迁移操作可能引入新的格式问题，立即体检能尽早发现。
 - **进入迁移前先检查 `<PLUGIN_ROOT>/docs/update.md`**：有新版本先更新插件并重启。
@@ -70,14 +71,15 @@ description: 版本与迁移入口：先同步最新版本定义，再执行完�
 
 ---
 
-## 版本检查前置（先于迁移）
+## 版本检查前置（唯一硬门禁）
 
 1. 按 `<PLUGIN_ROOT>/docs/update.md` 执行插件更新命令。
 2. 更新失败则查阅 [GitHub docs/update.md](https://github.com/kingkongshot/Pensieve/blob/main/docs/update.md) 并重试。
-3. 有新版本并完成更新：先重启 Claude Code 再继续。已是最新：直接继续。
-4. 无法确认版本状态：先询问用户；未确认前不进入迁移。
+3. 有新版本并完成更新：先重启 Claude Code，再进入迁移校准。
+4. 已是最新：输出"当前已是最新版本"，询问用户是否运行 `doctor` 自检；不进入迁移。
+5. 无法确认版本状态：先询问用户；未确认前不进入迁移。
 
-## 完整迁移校准门禁
+## 完整迁移校准门禁（仅在有新版本时）
 
 先执行与 Doctor 共用的结构扫描：
 
@@ -90,7 +92,7 @@ bash <SYSTEM_SKILL_ROOT>/tools/doctor/scripts/scan-structure.sh --output .state/
 - 结构、旧路径、README 副本、关键文件漂移、settings 键冲突统一以此扫描结果为准
 - 迁移动作只消费这份结果，不再在 Upgrade 文档内维护第二套检查逻辑
 
-判定：
+判定（仅在有新版本时）：
 - **`summary.must_fix_count = 0`** → no-op → `doctor`
 - **`summary.must_fix_count > 0`** → 完整迁移校准 → `doctor`
 
@@ -167,12 +169,17 @@ bash <SYSTEM_SKILL_ROOT>/tools/doctor/scripts/scan-structure.sh --output .state/
 ## 迁移步骤
 
 1. 版本检查前置。
-2. 执行共享结构扫描（pre）并读取 `.state/pensieve-structure-scan.pre.json`。
-3. 若无差异（`summary.must_fix_count = 0`）：
+2. 若已是最新：
+   - 输出版本已最新
+   - 询问用户是否运行 `doctor` 自检
+   - 维护项目级 SKILL：`bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event upgrade --note "upgrade skipped: version up-to-date; asked whether to run doctor"`
+   - 结束 upgrade（不进入迁移）
+3. 若有新版本：执行共享结构扫描（pre）并读取 `.state/pensieve-structure-scan.pre.json`。
+4. 若无差异（`summary.must_fix_count = 0`）：
    - 输出 no-op
-   - 维护项目级 SKILL：`bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event upgrade --note "upgrade no-op (structure + critical content aligned)"`
+   - 维护项目级 SKILL：`bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event upgrade --note "upgrade no-op after new version sync (structure + critical content aligned)"`
    - 运行 `doctor`
-4. 若有差异（`summary.must_fix_count > 0`）：
+5. 若有差异（`summary.must_fix_count > 0`）：
    - 修正 `enabledPlugins`
    - 清理旧安装引用与旧目录
    - 删除项目级子目录历史规范 README 副本
@@ -185,12 +192,12 @@ bash <SYSTEM_SKILL_ROOT>/tools/doctor/scripts/scan-structure.sh --output .state/
    - 对齐关键文件（缺失补齐；不一致替换）
    - 重写 review pipeline 路径引用
    - 用户文件冲突时最小合并
-5. 再次执行共享结构扫描（post）：
+6. 再次执行共享结构扫描（post）：
    - `bash <SYSTEM_SKILL_ROOT>/tools/doctor/scripts/scan-structure.sh --output .state/pensieve-structure-scan.post.json --fail-on-drift`
    - 若 post 扫描仍有 MUST_FIX，升级判定为未收敛，停止并返回差异清单
-6. 输出迁移报告。
-7. 维护项目级 SKILL：`bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event upgrade --note "upgrade migration completed"`
-8. 运行 `doctor`。
+7. 输出迁移报告。
+8. 维护项目级 SKILL：`bash <SYSTEM_SKILL_ROOT>/tools/project-skill/scripts/maintain-project-skill.sh --event upgrade --note "upgrade migration completed after new version sync"`
+9. 运行 `doctor`。
 
 ## 插件清理与更新命令
 

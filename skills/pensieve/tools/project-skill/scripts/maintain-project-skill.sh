@@ -170,11 +170,11 @@ description: Project-level Pensieve skill file. Auto-maintained route + graph. D
 - Last Note: {last_note}
 
 ## Routing
-- Init：初始化项目级 skill 数据目录并补齐种子；随后执行首轮提交/代码探索与 review 品味基线分析（只读）。
-- Upgrade：执行完整迁移校准（结构、关键文件内容、旧路径清理）。
-- Doctor：做结构/frontmatter/链接体检并给出修复建议。
-- Self-Improve：沉淀 knowledge/decision/maxim/pipeline。
-- Loop：进入任务分解与执行闭环。
+- Init：初始化项目级 skill 数据目录并补齐种子；随后执行首轮提交/代码探索与 review 品味基线分析（只读）。工具规范：`<SYSTEM_SKILL_ROOT>/tools/init/_init.md`（先读 `## Tool Contract`）。
+- Upgrade：先做版本检查；若无新版本，询问是否运行 `doctor` 自检；仅有新版本时执行迁移校准。工具规范：`<SYSTEM_SKILL_ROOT>/tools/upgrade/_upgrade.md`（先读 `## Tool Contract`）。
+- Doctor：做结构/frontmatter/链接体检并给出修复建议。工具规范：`<SYSTEM_SKILL_ROOT>/tools/doctor/_doctor.md`（先读 `## Tool Contract`）。
+- Self-Improve：沉淀 knowledge/decision/maxim/pipeline。工具规范：`<SYSTEM_SKILL_ROOT>/tools/self-improve/_self-improve.md`（先读 `## Tool Contract`）。
+- Loop：进入任务分解与执行闭环。工具规范：`<SYSTEM_SKILL_ROOT>/tools/loop/_loop.md`（先读 `## Tool Contract`）。
 - Graph View：直接读取本文件 `## Graph` 段，不再使用独立 pipeline 命令。
 
 ## Project Paths

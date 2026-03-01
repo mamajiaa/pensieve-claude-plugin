@@ -171,7 +171,9 @@ claude plugin install pensieve@kingkongshot-marketplace --scope user
 
 ### Hooks 没有触发？
 
-当前仅保留 `PostToolUse` hook：用于在编辑用户数据后自动同步 `SKILL.md` 图谱（loop 不依赖 hooks）。
+当前包含两个 hooks：
+- `SessionStart`：检查项目目录下的 marker（`<project>/.state/pensieve-session-marker.json`，记录版本 / 初始化状态 / doctor 自检版本）。仅当状态不满足时注入提示，并给出 marker 绝对路径；由主窗口在修复完成后主动执行 `pensieve-session-marker.sh --mode record --event ...` 更新。首次 `record` 会自动创建 `<project>/.state/.gitignore`（忽略 `.state` 内运行时文件）。
+- `PostToolUse`：在编辑用户数据后自动同步 `SKILL.md` 图谱（loop 不依赖 hooks）。
 
 ### Skill 没有加载？
 

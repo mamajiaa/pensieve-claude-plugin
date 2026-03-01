@@ -8,10 +8,11 @@
 
 版本更新前置检查统一由 `upgrade` 负责，且是最高优先级门槛。
 
-- 涉及"更新版本/插件异常/版本不确定/兼容问题"时，优先路由 `upgrade`。
-- 执行 `init` 或 `doctor` 前，若版本状态不明，先完成 `upgrade`。
+- 涉及"更新版本/插件异常/版本不确定/兼容问题"时，优先路由 `upgrade` 先做版本确认。
+- 执行 `init` 或 `doctor` 前，若版本状态不明，先完成 `upgrade` 版本检查。
 - `init` 完成后，必须执行一次 `doctor`。
-- 默认流程：`upgrade` → `doctor` → `self-improve`。
+- `upgrade` 发现已是最新时，不进入迁移；仅询问用户是否继续运行 `doctor` 自检。
+- 默认流程：`upgrade`（版本检查）→（可选）`doctor` → `self-improve`。
 - `doctor` 不是 `upgrade` 的前置门槛。
 
 ---
