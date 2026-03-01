@@ -263,6 +263,9 @@ if initialized and self_check_ok:
 messages: list[str] = []
 messages.append("## Pensieve 会话前置检查")
 messages.append("")
+messages.append("- 严重级别：`P0`（会影响后续路由与诊断准确性）")
+messages.append("- 主窗口策略：先完成前置修复并更新 marker，再处理用户当前需求。")
+messages.append("- 行动建议：先向用户汇报以上状态，并询问“是否现在先完成 `init/doctor` 前置修复？”")
 messages.append(f"- 当前插件版本：`{plugin_version}`")
 messages.append(f"- 当前项目 marker：`{marker_file}`")
 messages.append("- 规则：仅在主窗口确认迁移/修复已完成后，才主动更新这个 marker 文件。")
