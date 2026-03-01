@@ -67,7 +67,7 @@ Route: tools/loop/_loop.md
 | 意图 | 入口 | 工具规范（先读） | 触发词 |
 |------|------|------------------|--------|
 | 初始化 | `tools/init/_init.md` | `<SYSTEM_SKILL_ROOT>/tools/init/_init.md` | init, 初始化 |
-| 版本升级 | `tools/upgrade/_upgrade.md` | `<SYSTEM_SKILL_ROOT>/tools/upgrade/_upgrade.md` | upgrade, 迁移, 版本 |
+| 版本更新 | `tools/upgrade/_upgrade.md` | `<SYSTEM_SKILL_ROOT>/tools/upgrade/_upgrade.md` | upgrade, 迁移, 版本 |
 | 体检 | `tools/doctor/_doctor.md` | `<SYSTEM_SKILL_ROOT>/tools/doctor/_doctor.md` | doctor, 体检, 检查格式 |
 | 沉淀经验 | `tools/self-improve/_self-improve.md` | `<SYSTEM_SKILL_ROOT>/tools/self-improve/_self-improve.md` | self-improve, 沉淀, 复盘 |
 | 循环执行 | `tools/loop/_loop.md` | `<SYSTEM_SKILL_ROOT>/tools/loop/_loop.md` | loop, 循环执行, 执行 pipeline |
